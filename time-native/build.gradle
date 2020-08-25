@@ -19,7 +19,7 @@ plugins {
     id 'java'
 }
 
-description = 'Ballerina - Socket Java Utils'
+description = 'Ballerina - Time Java Utils'
 
 dependencies {
     compile group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
