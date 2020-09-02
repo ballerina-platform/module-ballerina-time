@@ -24,3 +24,25 @@ description = 'Ballerina - Time Java Utils'
 dependencies {
     compile group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
 }
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId "org.ballerinalang"
+            artifactId "time-native"
+            version = project.version
+            artifact jar
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/ballerina-platform/module-ballerina-time")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
