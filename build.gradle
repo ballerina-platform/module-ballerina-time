@@ -59,6 +59,10 @@ allprojects {
 
         maven {
             url = 'https://maven.pkg.github.com/ballerina-platform/module-ballerina-time'
+            credentials {
+                username System.getenv("packageUser")
+                password System.getenv("packagePAT")
+            }
         }
 
         maven {
@@ -77,12 +81,10 @@ subprojects {
     configurations {
         ballerinaStdLibs
     }
-
     dependencies {
         /* Standard libraries */
         ballerinaStdLibs "org.ballerinalang:stringutils-ballerina:${stdlibStringUtilsVersion}"
     }
-
     release {
         // Disable check snapshots temporarily
         buildTasks = []
