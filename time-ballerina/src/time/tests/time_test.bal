@@ -441,6 +441,6 @@ function testParseTimeWithDifferentFormats() {
 
  function systemNanoTime() returns int = @java:Method {
      name: "nanoTime",
-     class:"java.lang.System"
+     'class:"java.lang.System"
  } external;
 
