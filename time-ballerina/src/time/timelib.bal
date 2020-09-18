@@ -50,7 +50,7 @@ public type Time record {|
 # + time - The Time record to be converted to string
 # + return - The ISO 8601-formatted string of the given time
 public isolated function toString(Time time) returns string = @java:Method {
-    name: "toString",
+    name: "toTimeString",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
