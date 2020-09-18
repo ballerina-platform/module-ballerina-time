@@ -59,7 +59,7 @@ public class ExternMethods {
     private static final BTupleType getTimeTupleType = new BTupleType(
             Arrays.asList(BTypes.typeInt, BTypes.typeInt, BTypes.typeInt, BTypes.typeInt));
 
-    public static BString toString(BMap<BString, Object> timeRecord) {
+    public static BString toTimeString(BMap<BString, Object> timeRecord) {
         return getDefaultString(timeRecord);
     }
 
