@@ -17,7 +17,7 @@
  */
 
 module io.ballerina.stdlib.time {
-    requires io.ballerina.jvm;
+    requires io.ballerina.runtime;
     exports org.ballerinalang.stdlib.time.nativeimpl;
     exports org.ballerinalang.stdlib.time.util;
 }
