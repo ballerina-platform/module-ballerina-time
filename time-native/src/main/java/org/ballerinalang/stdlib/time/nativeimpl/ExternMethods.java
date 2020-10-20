@@ -18,14 +18,14 @@
 
 package org.ballerinalang.stdlib.time.nativeimpl;
 
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.values.BError;
-import org.ballerinalang.jvm.api.values.BMap;
-import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.types.BTupleType;
-import org.ballerinalang.jvm.types.BTypes;
-import org.ballerinalang.jvm.values.ArrayValue;
-import org.ballerinalang.jvm.values.TupleValueImpl;
+import io.ballerina.runtime.api.PredefinedTypes;
+import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.values.BError;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.types.BTupleType;
+import io.ballerina.runtime.values.ArrayValue;
+import io.ballerina.runtime.values.TupleValueImpl;
 import org.ballerinalang.stdlib.time.util.TimeUtils;
 
 import java.time.Instant;
@@ -55,9 +55,9 @@ public class ExternMethods {
     private ExternMethods() {}
 
     private static final BTupleType getDateTupleType = new BTupleType(
-            Arrays.asList(BTypes.typeInt, BTypes.typeInt, BTypes.typeInt));
+            Arrays.asList(PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT));
     private static final BTupleType getTimeTupleType = new BTupleType(
-            Arrays.asList(BTypes.typeInt, BTypes.typeInt, BTypes.typeInt, BTypes.typeInt));
+            Arrays.asList(PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT));
 
     public static BString toTimeString(BMap<BString, Object> timeRecord) {
         return getDefaultString(timeRecord);
@@ -67,7 +67,7 @@ public class ExternMethods {
         try {
             if ("RFC_1123".equals(pattern.getValue())) {
                 ZonedDateTime zonedDateTime = getZonedDateTime(timeRecord);
-                return BStringUtils.fromString(zonedDateTime.format(DateTimeFormatter.RFC_1123_DATE_TIME));
+                return StringUtils.fromString(zonedDateTime.format(DateTimeFormatter.RFC_1123_DATE_TIME));
             } else {
                 return getFormattedString(timeRecord, pattern);
             }
@@ -93,7 +93,7 @@ public class ExternMethods {
 
     public static BString getWeekday(BMap<BString, Object> timeRecord) {
         ZonedDateTime dateTime = getZonedDateTime(timeRecord);
-        return BStringUtils.fromString(dateTime.getDayOfWeek().toString());
+        return StringUtils.fromString(dateTime.getDayOfWeek().toString());
     }
 
     public static long getHour(BMap<BString, Object> timeRecord) {
@@ -166,7 +166,7 @@ public class ExternMethods {
     public static BMap<BString, Object> currentTime() {
         long currentTime = Instant.now().toEpochMilli();
         return TimeUtils.createTimeRecord(getTimeZoneRecord(), getTimeRecord(), currentTime,
-                                          BStringUtils.fromString(ZoneId.systemDefault().toString()));
+                                          StringUtils.fromString(ZoneId.systemDefault().toString()));
     }
 
     public static Object createTime(long years, long months, long dates, long hours, long minutes,
