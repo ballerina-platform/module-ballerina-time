@@ -1,9 +1,9 @@
 Ballerina Time Library
 ===================
 
-  [![Build](https://github.com/ballerina-platform/module-ballerina-time/workflows/Build%20master%20branch/badge.svg)](https://github.com/ballerina-platform/module-ballerina-time/actions?query=workflow%3ABuild)
-  [![Daily build](https://github.com/ballerina-platform/module-ballerina-time/workflows/Daily%20build/badge.svg)](https://github.com/ballerina-platform/module-ballerina-time/actions?query=workflow%3A%22Daily+build%22)
+  [![Build](https://github.com/ballerina-platform/module-ballerina-time/workflows/Build/badge.svg)](https://github.com/ballerina-platform/module-ballerina-time/actions?query=workflow%3ABuild)
   [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-time.svg)](https://github.com/ballerina-platform/module-ballerina-time/commits/master)
+  [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/time.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Ftime)
   [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 The Time library is one of the standard library modules of the<a target="_blank" href="https://ballerina.io/"> Ballerina
@@ -12,6 +12,14 @@ The Time library is one of the standard library modules of the<a target="_blank"
 This module provides implementations related to time, date, time zones, and durations.
 
 For more information go to [The Time Module](https://ballerina.io/swan-lake/learn/api-docs/ballerina/time/).
+
+For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/swan-lake/learn/by-example/time.html).
+
+## Issues and Projects Tabs 
+
+`Issues` and `Project` tabs are disabled for this repository as this is one of the Ballerina Standard Libraries. To report bugs, request new features, start new discussions, view project boards, etc. please visit Ballerina Standard Library [parent repository](https://github.com/ballerina-platform/ballerina-standard-library). 
+
+This repository only contains the source code for the module.
 
 ## Building from the Source
 
@@ -46,10 +54,7 @@ Execute the commands below to build from source.
 
 ## Contributing to Ballerina
 
-As an open source project, Ballerina welcomes contributions from the community. 
-
-You can also check for [open issues](https://github.com/ballerina-platform/module-ballerina-time/issues) that interest
- you. We look forward to receiving your contributions.
+As an open source project, Ballerina welcomes contributions from the community.
 
 For more information, go to the [contribution guidelines](https://github.com/ballerina-platform/ballerina-lang/blob/master/CONTRIBUTING.md).
 
