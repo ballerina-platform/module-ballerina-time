@@ -29,7 +29,7 @@ import static io.ballerina.runtime.util.BLangConstants.BALLERINA_BUILTIN_PKG_PRE
 public class Constants {
     private Constants() {}
 
-    public static final String TIME_PACKAGE_VERSION = "1.0.2";
+    public static final String TIME_PACKAGE_VERSION = "1.0.3";
     public static final Module TIME_PACKAGE_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "time",
                                                                 TIME_PACKAGE_VERSION);
     public static final String STRUCT_TYPE_TIME = "Time";
