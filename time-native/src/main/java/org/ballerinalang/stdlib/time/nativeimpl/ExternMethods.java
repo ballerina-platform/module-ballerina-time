@@ -19,13 +19,15 @@
 package org.ballerinalang.stdlib.time.nativeimpl;
 
 import io.ballerina.runtime.api.PredefinedTypes;
-import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.creators.TypeCreator;
+import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.runtime.types.BTupleType;
-import io.ballerina.runtime.values.ArrayValue;
-import io.ballerina.runtime.values.TupleValueImpl;
+import io.ballerina.runtime.api.types.TupleType;
+import io.ballerina.runtime.api.values.BArray;
+import io.ballerina.runtime.api.values.BArray;
 import org.ballerinalang.stdlib.time.util.TimeUtils;
 
 import java.time.Instant;
@@ -54,9 +56,9 @@ import static org.ballerinalang.stdlib.time.util.TimeUtils.parseTime;
 public class ExternMethods {
     private ExternMethods() {}
 
-    private static final BTupleType getDateTupleType = new BTupleType(
+    private static final TupleType getDateTupleType = TypeCreator.createTupleType(
             Arrays.asList(PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT));
-    private static final BTupleType getTimeTupleType = new BTupleType(
+    private static final TupleType getTimeTupleType = TypeCreator.createTupleType(
             Arrays.asList(PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT));
 
     public static BString toTimeString(BMap<BString, Object> timeRecord) {
@@ -116,16 +118,16 @@ public class ExternMethods {
         return dateTime.getNano() / 1000000;
     }
 
-    public static ArrayValue getDate(BMap<BString, Object> timeRecord) {
-        TupleValueImpl date = new TupleValueImpl(getDateTupleType);
+    public static BArray getDate(BMap<BString, Object> timeRecord) {
+        BArray date = ValueCreator.createTupleValue(getDateTupleType);
         date.add(0, Long.valueOf(getYear(timeRecord)));
         date.add(1, Long.valueOf(getMonth(timeRecord)));
         date.add(2, Long.valueOf(getDay(timeRecord)));
         return date;
     }
 
-    public static ArrayValue getTime(BMap<BString, Object> timeRecord) {
-        TupleValueImpl time = new TupleValueImpl(getTimeTupleType);
+    public static BArray getTime(BMap<BString, Object> timeRecord) {
+        BArray time = ValueCreator.createTupleValue(getTimeTupleType);
         time.add(0, Long.valueOf(getHour(timeRecord)));
         time.add(1, Long.valueOf(getMinute(timeRecord)));
         time.add(2, Long.valueOf(getSecond(timeRecord)));
