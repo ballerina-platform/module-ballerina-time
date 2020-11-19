@@ -1,16 +1,15 @@
-[project]
-org-name = "ballerina"
+[package]
+org = "ballerina"
+name = "time"
 version = "@toml.version@"
 
-[dependencies]
-"ballerina/stringutils" = "@stdlib.stringutils.version@"
+[[dependency]]
+org = "ballerina"
+name = "stringutils"
+version = "@stdlib.stringutils.version@"
 
-[platform]
-target = "java11"
-
-    [[platform.libraries]]
-    artifactId = "time"
-    version = "@project.version@"
-    path = "../time-native/build/libs/time-native-@project.version@.jar"
-    groupId = "ballerina"
-    modules = ["time"]
+[[platform.java11.dependency]]
+path = "../time-native/build/libs/time-native-@project.version@.jar"
+groupId = "ballerina"
+artifactId = "time"
+version = "@project.version@"
