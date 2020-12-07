@@ -31,12 +31,21 @@ public class Constants {
 
     public static final String STRUCT_TYPE_TIME = "Time";
     public static final String STRUCT_TYPE_TIMEZONE = "TimeZone";
+    public static final String STRUCT_TYPE_DURATION = "Duration";
 
     public static final String TIME_ERROR = "TimeError";
     public static final String KEY_ZONED_DATETIME = "ZonedDateTime";
     public static final String TIME_FIELD = "time";
     public static final String ZONE_FIELD = "zone";
     public static final String ZONE_ID_FIELD = "id";
+
+    public static final String YEARS = "years";
+    public static final String MONTHS = "months";
+    public static final String DAYS = "days";
+    public static final String HOURS = "hours";
+    public static final String MINUTES = "minutes";
+    public static final String SECONDS = "seconds";
+    public static final String MILLISECONDS = "milliSeconds";
 
     public static final int MULTIPLIER_TO_NANO = 1000000;
 }
