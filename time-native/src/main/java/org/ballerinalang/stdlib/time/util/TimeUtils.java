@@ -41,7 +41,6 @@ import static org.ballerinalang.stdlib.time.util.Constants.KEY_ZONED_DATETIME;
 import static org.ballerinalang.stdlib.time.util.Constants.STRUCT_TYPE_TIME;
 import static org.ballerinalang.stdlib.time.util.Constants.STRUCT_TYPE_TIMEZONE;
 import static org.ballerinalang.stdlib.time.util.Constants.TIME_FIELD;
-import static org.ballerinalang.stdlib.time.util.Constants.TIME_PACKAGE_ID;
 import static org.ballerinalang.stdlib.time.util.Constants.ZONE_FIELD;
 import static org.ballerinalang.stdlib.time.util.Constants.ZONE_ID_FIELD;
 
@@ -94,15 +93,15 @@ public class TimeUtils {
     }
 
     public static BMap<BString, Object> getTimeZoneRecord() {
-        return ValueCreator.createRecordValue(TIME_PACKAGE_ID, STRUCT_TYPE_TIMEZONE);
+        return ValueCreator.createRecordValue(ModuleUtils.getModule(), STRUCT_TYPE_TIMEZONE);
     }
 
     public static BMap<BString, Object> getTimeRecord() {
-        return ValueCreator.createRecordValue(TIME_PACKAGE_ID, STRUCT_TYPE_TIME);
+        return ValueCreator.createRecordValue(ModuleUtils.getModule(), STRUCT_TYPE_TIME);
     }
 
     public static BError getTimeError(String message) {
-        return ErrorCreator.createDistinctError(Constants.TIME_ERROR, TIME_PACKAGE_ID,
+        return ErrorCreator.createDistinctError(Constants.TIME_ERROR, ModuleUtils.getModule(),
                                                  StringUtils.fromString(message));
     }
 
