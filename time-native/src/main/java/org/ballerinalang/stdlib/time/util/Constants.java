@@ -29,9 +29,6 @@ import static io.ballerina.runtime.api.constants.RuntimeConstants.BALLERINA_BUIL
 public class Constants {
     private Constants() {}
 
-    public static final String TIME_PACKAGE_VERSION = "1.0.6";
-    public static final Module TIME_PACKAGE_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "time",
-                                                                TIME_PACKAGE_VERSION);
     public static final String STRUCT_TYPE_TIME = "Time";
     public static final String STRUCT_TYPE_TIMEZONE = "TimeZone";
 
