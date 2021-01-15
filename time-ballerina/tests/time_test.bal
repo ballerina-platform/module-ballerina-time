@@ -93,7 +93,7 @@ function testParseTimeWithTimePartOnly() {
 
 @test:Config {}
 function testParseRFC1123Time() {
-    var timeRet = parse("Wed, 28 Mar 2018 11:56:23 +0530", TIME_FORMAT_RFC_1123);
+    var timeRet = parse("Wed, 28 Mar 2018 11:56:23 +0530", RFC_1123_DATE_TIME);
     if (timeRet is Time) {
         test:assertEquals(timeRet.time, 1522218383000);
         test:assertEquals(timeRet.zone.id, "+05:30");
@@ -152,7 +152,7 @@ function testFormatTimeToRFC1123() {
     string retValue = "";
     TimeZone zoneValue = {id:"America/Panama"};
     Time time = { time: 1498488382444, zone: zoneValue };
-    var ret = format(time, TIME_FORMAT_RFC_1123);
+    var ret = format(time, RFC_1123_DATE_TIME);
     if (ret is string ) {
         retValue = ret;
         test:assertEquals(ret, "Mon, 26 Jun 2017 09:46:22 -0500");
@@ -172,7 +172,7 @@ function testGetFunctions() {
     int minute = getMinute(time);
     int second = getSecond(time);
     int milliSecond = getMilliSecond(time);
-    string weekday = getWeekday(time);
+    DayOfWeek weekday = getWeekday(time);
     test:assertEquals(year, 2016);
     test:assertEquals(month, 3);
     test:assertEquals(day, 1);
@@ -210,7 +210,16 @@ function testGetTimeFunction() {
 function testAddDuration() {
     var timeRet = parse("2017-06-26T09:46:22.444-0500", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     if (timeRet is Time) {
-        Time timeAdded = addDuration(timeRet, 1, 1, 1, 1, 1, 1, 1);
+        Duration d = {
+                years: 1,
+                months: 1,
+                days: 1,
+                hours: 1,
+                minutes: 1,
+                seconds: 1,
+                milliSeconds: 1
+            };
+        Time timeAdded = addDuration(timeRet, d);
         var retStr = format(timeAdded, "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         if (retStr is string) {
             test:assertEquals(retStr, "2018-07-27T10:47:23.445-0500");
@@ -226,7 +235,16 @@ function testAddDuration() {
 function testSubtractDuration() {
     var timeRet = parse("2016-03-01T09:46:22.444-0500", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     if (timeRet is Time) {
-        Time timeSubs = subtractDuration(timeRet, 1, 1, 1, 1, 1, 1, 1);
+        Duration d = {
+                years: 1,
+                months: 1,
+                days: 1,
+                hours: 1,
+                minutes: 1,
+                seconds: 1,
+                milliSeconds: 1
+            };
+        Time timeSubs = subtractDuration(timeRet, d);
         var retStr = format(timeSubs, "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         if (retStr is string) {
             test:assertEquals(retStr, "2015-01-31T08:45:21.443-0500");
@@ -437,6 +455,28 @@ function testParseTimeWithDifferentFormats() {
     test:assertEquals(dateZoneStr, "2015-02-15+0800");
     test:assertEquals(timeZoneStr, "08-23-59-544:+0700");
     test:assertEquals(datetimeStr, "2014-05-29-23:44:59.544");
+}
+
+@test:Config {}
+function testGetDifference() {
+    Time|Error timeone = createTime(2020, 1,1);
+    Time|Error timetwo = createTime(2021, 1,1);
+    if (timeone is Time && timetwo is Time) {
+        Duration|Error delta = getDifference(timeone, timetwo);
+        if (delta is Duration) {
+            test:assertEquals(delta.years, 1);
+        } else {
+            test:assertFail("Error obtaining difference. " + delta.message());
+        }
+    } else {
+        test:assertFail("Error creating time to obtain difference!");
+    }
+}
+
+@test:Config {}
+function testGetTimezones() {
+    string[] zones = getTimezones(-36000000);
+    test:assertEquals(zones.indexOf("Pacific/Honolulu"), 4);
 }
 
  function systemNanoTime() returns int = @java:Method {

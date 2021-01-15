@@ -27,17 +27,30 @@ import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.types.TupleType;
 import io.ballerina.runtime.api.values.BArray;
-import io.ballerina.runtime.api.values.BArray;
+import org.ballerinalang.stdlib.time.util.ModuleUtils;
 import org.ballerinalang.stdlib.time.util.TimeUtils;
 
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TimeZone;
 
+import static org.ballerinalang.stdlib.time.util.Constants.DAYS;
+import static org.ballerinalang.stdlib.time.util.Constants.HOURS;
+import static org.ballerinalang.stdlib.time.util.Constants.MILLISECONDS;
+import static org.ballerinalang.stdlib.time.util.Constants.MINUTES;
+import static org.ballerinalang.stdlib.time.util.Constants.MONTHS;
 import static org.ballerinalang.stdlib.time.util.Constants.MULTIPLIER_TO_NANO;
+import static org.ballerinalang.stdlib.time.util.Constants.SECONDS;
+import static org.ballerinalang.stdlib.time.util.Constants.STRUCT_TYPE_DURATION;
+import static org.ballerinalang.stdlib.time.util.Constants.YEARS;
 import static org.ballerinalang.stdlib.time.util.TimeUtils.changeTimezone;
 import static org.ballerinalang.stdlib.time.util.TimeUtils.createDateTime;
 import static org.ballerinalang.stdlib.time.util.TimeUtils.getDefaultString;
@@ -67,11 +80,26 @@ public class ExternMethods {
 
     public static Object format(BMap<BString, Object> timeRecord, BString pattern) {
         try {
-            if ("RFC_1123".equals(pattern.getValue())) {
-                ZonedDateTime zonedDateTime = getZonedDateTime(timeRecord);
-                return StringUtils.fromString(zonedDateTime.format(DateTimeFormatter.RFC_1123_DATE_TIME));
-            } else {
-                return getFormattedString(timeRecord, pattern);
+            ZonedDateTime zonedDateTime = getZonedDateTime(timeRecord);
+            switch (pattern.getValue()) {
+                case "BASIC_ISO_DATE":
+                    return StringUtils.fromString(zonedDateTime.format(DateTimeFormatter.BASIC_ISO_DATE));
+                case "ISO_DATE":
+                    return StringUtils.fromString(zonedDateTime.format(DateTimeFormatter.ISO_DATE));
+                case "ISO_TIME":
+                    return StringUtils.fromString(zonedDateTime.format(DateTimeFormatter.ISO_TIME));
+                case "ISO_DATE_TIME":
+                    return StringUtils.fromString(zonedDateTime.format(DateTimeFormatter.ISO_DATE_TIME));
+                case "ISO_LOCAL_DATE_TIME":
+                    return StringUtils.fromString(zonedDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                case "ISO_OFFSET_DATE_TIME":
+                    return StringUtils.fromString(zonedDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+                case "ISO_ZONED_DATE_TIME":
+                    return StringUtils.fromString(zonedDateTime.format(DateTimeFormatter.ISO_ZONED_DATE_TIME));
+                case "RFC_1123_DATE_TIME":
+                    return StringUtils.fromString(zonedDateTime.format(DateTimeFormatter.RFC_1123_DATE_TIME));
+                default:
+                    return getFormattedString(timeRecord, pattern);
             }
         } catch (IllegalArgumentException e) {
             return TimeUtils.getTimeError("Invalid Pattern: " + pattern.getValue());
@@ -93,7 +121,7 @@ public class ExternMethods {
         return dateTime.getDayOfMonth();
     }
 
-    public static BString getWeekday(BMap<BString, Object> timeRecord) {
+    public static Object getWeekday(BMap<BString, Object> timeRecord) {
         ZonedDateTime dateTime = getZonedDateTime(timeRecord);
         return StringUtils.fromString(dateTime.getDayOfWeek().toString());
     }
@@ -135,10 +163,15 @@ public class ExternMethods {
         return time;
     }
 
-    public static BMap<BString, Object> addDuration(BMap<BString, Object> timeRecord, long years, long months,
-                                                    long days, long hours, long minutes, long seconds,
-                                                    long milliSeconds) {
+    public static BMap<BString, Object> addDuration(BMap<BString, Object> timeRecord, BMap<BString, Object> durationRecord) {
         ZonedDateTime dateTime = getZonedDateTime(timeRecord);
+        long years = durationRecord.getIntValue(StringUtils.fromString("years"));
+        long months = durationRecord.getIntValue(StringUtils.fromString("months"));
+        long days = durationRecord.getIntValue(StringUtils.fromString("days"));
+        long hours = durationRecord.getIntValue(StringUtils.fromString("hours"));
+        long minutes = durationRecord.getIntValue(StringUtils.fromString("minutes"));
+        long seconds = durationRecord.getIntValue(StringUtils.fromString("seconds"));
+        long milliSeconds = durationRecord.getIntValue(StringUtils.fromString("milliSeconds"));
         long nanoSeconds = milliSeconds * MULTIPLIER_TO_NANO;
         dateTime = dateTime.plusYears(years).plusMonths(months).plusDays(days).plusHours(hours).plusMinutes(minutes)
                 .plusSeconds(seconds).plusNanos(nanoSeconds);
@@ -146,10 +179,15 @@ public class ExternMethods {
         return TimeUtils.createTimeRecord(getTimeZoneRecord(), getTimeRecord(), mSec, getZoneId(timeRecord));
     }
 
-    public static BMap<BString, Object> subtractDuration(BMap<BString, Object> timeRecord,
-                                                             long years, long months, long days, long hours,
-                                                             long minutes, long seconds, long milliSeconds) {
+    public static BMap<BString, Object> subtractDuration(BMap<BString, Object> timeRecord, BMap<BString, Object> durationRecord) {
         ZonedDateTime dateTime = getZonedDateTime(timeRecord);
+        long years = durationRecord.getIntValue(StringUtils.fromString("years"));
+        long months = durationRecord.getIntValue(StringUtils.fromString("months"));
+        long days = durationRecord.getIntValue(StringUtils.fromString("days"));
+        long hours = durationRecord.getIntValue(StringUtils.fromString("hours"));
+        long minutes = durationRecord.getIntValue(StringUtils.fromString("minutes"));
+        long seconds = durationRecord.getIntValue(StringUtils.fromString("seconds"));
+        long milliSeconds = durationRecord.getIntValue(StringUtils.fromString("milliSeconds"));
         long nanoSeconds = milliSeconds * MULTIPLIER_TO_NANO;
         dateTime = dateTime.minusYears(years).minusMonths(months).minusDays(days).minusHours(hours)
                 .minusMinutes(minutes).minusSeconds(seconds).minusNanos(nanoSeconds);
@@ -184,13 +222,87 @@ public class ExternMethods {
     public static Object parse(BString dateString, BString pattern) {
         try {
             TemporalAccessor parsedDateTime;
-            if ("RFC_1123".equals(pattern.getValue())) {
-                parsedDateTime = DateTimeFormatter.RFC_1123_DATE_TIME.parse(dateString.getValue());
-                return getTimeRecord(parsedDateTime, dateString, pattern);
+            switch (pattern.getValue()) {
+                case "BASIC_ISO_DATE":
+                    parsedDateTime = DateTimeFormatter.BASIC_ISO_DATE.parse(dateString.getValue());
+                    break;
+                case "ISO_DATE":
+                    parsedDateTime = DateTimeFormatter.ISO_DATE.parse(dateString.getValue());
+                    break;
+                case "ISO_TIME":
+                    parsedDateTime = DateTimeFormatter.ISO_TIME.parse(dateString.getValue());
+                    break;
+                case "ISO_DATE_TIME":
+                    parsedDateTime = DateTimeFormatter.ISO_DATE_TIME.parse(dateString.getValue());
+                    break;
+                case "ISO_LOCAL_DATE_TIME":
+                    parsedDateTime = DateTimeFormatter.ISO_LOCAL_DATE_TIME.parse(dateString.getValue());
+                    break;
+                case "ISO_OFFSET_DATE_TIME":
+                    parsedDateTime = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(dateString.getValue());
+                    break;
+                case "ISO_ZONED_DATE_TIME":
+                    parsedDateTime = DateTimeFormatter.ISO_ZONED_DATE_TIME.parse(dateString.getValue());
+                    break;
+                case "RFC_1123_DATE_TIME":
+                    parsedDateTime = DateTimeFormatter.RFC_1123_DATE_TIME.parse(dateString.getValue());
+                    break;
+                default:
+                    return parseTime(dateString, pattern);
             }
-            return parseTime(dateString, pattern);
-        } catch (BError e) {
+            return getTimeRecord(parsedDateTime, dateString, pattern);
+        } catch (BError | DateTimeParseException e) {
             return TimeUtils.getTimeError(e.getMessage());
         }
+    }
+
+    public static Object getDifference(BMap<BString, Object> timeRecord1, BMap<BString, Object> timeRecord2) {
+        try {
+            ZonedDateTime dateTime1 = getZonedDateTime(timeRecord1);
+            ZonedDateTime dateTime2 = getZonedDateTime(timeRecord2);
+
+            long years = ChronoUnit.YEARS.between(dateTime1, dateTime2);
+            dateTime1 = dateTime1.plusYears(years);
+
+            long months = ChronoUnit.MONTHS.between(dateTime1, dateTime2);
+            dateTime1 = dateTime1.plusMonths(months);
+
+            long days = ChronoUnit.DAYS.between(dateTime1, dateTime2);
+            dateTime1 = dateTime1.plusDays(days);
+
+            long hours = ChronoUnit.HOURS.between(dateTime1, dateTime2);
+            dateTime1 = dateTime1.plusHours(hours);
+
+            long minutes = ChronoUnit.MINUTES.between(dateTime1, dateTime2);
+            dateTime1 = dateTime1.plusMinutes(minutes);
+
+            long seconds = ChronoUnit.SECONDS.between(dateTime1, dateTime2);
+            dateTime1 = dateTime1.plusSeconds(seconds);
+
+            long millis = ChronoUnit.MILLIS.between(dateTime1, dateTime2);
+
+            Map<String, Object> durationRecordMap = new HashMap<>();
+            durationRecordMap.put(YEARS, years);
+            durationRecordMap.put(MONTHS, months);
+            durationRecordMap.put(DAYS, days);
+            durationRecordMap.put(HOURS, hours);
+            durationRecordMap.put(MINUTES, minutes);
+            durationRecordMap.put(SECONDS, seconds);
+            durationRecordMap.put(MILLISECONDS, millis);
+            return ValueCreator.createRecordValue(ModuleUtils.getModule(), STRUCT_TYPE_DURATION, durationRecordMap);
+        } catch(BError e) {
+            return TimeUtils.getTimeError(e.getMessage());
+        }
+    }
+
+    public static BArray getTimezones(Object rawOffset) {
+        BArray timezoneIds;
+        if (rawOffset != null) {
+            long offset = (long) rawOffset;
+            timezoneIds = StringUtils.fromStringArray(TimeZone.getAvailableIDs((int) offset));
+        } else {
+            timezoneIds = StringUtils.fromStringArray(TimeZone.getAvailableIDs());
+        }
+        return timezoneIds;
     }
 }

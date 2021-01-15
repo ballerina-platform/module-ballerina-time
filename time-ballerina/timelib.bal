@@ -16,12 +16,6 @@
 
 import ballerina/java;
 
-# Specifies the time format defined by the RFC-1123.
-public const TIME_FORMAT_RFC_1123 = "RFC_1123";
-
-# The time format defined by the RFC-1123.
-public type TimeFormat TIME_FORMAT_RFC_1123;
-
 # Represents the time-zone information associated with a particular time.
 #
 # + id - Zone short ID or offset string
@@ -38,6 +32,25 @@ public type TimeZone record {|
 public type Time record {|
     int time;
     TimeZone zone;
+|};
+
+# Represents a chunk of time.
+#
+# + years - Number of years
+# + months - Number of months
+# + days - Number of days
+# + hours - Number of hours
+# + minutes - Number of minutes
+# + seconds - Number of seconds
+# + milliSeconds - Number of milliseconds
+public type Duration record {|
+    int years = 0;
+    int months = 0;
+    int days = 0;
+    int hours = 0;
+    int minutes = 0;
+    int seconds = 0;
+    int milliSeconds = 0;
 |};
 
 # Returns the ISO 8601 string representation of the given time.
@@ -64,7 +77,7 @@ public isolated function toString(Time time) returns string = @java:Method {
 # + time - The Time record to be formatted
 # + timeFormat - The format, which is used to format the time represented by this object
 # + return - The formatted string of the given time or else a `time:Error` if failed to format the time
-public isolated function format(Time time, string timeFormat) returns string|Error = @java:Method {
+public isolated function format(Time time, DateTimeFormat|string timeFormat) returns string|Error = @java:Method {
     name: "format",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -120,7 +133,7 @@ public isolated function getDay(Time time) returns int = @java:Method {
 #
 # + time - The Time record to get the weekday representation
 # + return - The weekday representation from SUNDAY to SATURDAY
-public isolated function getWeekday(Time time) returns string = @java:Method {
+public isolated function getWeekday(Time time) returns DayOfWeek = @java:Method {
     name: "getWeekday",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -219,22 +232,16 @@ public isolated function getTime(Time time) returns [int, int, int, int] = @java
 #  string timeText = "2020-06-26T09:46:22.444-0500";
 #  string timeFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 #  time:Time|error originalTime = time:parse(timeText, timeFormat);
+#  Duration delta = {years: 1, months: 2};
 #  if (originalTime is time:Time) {
-#      time:Time newTime = time:addDuration(originalTime, 1, 1, 1, 1, 1, 1, 1);
+#      time:Time newTime = time:addDuration(originalTime, delta);
 #  }
 # ```
 #
 # + time - The Time record to add the duration 
-# + years - The year representation
-# + months - The month-of-year to represent, from 1 (January) to 12 (December)
-# + days - The day-of-month to represent, from 1 to 31
-# + hours - The hour-of-day to represent, from 0 to 23
-# + minutes - The minute-of-hour to represent, from 0 to 59
-# + seconds - The second-of-minute to represent, from 0 to 59
-# + milliSeconds - The milli-of-second to represent, from 0 to 999
+# + duration - The duration to be added
 # + return - Time object containing time and zone information after the addition
-public isolated function addDuration(Time time, int years, int months, int days, int hours, int minutes, int seconds,
-                            int milliSeconds) returns Time = @java:Method {
+public isolated function addDuration(Time time, Duration duration) returns Time = @java:Method {
     name: "addDuration",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -244,22 +251,16 @@ public isolated function addDuration(Time time, int years, int months, int days,
 #  string timeText = "2020-06-26T09:46:22.444-0500";
 #  string timeFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 #  time:Time|error originalTime = time:parse(timeText, timeFormat);
+#  Duration delta = {years: 1, months: 2};
 #  if (originalTime is time:Time) {
-#      time:Time newTime = time:subtractDuration(originalTime, 1, 1, 1, 1, 1, 1, 1);
+#      time:Time newTime = time:subtractDuration(originalTime, delta);
 #  }
 # ```
 #
 # + time - The Time record to subtract the duration from
-# + years - The year representation
-# + months - The month-of-year to represent, from 1 (January) to 12 (December)
-# + days - The day-of-month to represent, from 1 to 31
-# + hours - The hour-of-day to represent, from 0 to 23
-# + minutes - The minute-of-hour to represent, from 0 to 59
-# + seconds - The second-of-minute to represent, from 0 to 59
-# + milliSeconds - The milli-of-second to represent, from 0 to 999
+# + duration - The duration to be subtracted
 # + return - Time object containing time and zone information after the subtraction
-public isolated function subtractDuration(Time time, int years, int months, int days, int hours, int minutes, int
-                        seconds, int milliSeconds) returns Time = @java:Method {
+public isolated function subtractDuration(Time time, Duration duration) returns Time = @java:Method {
     name: "subtractDuration",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -317,8 +318,8 @@ public isolated function nanoTime() returns int = @java:Method {
 # + milliSecond - The milli-of-second to represent, from 0 to 999
 # + zoneId - The zone id of the required time-zone.If empty the system local time-zone will be used
 # + return - Time object containing time and zone information or an `time:Error` if failed to create the time
-public isolated function createTime(int year, int month, int date, int hour, int minute, int second, int milliSecond,
-                           string zoneId) returns Time|Error = @java:Method {
+public isolated function createTime(int year, int month, int date, int hour = 0, int minute = 0,
+                        int second = 0, int milliSecond = 0, string zoneId = "") returns Time|Error = @java:Method {
     name: "createTime",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -332,7 +333,30 @@ public isolated function createTime(int year, int month, int date, int hour, int
 # + data - The time text to parse
 # + timeFormat - The format, which is used to parse the given text
 # + return - Time object containing the time and zone information or else  a `time:Error` if failed to parse the given string
-public isolated function parse(string data, string timeFormat) returns Time|Error = @java:Method {
+public isolated function parse(string data, DateTimeFormat|string timeFormat) returns Time|Error = @java:Method {
     name: "parse",
+    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+} external;
+
+
+# Calculate the difference between two Time values.
+# ```ballerina
+# Duration|error delta = time:getDifference(timeone, timetwo);
+# ```
+#
+# + timeone - Start time
+# + timetwo - End time
+# + return - The Duration of the difference
+public isolated function getDifference(Time timeone, Time timetwo) returns Duration|Error = @java:Method {
+    name: "getDifference",
+    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+} external;
+
+# Get available timezone IDs.
+#
+# + offset - Timezone offset in milliseconds
+# + return - All the available timezone IDs or the IDs that fall under an offset, if the offset value is specified
+public isolated function getTimezones(int? offset = ()) returns string[] = @java:Method {
+    name: "getTimezones",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;

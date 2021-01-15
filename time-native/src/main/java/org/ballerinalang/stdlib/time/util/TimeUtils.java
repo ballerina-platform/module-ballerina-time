@@ -111,17 +111,21 @@ public class TimeUtils {
         BMap<BString, Object> timeRecord = TimeUtils.getTimeRecord();
         long epochTime = -1;
         String zoneId;
-        try {
-            epochTime = Instant.from(dateTime).toEpochMilli();
-            zoneId = String.valueOf(ZoneId.from(dateTime));
-        } catch (DateTimeException e) {
-            if (epochTime < 0) {
-                throw TimeUtils.getTimeError("failed to parse \"" + dateString.getValue() + "\" to the " +
-                        pattern.getValue() + " format");
+        if (dateTime.isSupported(ChronoField.INSTANT_SECONDS)) {
+            try {
+                epochTime = Instant.from(dateTime).toEpochMilli();
+                zoneId = String.valueOf(ZoneId.from(dateTime));
+            } catch (DateTimeException e) {
+                if (epochTime < 0) {
+                    throw TimeUtils.getTimeError("failed to parse \"" + dateString.getValue() + "\" to the " +
+                            pattern.getValue() + " format");
+                }
+                zoneId = ZoneId.systemDefault().toString();
             }
-            zoneId = ZoneId.systemDefault().toString();
+            return TimeUtils.createTimeRecord(timeZoneRecord, timeRecord, epochTime, StringUtils.fromString(zoneId));
+        } else {
+            return getParsedTimeRecord(dateTime);
         }
-        return TimeUtils.createTimeRecord(timeZoneRecord, timeRecord, epochTime, StringUtils.fromString(zoneId));
     }
 
     public static BString getFormattedString(BMap<BString, Object> timeRecord, BString pattern)
@@ -140,47 +144,7 @@ public class TimeUtils {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern.getValue());
             TemporalAccessor temporalAccessor = formatter.parse(dateValue.getValue());
-            //Initialize with default values
-            int year = 1970;
-            int month = 1;
-            int day = 1;
-            int hour = 0;
-            int minute = 0;
-            int second = 0;
-            int nanoSecond = 0;
-            if (temporalAccessor.isSupported(ChronoField.YEAR)) {
-                year = temporalAccessor.get(ChronoField.YEAR);
-            }
-            if (temporalAccessor.isSupported(ChronoField.MONTH_OF_YEAR)) {
-                month = temporalAccessor.get(ChronoField.MONTH_OF_YEAR);
-            }
-            if (temporalAccessor.isSupported(ChronoField.DAY_OF_MONTH)) {
-                day = temporalAccessor.get(ChronoField.DAY_OF_MONTH);
-            }
-            if (temporalAccessor.isSupported(ChronoField.HOUR_OF_DAY)) {
-                hour = temporalAccessor.get(ChronoField.HOUR_OF_DAY);
-            }
-            if (temporalAccessor.isSupported(ChronoField.MINUTE_OF_HOUR)) {
-                minute = temporalAccessor.get(ChronoField.MINUTE_OF_HOUR);
-            }
-            if (temporalAccessor.isSupported(ChronoField.SECOND_OF_MINUTE)) {
-                second = temporalAccessor.get(ChronoField.SECOND_OF_MINUTE);
-            }
-            if (temporalAccessor.isSupported(ChronoField.NANO_OF_SECOND)) {
-                nanoSecond = temporalAccessor.get(ChronoField.NANO_OF_SECOND);
-            }
-
-            ZoneId zoneId;
-            try {
-                zoneId = ZoneId.from(temporalAccessor);
-            } catch (DateTimeException e) {
-                zoneId = ZoneId.systemDefault(); // Initialize to the default system timezone
-            }
-
-            ZonedDateTime zonedDateTime = ZonedDateTime.of(year, month, day, hour, minute, second, nanoSecond, zoneId);
-            long timeValue = zonedDateTime.toInstant().toEpochMilli();
-            return TimeUtils.createTimeRecord(getTimeZoneRecord(), getTimeRecord(), timeValue,
-                    StringUtils.fromString(zoneId.toString()));
+            return getParsedTimeRecord(temporalAccessor);
         } catch (DateTimeParseException e) {
             throw TimeUtils.getTimeError("parse date \"" + dateValue + "\" for the format \"" + pattern + "\" "
                     + "failed:" + e.getMessage());
@@ -189,6 +153,49 @@ public class TimeUtils {
         }
     }
 
+    private static BMap<BString, Object> getParsedTimeRecord(TemporalAccessor temporalAccessor) {
+        //Initialize with default values
+        int year = 1970;
+        int month = 1;
+        int day = 1;
+        int hour = 0;
+        int minute = 0;
+        int second = 0;
+        int nanoSecond = 0;
+        if (temporalAccessor.isSupported(ChronoField.YEAR)) {
+            year = temporalAccessor.get(ChronoField.YEAR);
+        }
+        if (temporalAccessor.isSupported(ChronoField.MONTH_OF_YEAR)) {
+            month = temporalAccessor.get(ChronoField.MONTH_OF_YEAR);
+        }
+        if (temporalAccessor.isSupported(ChronoField.DAY_OF_MONTH)) {
+            day = temporalAccessor.get(ChronoField.DAY_OF_MONTH);
+        }
+        if (temporalAccessor.isSupported(ChronoField.HOUR_OF_DAY)) {
+            hour = temporalAccessor.get(ChronoField.HOUR_OF_DAY);
+        }
+        if (temporalAccessor.isSupported(ChronoField.MINUTE_OF_HOUR)) {
+            minute = temporalAccessor.get(ChronoField.MINUTE_OF_HOUR);
+        }
+        if (temporalAccessor.isSupported(ChronoField.SECOND_OF_MINUTE)) {
+            second = temporalAccessor.get(ChronoField.SECOND_OF_MINUTE);
+        }
+        if (temporalAccessor.isSupported(ChronoField.NANO_OF_SECOND)) {
+            nanoSecond = temporalAccessor.get(ChronoField.NANO_OF_SECOND);
+        }
+
+        ZoneId zoneId;
+        try {
+            zoneId = ZoneId.from(temporalAccessor);
+        } catch (DateTimeException e) {
+            zoneId = ZoneId.systemDefault(); // Initialize to the default system timezone
+        }
+
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(year, month, day, hour, minute, second, nanoSecond, zoneId);
+        long timeValue = zonedDateTime.toInstant().toEpochMilli();
+        return TimeUtils.createTimeRecord(getTimeZoneRecord(), getTimeRecord(), timeValue,
+                StringUtils.fromString(zoneId.toString()));
+    }
 
     public static ZonedDateTime getZonedDateTime(BMap<BString, Object> timeRecord) {
         ZonedDateTime dateTime = (ZonedDateTime) timeRecord.getNativeData(KEY_ZONED_DATETIME);
