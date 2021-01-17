@@ -3,11 +3,6 @@ org = "ballerina"
 name = "time"
 version = "@toml.version@"
 
-[[dependency]]
-org = "ballerina"
-name = "stringutils"
-version = "@stdlib.stringutils.version@"
-
 [[platform.java11.dependency]]
 path = "../time-native/build/libs/time-native-@project.version@.jar"
 groupId = "ballerina"

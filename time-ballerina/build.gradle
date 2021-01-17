@@ -49,33 +49,6 @@ task unpackJballerinaTools(type: Copy) {
     }
 }
 
-task unpackStdLibs() {
-    doLast {
-        configurations.ballerinaStdLibs.resolvedConfiguration.resolvedArtifacts.each { artifact ->
-            copy {
-                from project.zipTree(artifact.getFile())
-                into new File("${buildDir}/target/extracted-distributions", artifact.name + "-zip")
-            }
-        }
-    }
-}
-
-task copyStdlibs(type: Copy) {
-    def ballerinaDist = "build/target/extracted-distributions/jballerina-tools-zip/jballerina-tools-${ballerinaLangVersion}"
-    into ballerinaDist
-
-    /* Standard Libraries */
-    configurations.ballerinaStdLibs.resolvedConfiguration.resolvedArtifacts.each { artifact ->
-        def artifactExtractedPath = "${buildDir}/target/extracted-distributions/" + artifact.name + "-zip"
-        into("repo/balo") {
-            from "${artifactExtractedPath}/balo/"
-        }
-        into("repo/cache") {
-            from "${artifactExtractedPath}/cache"
-        }
-    }
-}
-
 def packageName = "time"
 def packageOrg = "ballerina"
 def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
@@ -88,11 +61,8 @@ def originalConfig = ballerinaConfigFile.text
 
 task updateTomlVersions {
     doLast {
-        def stdlibDependentStringUtilsVersion = project.stdlibStringUtilsVersion.split("-")[0]
-
         def newConfig = ballerinaConfigFile.text.replace("@project.version@", project.version)
         newConfig = newConfig.replace("@toml.version@", tomlVersion)
-        newConfig = newConfig.replace("@stdlib.stringutils.version@", stdlibDependentStringUtilsVersion)
         ballerinaConfigFile.text = newConfig
     }
 }
@@ -104,7 +74,6 @@ task revertTomlFile {
 }
 
 task ballerinaTest {
-    dependsOn(copyStdlibs)
     dependsOn(":time-native:build")
     dependsOn(updateTomlVersions)
     finalizedBy(revertTomlFile)
@@ -221,8 +190,6 @@ publishing {
 }
 
 ballerinaBuild.dependsOn ":time-native:build"
-unpackStdLibs.dependsOn unpackJballerinaTools
-copyStdlibs.dependsOn unpackStdLibs
-ballerinaBuild.dependsOn copyStdlibs
+updateTomlVersions.dependsOn unpackJballerinaTools
 ballerinaBuild.dependsOn updateTomlVersions
 build.dependsOn ballerinaBuild
