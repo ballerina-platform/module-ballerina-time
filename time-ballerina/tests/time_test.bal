@@ -16,7 +16,6 @@
 
 import ballerina/test;
 import ballerina/java;
-import ballerina/stringutils;
 
 
 @test:Config {}
@@ -119,7 +118,7 @@ function testCreateDateTime() {
 function testCreateDateTimeWithInvalidZone() {
     var retTime = createTime(2017, 3, 28, 23, 42, 45, 554, "TEST");
     if (retTime is Error) {
-        test:assertTrue(stringutils:contains(retTime.message(), "invalid timezone id: TEST"));
+        test:assertTrue(retTime.message().includes("invalid timezone id: TEST"));
     } else {
         test:assertFail("Invalid time created!");
     }
@@ -280,7 +279,7 @@ function testToTimezoneWithInvalidZone() {
     if (retTime is Time) {
         test:assertFail("Invalid time created");
     } else {
-        test:assertTrue(stringutils:contains(retTime.message(), "invalid timezone id: test"));
+        test:assertTrue(retTime.message().includes("invalid timezone id: test"));
     }
 }
 
@@ -334,7 +333,7 @@ function testManualTimeCreateWithInvalidZone() {
     Time time = { time: 1498488382555, zone: zoneValue };
     int|error year = trap getYear(time);
     if (year is error) {
-        test:assertTrue(stringutils:contains(year.message(), "invalid timezone id: test"));
+        test:assertTrue(year.message().includes("invalid timezone id: test"));
     }
 }
 
@@ -342,7 +341,7 @@ function testManualTimeCreateWithInvalidZone() {
 function testParseTimeValidPattern() {
     var timeRet = parse("2017-06-26T09:46:22.444-0500", "test");
     if (timeRet is Error) {
-        test:assertTrue(stringutils:contains(timeRet.message(), "invalid pattern: test"));
+        test:assertTrue(timeRet.message().includes("invalid pattern: test"));
     } else {
         test:assertFail("Invalid time created!");
     }
@@ -356,7 +355,7 @@ function testParseTimeFormatMismatch() {
     string zoneId = "";
     int zoneoffset = 0;
     if (timeRet is Error) {
-        test:assertTrue(stringutils:contains(timeRet.message(), "could not be parsed"));
+        test:assertTrue(timeRet.message().includes("could not be parsed"));
     } else {
         test:assertFail("Invalid time created!");
     }
@@ -368,7 +367,7 @@ function testFormatTimeInvalidPattern() {
     Time time = { time: 1498488382444, zone: zoneValue };
     string|Error fmtTime = format(time, "test");
     if (fmtTime is Error) {
-        test:assertTrue(stringutils:contains(fmtTime.message(), "Invalid Pattern: test"));
+        test:assertTrue(fmtTime.message().includes("Invalid Pattern: test"));
     } else {
         test:assertFail("Invalid time created!");
     }
