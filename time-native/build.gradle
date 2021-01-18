@@ -17,6 +17,8 @@
 
 plugins {
     id 'java'
+    id 'checkstryle'
+    id 'com.github.spotbugs'
 }
 
 description = 'Ballerina - Time Java Utils'
