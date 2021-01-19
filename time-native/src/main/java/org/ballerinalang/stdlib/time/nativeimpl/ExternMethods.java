@@ -21,12 +21,12 @@ package org.ballerinalang.stdlib.time.nativeimpl;
 import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.types.TupleType;
 import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.runtime.api.types.TupleType;
-import io.ballerina.runtime.api.values.BArray;
 import org.ballerinalang.stdlib.time.util.ModuleUtils;
 import org.ballerinalang.stdlib.time.util.TimeUtils;
 
@@ -72,7 +72,8 @@ public class ExternMethods {
     private static final TupleType getDateTupleType = TypeCreator.createTupleType(
             Arrays.asList(PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT));
     private static final TupleType getTimeTupleType = TypeCreator.createTupleType(
-            Arrays.asList(PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT));
+            Arrays.asList(PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT,
+                    PredefinedTypes.TYPE_INT));
 
     public static BString toTimeString(BMap<BString, Object> timeRecord) {
         return getDefaultString(timeRecord);
@@ -163,7 +164,8 @@ public class ExternMethods {
         return time;
     }
 
-    public static BMap<BString, Object> addDuration(BMap<BString, Object> timeRecord, BMap<BString, Object> durationRecord) {
+    public static BMap<BString, Object> addDuration(BMap<BString, Object> timeRecord,
+                                                    BMap<BString, Object> durationRecord) {
         ZonedDateTime dateTime = getZonedDateTime(timeRecord);
         long years = durationRecord.getIntValue(StringUtils.fromString("years"));
         long months = durationRecord.getIntValue(StringUtils.fromString("months"));
@@ -179,7 +181,8 @@ public class ExternMethods {
         return TimeUtils.createTimeRecord(getTimeZoneRecord(), getTimeRecord(), mSec, getZoneId(timeRecord));
     }
 
-    public static BMap<BString, Object> subtractDuration(BMap<BString, Object> timeRecord, BMap<BString, Object> durationRecord) {
+    public static BMap<BString, Object> subtractDuration(BMap<BString, Object> timeRecord,
+                                                         BMap<BString, Object> durationRecord) {
         ZonedDateTime dateTime = getZonedDateTime(timeRecord);
         long years = durationRecord.getIntValue(StringUtils.fromString("years"));
         long months = durationRecord.getIntValue(StringUtils.fromString("months"));
@@ -290,7 +293,7 @@ public class ExternMethods {
             durationRecordMap.put(SECONDS, seconds);
             durationRecordMap.put(MILLISECONDS, millis);
             return ValueCreator.createRecordValue(ModuleUtils.getModule(), STRUCT_TYPE_DURATION, durationRecordMap);
-        } catch(BError e) {
+        } catch (BError e) {
             return TimeUtils.getTimeError(e.getMessage());
         }
     }
