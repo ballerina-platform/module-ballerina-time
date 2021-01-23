@@ -75,7 +75,7 @@ public isolated function toString(Time time) returns string = @java:Method {
 # ```
 #
 # + time - The Time record to be formatted
-# + timeFormat - The format, which is used to format the time represented by this object
+# + timeFormat - The format, which is used to format the time represented by this record
 # + return - The formatted string of the given time or else a `time:Error` if failed to format the time
 public isolated function format(Time time, DateTimeFormat|string timeFormat) returns string|Error = @java:Method {
     name: "format",
@@ -240,7 +240,7 @@ public isolated function getTime(Time time) returns [int, int, int, int] = @java
 #
 # + time - The Time record to add the duration 
 # + duration - The duration to be added
-# + return - Time object containing time and zone information after the addition
+# + return - Time record containing time and zone information after the addition
 public isolated function addDuration(Time time, Duration duration) returns Time = @java:Method {
     name: "addDuration",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
@@ -259,7 +259,7 @@ public isolated function addDuration(Time time, Duration duration) returns Time 
 #
 # + time - The Time record to subtract the duration from
 # + duration - The duration to be subtracted
-# + return - Time object containing time and zone information after the subtraction
+# + return - Time record containing time and zone information after the subtraction
 public isolated function subtractDuration(Time time, Duration duration) returns Time = @java:Method {
     name: "subtractDuration",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
@@ -275,7 +275,7 @@ public isolated function subtractDuration(Time time, Duration duration) returns 
 #
 # + time - The Time record of which the time-zone is to be changed
 # + zoneId - The new time-zone ID
-# + return - Time object containing the time and zone information after the conversion
+# + return - Time record containing the time and zone information after the conversion
 #            or else a `time:Error` if failed to format the time
 public isolated function toTimeZone(Time time, string zoneId) returns Time|Error = @java:Method {
     name: "toTimeZone",
@@ -287,7 +287,7 @@ public isolated function toTimeZone(Time time, string zoneId) returns Time|Error
 #  time:Time now = time:currentTime();
 # ```
 #
-# + return - Time object containing the time and the zone information
+# + return - Time record containing the time and the zone information
 public isolated function currentTime() returns Time = @java:Method {
     name: "currentTime",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
@@ -304,7 +304,7 @@ public isolated function nanoTime() returns int = @java:Method {
     'class: "java.lang.System"
 } external;
 
-# Returns the Time object correspoding to the given time components and time-zone.
+# Returns the Time record correspoding to the given time components and time-zone.
 # ```ballerina
 #  time:Time|time:Error dateTime = time:createTime(2020, 3, 28, 23, 42, 45, 554, "America/Panama");
 # ```
@@ -317,7 +317,7 @@ public isolated function nanoTime() returns int = @java:Method {
 # + second - The second-of-minute to represent, from 0 to 59
 # + milliSecond - The milli-of-second to represent, from 0 to 999
 # + zoneId - The zone id of the required time-zone.If empty the system local time-zone will be used
-# + return - Time object containing time and zone information or an `time:Error` if failed to create the time
+# + return - Time record containing time and zone information or an `time:Error` if failed to create the time
 public isolated function createTime(int year, int month, int date, int hour = 0, int minute = 0,
                         int second = 0, int milliSecond = 0, string zoneId = "") returns Time|Error = @java:Method {
     name: "createTime",
@@ -332,7 +332,7 @@ public isolated function createTime(int year, int month, int date, int hour = 0,
 #
 # + data - The time text to parse
 # + timeFormat - The format, which is used to parse the given text
-# + return - Time object containing the time and zone information or else  a `time:Error` if failed to parse the given string
+# + return - Time record containing the time and zone information or else  a `time:Error` if failed to parse the given string
 public isolated function parse(string data, DateTimeFormat|string timeFormat) returns Time|Error = @java:Method {
     name: "parse",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
