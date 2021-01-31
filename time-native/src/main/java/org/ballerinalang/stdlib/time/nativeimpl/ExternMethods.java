@@ -94,7 +94,7 @@ public class ExternMethods {
                     return TimeUtils.getFormattedString(timeRecord, pattern);
             }
         } catch (IllegalArgumentException e) {
-            return TimeUtils.getTimeError("Invalid Pattern: " + pattern.getValue());
+            return TimeUtils.getTimeError("Invalid Pattern: " + pattern.getValue() + ", " + e.getMessage());
         }
     }
 
