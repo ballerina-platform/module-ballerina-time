@@ -19,9 +19,9 @@
 # + BASIC_ISO_DATE - Sample format - yyyyMMddZZZ (eg: 20210228+0530)
 # + ISO_DATE - Sample format - yyyy-MM-ddXXX (eg: 2021-02-28+05:30)
 # + ISO_TIME - Sample format - HH:mm:ss.SSZZZZZ (eg: 23:10:15.02+05:30)
-# + ISO_DATE_TIME - Sample format - yyyy-MM-dd'T'HH-mm-ss.SSXXX'['VV']' (eg: 2021-02-28T23:10:15.02+05:30[Asia/Colombo])
-# + ISO_LOCAL_DATE_TIME - Sample format - yyyy-MM-dd'T'HH-mm-ss.SS (eg: 2021-02-28T23:10:15.02)
-# + ISO_OFFSET_DATE_TIME - Sample format - yyyy-MM-dd'T'HH-mm-ss.SSXXX (eg: 2021-02-28T23:10:15.02+05:30)
+# + ISO_DATE_TIME - Sample format - yyyy-MM-dd'T'HH:mm:ss.SSXXX'['VV']' (eg: 2021-02-28T23:10:15.02+05:30[Asia/Colombo])
+# + ISO_LOCAL_DATE_TIME - Sample format - yyyy-MM-dd'T'HH:mm:ss.SS (eg: 2021-02-28T23:10:15.02)
+# + ISO_OFFSET_DATE_TIME - Sample format - yyyy-MM-dd'T'HH:mm:ss.SSXXX (eg: 2021-02-28T23:10:15.02+05:30)
 # + ISO_ZONED_DATE_TIME - Similar to ISO_DATE_TIME but offset is compulsory
 # + RFC_1123_DATE_TIME - Sample format - E, dd LLL yyyy HH:mm:ss ZZZ (eg: Sun, 28 Feb 2021 23:10:15 +0530)
 public enum DateTimeFormat {
