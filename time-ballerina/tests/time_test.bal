@@ -104,10 +104,9 @@ function testParseRFC1123Time() {
 
 @test:Config {}
 function testCreateDateTime() {
-    string timeValue = "";
     var  retTime = createTime(2017, 3, 28, 23, 42, 45, 554, "America/Panama");
     if (retTime is Time) {
-        timeValue = toString(retTime);
+        string|Error timeValue = toString(retTime);
         test:assertEquals(timeValue, "2017-03-28T23:42:45.554-05:00");
     } else {
         test:assertFail("Error creating time!");
@@ -118,7 +117,7 @@ function testCreateDateTime() {
 function testCreateDateTimeWithInvalidZone() {
     var retTime = createTime(2017, 3, 28, 23, 42, 45, 554, "TEST");
     if (retTime is Error) {
-        test:assertTrue(retTime.message().includes("invalid timezone id: TEST"));
+        test:assertTrue(retTime.message().includes("Invalid timezone id: TEST"));
     } else {
         test:assertFail("Invalid time created!");
     }
@@ -128,7 +127,7 @@ function testCreateDateTimeWithInvalidZone() {
 function testToStringWithCreateTime() {
     TimeZone zoneValue = {id:"America/Panama"};
     Time time = { time: 1498488382000, zone: zoneValue };
-    string timetoStr = toString(time);
+    string|Error timetoStr = toString(time);
     test:assertEquals(timetoStr, "2017-06-26T09:46:22-05:00");
 }
 
@@ -164,14 +163,14 @@ function testFormatTimeToRFC1123() {
 function testGetFunctions() {
     TimeZone zoneValue = {id:"America/Panama"};
     Time time = { time: 1456876583555, zone: zoneValue };
-    int year = getYear(time);
-    int month = getMonth(time);
-    int day = getDay(time);
-    int hour = getHour(time);
-    int minute = getMinute(time);
-    int second = getSecond(time);
-    int milliSecond = getMilliSecond(time);
-    DayOfWeek weekday = getWeekday(time);
+    int|Error year = getYear(time);
+    int|Error month = getMonth(time);
+    int|Error day = getDay(time);
+    int|Error hour = getHour(time);
+    int|Error minute = getMinute(time);
+    int|Error second = getSecond(time);
+    int|Error milliSecond = getMilliSecond(time);
+    DayOfWeek|Error weekday = getWeekday(time);
     test:assertEquals(year, 2016);
     test:assertEquals(month, 3);
     test:assertEquals(day, 1);
@@ -186,23 +185,29 @@ function testGetFunctions() {
 function testGetDateFunction() {
     TimeZone zoneValue = {id:"America/Panama"};
     Time time = { time: 1456876583555, zone: zoneValue };
-    int year; int month; int day;
-    [year, month, day] = getDate(time);
-    test:assertEquals(year, 2016);
-    test:assertEquals(month, 3);
-    test:assertEquals(day, 1);
+    [int, int, int]|Error date = getDate(time);
+    if (date is Error) {
+        test:assertFail("Error retrieving date");
+    } else {
+        test:assertEquals(date[0], 2016);
+        test:assertEquals(date[1], 3);
+        test:assertEquals(date[2], 1);
+    }
 }
 
 @test:Config {}
 function testGetTimeFunction() {
     TimeZone zoneValue = {id:"America/Panama"};
     Time time = { time: 1456876583555, zone: zoneValue };
-    int hour; int minute; int second; int milliSecond;
-    [hour, minute, second, milliSecond] = getTime(time);
-    test:assertEquals(hour, 18);
-    test:assertEquals(minute, 56);
-    test:assertEquals(second, 23);
-    test:assertEquals(milliSecond, 555);
+    [int, int, int, int]|Error timeVal = getTime(time);
+    if (timeVal is Error) {
+        test:assertFail("Error retrieving time");
+    } else {
+        test:assertEquals(timeVal[0], 18);
+        test:assertEquals(timeVal[1], 56);
+        test:assertEquals(timeVal[2], 23);
+        test:assertEquals(timeVal[3], 555);
+    }
 }
 
 @test:Config {}
@@ -218,12 +223,16 @@ function testAddDuration() {
                 seconds: 1,
                 milliSeconds: 1
             };
-        Time timeAdded = addDuration(timeRet, d);
-        var retStr = format(timeAdded, "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        if (retStr is string) {
-            test:assertEquals(retStr, "2018-07-27T10:47:23.445-0500");
+        Time|Error timeAdded = addDuration(timeRet, d);
+        if (timeAdded is Time) {
+            var retStr = format(timeAdded, "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+            if (retStr is string) {
+                test:assertEquals(retStr, "2018-07-27T10:47:23.445-0500");
+            } else {
+                test:assertFail("Error formatting time");
+            }
         } else {
-            test:assertFail("Error formatting time");
+            test:assertFail("Error adding duration");
         }
     } else {
         test:assertFail("Error parsing time");
@@ -243,12 +252,16 @@ function testSubtractDuration() {
                 seconds: 1,
                 milliSeconds: 1
             };
-        Time timeSubs = subtractDuration(timeRet, d);
-        var retStr = format(timeSubs, "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        if (retStr is string) {
-            test:assertEquals(retStr, "2015-01-31T08:45:21.443-0500");
+        Time|Error timeSubs = subtractDuration(timeRet, d);
+        if (timeSubs is Time) {
+            var retStr = format(timeSubs, "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+            if (retStr is string) {
+                test:assertEquals(retStr, "2015-01-31T08:45:21.443-0500");
+            } else {
+                test:assertFail("Error formatting time");
+            }
         } else {
-            test:assertFail("Error formatting time");
+            test:assertFail("Error subtracting duration");
         }
     } else {
         test:assertFail("Error parsing time");
@@ -259,10 +272,10 @@ function testSubtractDuration() {
 function testToTimezone() {
     TimeZone zoneValue = {id:"America/Panama"};
     Time time = { time: 1456876583555, zone: zoneValue };
-    string timeStrBefore = toString(time);
+    string|Error timeStrBefore = toString(time);
     var retTime = toTimeZone(time, "Asia/Colombo");
     if (retTime is Time) {
-        string timeStrAfter = toString(time);
+        string|Error timeStrAfter = toString(time);
         test:assertEquals(timeStrBefore, "2016-03-01T18:56:23.555-05:00");
         test:assertEquals(timeStrAfter, "2016-03-02T05:26:23.555+05:30");
     } else {
@@ -279,7 +292,7 @@ function testToTimezoneWithInvalidZone() {
     if (retTime is Time) {
         test:assertFail("Invalid time created");
     } else {
-        test:assertTrue(retTime.message().includes("invalid timezone id: test"));
+        test:assertTrue(retTime.message().includes("Invalid timezone id: test"));
     }
 }
 
@@ -307,7 +320,7 @@ function testToTimezoneWithDateTime() {
 function testManualTimeCreate() {
     TimeZone zoneValue = {id:"America/Panama"};
     Time time = { time: 1498488382000, zone: zoneValue };
-    string timeStr = toString(time);
+    string|Error timeStr = toString(time);
     test:assertEquals(timeStr, "2017-06-26T09:46:22-05:00");
 }
 
@@ -315,7 +328,7 @@ function testManualTimeCreate() {
 function testManualTimeCreateWithNoZone() {
     TimeZone zoneValue = {id:""};
     Time time = { time: 1498488382555, zone: zoneValue };
-    int year = getYear(time);
+    int|Error year = getYear(time);
     test:assertEquals(year, 2017);
 }
 
@@ -323,7 +336,7 @@ function testManualTimeCreateWithNoZone() {
 function testManualTimeCreateWithEmptyZone() {
     TimeZone zoneValue = {id:""};
     Time time = { time: 1498488382555, zone: zoneValue };
-    int year = getYear(time);
+    int|Error year = getYear(time);
     test:assertEquals(year, 2017);
 }
 
@@ -331,9 +344,9 @@ function testManualTimeCreateWithEmptyZone() {
 function testManualTimeCreateWithInvalidZone() {
     TimeZone zoneValue = {id:"test"};
     Time time = { time: 1498488382555, zone: zoneValue };
-    int|error year = trap getYear(time);
-    if (year is error) {
-        test:assertTrue(year.message().includes("invalid timezone id: test"));
+    int|Error year = getYear(time);
+    if (year is Error) {
+        test:assertTrue(year.message().includes("Invalid timezone id: test"));
     }
 }
 
@@ -341,7 +354,7 @@ function testManualTimeCreateWithInvalidZone() {
 function testParseTimeValidPattern() {
     var timeRet = parse("2017-06-26T09:46:22.444-0500", "test");
     if (timeRet is Error) {
-        test:assertTrue(timeRet.message().includes("invalid pattern: test"));
+        test:assertTrue(timeRet.message().includes("Invalid pattern: test"));
     } else {
         test:assertFail("Invalid time created!");
     }
@@ -375,13 +388,13 @@ function testFormatTimeInvalidPattern() {
 
 @test:Config {}
 function testParseTimeWithDifferentFormats() {
-    int year = 0;
-    int month = 0;
-    int day = 0;
-    int hour = 0;
-    int minute = 0;
-    int second = 0;
-    int milliSecond = 0;
+    int|Error year = 0;
+    int|Error month = 0;
+    int|Error day = 0;
+    int|Error hour = 0;
+    int|Error minute = 0;
+    int|Error second = 0;
+    int|Error milliSecond = 0;
     string dateStr = "";
     string dateZoneStr = "";
     string timeZoneStr = "";

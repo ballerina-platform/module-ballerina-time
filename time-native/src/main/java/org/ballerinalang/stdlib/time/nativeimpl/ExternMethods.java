@@ -30,6 +30,7 @@ import io.ballerina.runtime.api.values.BString;
 import org.ballerinalang.stdlib.time.util.ModuleUtils;
 import org.ballerinalang.stdlib.time.util.TimeUtils;
 
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -66,8 +67,12 @@ public class ExternMethods {
             Arrays.asList(PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_INT,
                     PredefinedTypes.TYPE_INT));
 
-    public static BString toTimeString(BMap<BString, Object> timeRecord) {
-        return TimeUtils.getDefaultString(timeRecord);
+    public static Object toTimeString(BMap<BString, Object> timeRecord) {
+        try {
+            return TimeUtils.getDefaultString(timeRecord);
+        } catch (BError e) {
+            return TimeUtils.getTimeError(e.getMessage());
+        }
     }
 
     public static Object format(BMap<BString, Object> timeRecord, BString pattern) {
@@ -95,98 +100,148 @@ public class ExternMethods {
             }
         } catch (IllegalArgumentException e) {
             return TimeUtils.getTimeError("Invalid Pattern: " + pattern.getValue() + ", " + e.getMessage());
+        } catch (BError e) {
+            return TimeUtils.getTimeError(e.getMessage());
         }
     }
 
-    public static long getYear(BMap<BString, Object> timeRecord) {
-        ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
-        return dateTime.getYear();
+    public static Object getYear(BMap<BString, Object> timeRecord) {
+        try {
+            ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
+            return dateTime.getYear();
+        } catch (BError e) {
+            return TimeUtils.getTimeError(e.getMessage());
+        }
     }
 
-    public static long getMonth(BMap<BString, Object> timeRecord) {
-        ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
-        return dateTime.getMonthValue();
+    public static Object getMonth(BMap<BString, Object> timeRecord) {
+        try {
+            ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
+            return dateTime.getMonthValue();
+        } catch (BError e) {
+            return TimeUtils.getTimeError(e.getMessage());
+        }
     }
 
-    public static long getDay(BMap<BString, Object> timeRecord) {
-        ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
-        return dateTime.getDayOfMonth();
+    public static Object getDay(BMap<BString, Object> timeRecord) {
+        try {
+            ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
+            return dateTime.getDayOfMonth();
+        } catch (BError e) {
+            return TimeUtils.getTimeError(e.getMessage());
+        }
     }
 
     public static Object getWeekday(BMap<BString, Object> timeRecord) {
-        ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
-        return StringUtils.fromString(dateTime.getDayOfWeek().toString());
+        try {
+            ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
+            return StringUtils.fromString(dateTime.getDayOfWeek().toString());
+        } catch (BError e) {
+            return TimeUtils.getTimeError(e.getMessage());
+        }
     }
 
-    public static long getHour(BMap<BString, Object> timeRecord) {
-        ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
-        return dateTime.getHour();
+    public static Object getHour(BMap<BString, Object> timeRecord) {
+        try {
+            ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
+            return dateTime.getHour();
+        } catch (BError e) {
+            return TimeUtils.getTimeError(e.getMessage());
+        }
     }
 
-    public static long getMinute(BMap<BString, Object> timeRecord) {
-        ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
-        return dateTime.getMinute();
+    public static Object getMinute(BMap<BString, Object> timeRecord) {
+        try {
+            ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
+            return dateTime.getMinute();
+        } catch (BError e) {
+            return TimeUtils.getTimeError(e.getMessage());
+        }
     }
 
-    public static long getSecond(BMap<BString, Object> timeRecord) {
-        ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
-        return dateTime.getSecond();
+    public static Object getSecond(BMap<BString, Object> timeRecord) {
+        try {
+            ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
+            return dateTime.getSecond();
+        } catch (BError e) {
+            return TimeUtils.getTimeError(e.getMessage());
+        }
     }
 
-    public static long getMilliSecond(BMap<BString, Object> timeRecord) {
-        ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
-        return dateTime.getNano() / MULTIPLIER_TO_NANO;
+    public static Object getMilliSecond(BMap<BString, Object> timeRecord) {
+        try {
+            ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
+            return dateTime.getNano() / MULTIPLIER_TO_NANO;
+        } catch (BError e) {
+            return TimeUtils.getTimeError(e.getMessage());
+        }
     }
 
-    public static BArray getDate(BMap<BString, Object> timeRecord) {
+    public static Object getDate(BMap<BString, Object> timeRecord) {
         BArray date = ValueCreator.createTupleValue(getDateTupleType);
-        date.add(0, Long.valueOf(getYear(timeRecord)));
-        date.add(1, Long.valueOf(getMonth(timeRecord)));
-        date.add(2, Long.valueOf(getDay(timeRecord)));
-        return date;
+        try {
+            ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
+            date.add(0, dateTime.getYear());
+            date.add(1, dateTime.getMonthValue());
+            date.add(2, dateTime.getDayOfMonth());
+            return date;
+        } catch (BError e) {
+            return TimeUtils.getTimeError(e.getMessage());
+        }
     }
 
-    public static BArray getTime(BMap<BString, Object> timeRecord) {
+    public static Object getTime(BMap<BString, Object> timeRecord) {
         BArray time = ValueCreator.createTupleValue(getTimeTupleType);
-        time.add(0, Long.valueOf(getHour(timeRecord)));
-        time.add(1, Long.valueOf(getMinute(timeRecord)));
-        time.add(2, Long.valueOf(getSecond(timeRecord)));
-        time.add(3, Long.valueOf(getMilliSecond(timeRecord)));
-        return time;
+        try {
+            ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
+            time.add(0, dateTime.getHour());
+            time.add(1, dateTime.getMinute());
+            time.add(2, dateTime.getSecond());
+            time.add(3, dateTime.getNano() / MULTIPLIER_TO_NANO);
+            return time;
+        } catch (BError e) {
+            return TimeUtils.getTimeError(e.getMessage());
+        }
     }
 
-    public static BMap<BString, Object> addDuration(BMap<BString, Object> timeRecord,
-                                                    BMap<BString, Object> durationRecord) {
-        ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
-        long years = durationRecord.getIntValue(StringUtils.fromString(YEARS));
-        long months = durationRecord.getIntValue(StringUtils.fromString(MONTHS));
-        long days = durationRecord.getIntValue(StringUtils.fromString(DAYS));
-        long hours = durationRecord.getIntValue(StringUtils.fromString(HOURS));
-        long minutes = durationRecord.getIntValue(StringUtils.fromString(MINUTES));
-        long seconds = durationRecord.getIntValue(StringUtils.fromString(SECONDS));
-        long milliSeconds = durationRecord.getIntValue(StringUtils.fromString(MILLISECONDS));
-        long nanoSeconds = milliSeconds * MULTIPLIER_TO_NANO;
-        dateTime = dateTime.plusYears(years).plusMonths(months).plusDays(days).plusHours(hours).plusMinutes(minutes)
-                .plusSeconds(seconds).plusNanos(nanoSeconds);
-        long mSec = dateTime.toInstant().toEpochMilli();
-        return TimeUtils.createTimeRecord(mSec, TimeUtils.getZoneId(timeRecord));
+    public static Object addDuration(BMap<BString, Object> timeRecord, BMap<BString, Object> durationRecord) {
+        try {
+            ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
+            long years = durationRecord.getIntValue(StringUtils.fromString(YEARS));
+            long months = durationRecord.getIntValue(StringUtils.fromString(MONTHS));
+            long days = durationRecord.getIntValue(StringUtils.fromString(DAYS));
+            long hours = durationRecord.getIntValue(StringUtils.fromString(HOURS));
+            long minutes = durationRecord.getIntValue(StringUtils.fromString(MINUTES));
+            long seconds = durationRecord.getIntValue(StringUtils.fromString(SECONDS));
+            long milliSeconds = durationRecord.getIntValue(StringUtils.fromString(MILLISECONDS));
+            long nanoSeconds = milliSeconds * MULTIPLIER_TO_NANO;
+            dateTime = dateTime.plusYears(years).plusMonths(months).plusDays(days).plusHours(hours).plusMinutes(minutes)
+                    .plusSeconds(seconds).plusNanos(nanoSeconds);
+            long mSec = dateTime.toInstant().toEpochMilli();
+            return TimeUtils.createTimeRecord(mSec, StringUtils.fromString(dateTime.getZone().toString()));
+        } catch (BError e) {
+            return TimeUtils.getTimeError(e.getMessage());
+        }
     }
 
-    public static BMap<BString, Object> subtractDuration(BMap<BString, Object> timeRecord,
-                                                         BMap<BString, Object> durationRecord) {
-        ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
-        long years = durationRecord.getIntValue(StringUtils.fromString(YEARS));
-        long months = durationRecord.getIntValue(StringUtils.fromString(MONTHS));
-        long days = durationRecord.getIntValue(StringUtils.fromString(DAYS));
-        long hours = durationRecord.getIntValue(StringUtils.fromString(HOURS));
-        long minutes = durationRecord.getIntValue(StringUtils.fromString(MINUTES));
-        long seconds = durationRecord.getIntValue(StringUtils.fromString(SECONDS));
-        long milliSeconds = durationRecord.getIntValue(StringUtils.fromString(MILLISECONDS));
-        long nanoSeconds = milliSeconds * MULTIPLIER_TO_NANO;
-        dateTime = dateTime.minusYears(years).minusMonths(months).minusDays(days).minusHours(hours)
-                .minusMinutes(minutes).minusSeconds(seconds).minusNanos(nanoSeconds);
-        long mSec = dateTime.toInstant().toEpochMilli();
-        return TimeUtils.createTimeRecord(mSec, TimeUtils.getZoneId(timeRecord));
+    public static Object subtractDuration(BMap<BString, Object> timeRecord, BMap<BString, Object> durationRecord) {
+        try {
+            ZonedDateTime dateTime = TimeUtils.getZonedDateTime(timeRecord);
+            long years = durationRecord.getIntValue(StringUtils.fromString(YEARS));
+            long months = durationRecord.getIntValue(StringUtils.fromString(MONTHS));
+            long days = durationRecord.getIntValue(StringUtils.fromString(DAYS));
+            long hours = durationRecord.getIntValue(StringUtils.fromString(HOURS));
+            long minutes = durationRecord.getIntValue(StringUtils.fromString(MINUTES));
+            long seconds = durationRecord.getIntValue(StringUtils.fromString(SECONDS));
+            long milliSeconds = durationRecord.getIntValue(StringUtils.fromString(MILLISECONDS));
+            long nanoSeconds = milliSeconds * MULTIPLIER_TO_NANO;
+            dateTime = dateTime.minusYears(years).minusMonths(months).minusDays(days).minusHours(hours)
+                    .minusMinutes(minutes).minusSeconds(seconds).minusNanos(nanoSeconds);
+            long mSec = dateTime.toInstant().toEpochMilli();
+            return TimeUtils.createTimeRecord(mSec, StringUtils.fromString(dateTime.getZone().toString()));
+        } catch (BError e) {
+            return TimeUtils.getTimeError(e.getMessage());
+        }
     }
 
     public static Object toTimeZone(BMap<BString, Object> timeRecord, BString zoneId) {
@@ -207,7 +262,7 @@ public class ExternMethods {
         try {
             return TimeUtils.createDateTime((int) years, (int) months, (int) dates, (int) hours, (int) minutes,
                             (int) seconds, (int) milliSeconds, zoneId);
-        } catch (BError e) {
+        } catch (BError | DateTimeException e) {
             return TimeUtils.getTimeError(e.getMessage());
         }
     }
