@@ -83,7 +83,7 @@ public class TimeUtils {
         try {
             return ZoneId.of(zoneIdValue.getValue());
         } catch (ZoneRulesException e) {
-            throw TimeUtils.getTimeError("invalid timezone id: " + zoneIdValue);
+            throw TimeUtils.getTimeError("Invalid timezone id: " + zoneIdValue);
         }
     }
 
@@ -108,7 +108,7 @@ public class TimeUtils {
                 zoneId = String.valueOf(ZoneId.from(dateTime));
             } catch (DateTimeException e) {
                 if (epochTime < 0) {
-                    throw TimeUtils.getTimeError("failed to parse \"" + dateString.getValue() + "\" to the " +
+                    throw TimeUtils.getTimeError("Failed to parse \"" + dateString.getValue() + "\" to the " +
                             pattern.getValue() + " format");
                 }
                 zoneId = ZoneId.systemDefault().toString();
@@ -137,10 +137,10 @@ public class TimeUtils {
             TemporalAccessor temporalAccessor = formatter.parse(dateValue.getValue());
             return getParsedTimeRecord(temporalAccessor);
         } catch (DateTimeParseException e) {
-            throw TimeUtils.getTimeError("parse date \"" + dateValue + "\" for the format \"" + pattern + "\" "
+            throw TimeUtils.getTimeError("Parse date \"" + dateValue + "\" for the format \"" + pattern + "\" "
                     + "failed:" + e.getMessage());
         } catch (IllegalArgumentException e) {
-            throw TimeUtils.getTimeError("invalid pattern: " + pattern);
+            throw TimeUtils.getTimeError("Invalid pattern: " + pattern);
         }
     }
 

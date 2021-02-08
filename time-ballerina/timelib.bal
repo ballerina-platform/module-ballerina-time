@@ -57,12 +57,12 @@ public type Duration record {|
 # ```ballerina
 #  time:TimeZone zoneValue = {id: "America/Panama"};
 #  time:Time time = {time: 1578488382444, zone: zoneValue};
-#  string timeString = time:toString(time);
+#  string|error timeString = time:toString(time);
 # ```
 #
 # + time - The Time record to be converted to string
-# + return - The ISO 8601-formatted string of the given time
-public isolated function toString(Time time) returns string = @java:Method {
+# + return - The ISO 8601-formatted string of the given time or else a `time:Error` if failed to convert
+public isolated function toString(Time time) returns string|Error = @java:Method {
     name: "toTimeString",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -86,12 +86,12 @@ public isolated function format(Time time, DateTimeFormat|string timeFormat) ret
 # ```ballerina
 #  time:TimeZone zoneValue = {id: "America/Panama"};
 #  time:Time time = {time: 1578488382444, zone: zoneValue};
-#  int year = time:getYear(time);
+#  int|error year = time:getYear(time);
 # ```
 #
 # + time - The Time record to retrieve the year representation
-# + return - The year representation
-public isolated function getYear(Time time) returns int = @java:Method {
+# + return - The year representation or else a `time:Error` if failed to retrieve the year
+public isolated function getYear(Time time) returns int|Error = @java:Method {
     name: "getYear",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -100,12 +100,12 @@ public isolated function getYear(Time time) returns int = @java:Method {
 # ```ballerina
 #  time:TimeZone zoneValue = {id: "America/Panama"};
 #  time:Time time = {time: 1578488382444, zone: zoneValue};
-#  int month = time:getMonth(time);
+#  int|error month = time:getMonth(time);
 # ```
 #
 # + time - The Time record to get the month representation from
-# + return - The month-of-year from 1 (January) to 12 (December)
-public isolated function getMonth(Time time) returns int = @java:Method {
+# + return - The month-of-year from 1 (January) to 12 (December) or else a `time:Error` if failed to retrieve the month
+public isolated function getMonth(Time time) returns int|Error = @java:Method {
     name: "getMonth",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -114,12 +114,12 @@ public isolated function getMonth(Time time) returns int = @java:Method {
 # ```ballerina
 #  time:TimeZone zoneValue = {id: "America/Panama"};
 #  time:Time time = {time: 1578488382444, zone: zoneValue};
-#  int day = time:getDay(time);
+#  int|error day = time:getDay(time);
 # ```
 #
 # + time - The Time record to get the date representation
-# + return - The day-of-month from 1 to 31
-public isolated function getDay(Time time) returns int = @java:Method {
+# + return - The day-of-month from 1 to 31 or else a `time:Error` if failed to retrieve the day
+public isolated function getDay(Time time) returns int|Error = @java:Method {
     name: "getDay",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -128,12 +128,12 @@ public isolated function getDay(Time time) returns int = @java:Method {
 # ```ballerina
 #  time:TimeZone zoneValue = {id: "America/Panama"};
 #  time:Time time = {time: 1578488382444, zone: zoneValue};
-#  string weekDay = time:getWeekday(time);
+#  time:DayOfWeek|error weekDay = time:getWeekday(time);
 # ```
 #
 # + time - The Time record to get the weekday representation
-# + return - The weekday representation from SUNDAY to SATURDAY
-public isolated function getWeekday(Time time) returns DayOfWeek = @java:Method {
+# + return - The weekday representation from SUNDAY to SATURDAY or else a `time:Error` if failed to retrieve the weekday
+public isolated function getWeekday(Time time) returns DayOfWeek|Error = @java:Method {
     name: "getWeekday",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -142,12 +142,12 @@ public isolated function getWeekday(Time time) returns DayOfWeek = @java:Method 
 # ```ballerina
 #  time:TimeZone zoneValue = {id: "America/Panama"};
 #  time:Time time = {time: 1578488382444, zone: zoneValue};
-#  int hour = time:getHour(time);
+#  int|error hour = time:getHour(time);
 # ```
 #
 # + time - The Time record to get the hour representation
-# + return - The hour-of-day from 0 to 23
-public isolated function getHour(Time time) returns int = @java:Method {
+# + return - The hour-of-day from 0 to 23 or else a `time:Error` if failed to retrieve the hour
+public isolated function getHour(Time time) returns int|Error = @java:Method {
     name: "getHour",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -156,12 +156,12 @@ public isolated function getHour(Time time) returns int = @java:Method {
 # ```ballerina
 #  time:TimeZone zoneValue = {id: "America/Panama"};
 #  time:Time time = {time: 1578488382444, zone: zoneValue};
-#  int minute = time:getMinute(time);
+#  int|error minute = time:getMinute(time);
 # ```
 #
 # + time - The Time record to get the minute representation
-# + return - The minute-of-hour to represent from 0 to 59
-public isolated function getMinute(Time time) returns int = @java:Method {
+# + return - The minute-of-hour to represent from 0 to 59 or else a `time:Error` if failed to retrieve the minute
+public isolated function getMinute(Time time) returns int|Error = @java:Method {
     name: "getMinute",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -170,12 +170,12 @@ public isolated function getMinute(Time time) returns int = @java:Method {
 # ```ballerina
 #  time:TimeZone zoneValue = {id: "America/Panama"};
 #  time:Time time = {time: 1578488382444, zone: zoneValue};
-#  int second = time:getSecond(time);
+#  int|error second = time:getSecond(time);
 # ```
 #
 # + time - The Time record to get the second representation
-# + return - The second-of-minute from 0 to 59
-public isolated function getSecond(Time time) returns int = @java:Method {
+# + return - The second-of-minute from 0 to 59 or else a `time:Error` if failed to retrieve the second
+public isolated function getSecond(Time time) returns int|Error = @java:Method {
     name: "getSecond",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -184,12 +184,12 @@ public isolated function getSecond(Time time) returns int = @java:Method {
 # ```ballerina
 #  time:TimeZone zoneValue = {id: "America/Panama"};
 #  time:Time time = {time: 1578488382444, zone: zoneValue};
-#  int milliSecond = time:getMilliSecond(time);
+#  int|error milliSecond = time:getMilliSecond(time);
 # ```
 #
 # + time - The Time record to get the millisecond representation
-# + return - The milli-of-second from 0 to 999
-public isolated function getMilliSecond(Time time) returns int = @java:Method {
+# + return - The milli-of-second from 0 to 999 or else a `time:Error` if failed to retrieve the millisecond
+public isolated function getMilliSecond(Time time) returns int|Error = @java:Method {
     name: "getMilliSecond",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -198,14 +198,14 @@ public isolated function getMilliSecond(Time time) returns int = @java:Method {
 # ```ballerina
 #  time:TimeZone zoneValue = {id: "America/Panama"};
 #  time:Time time = {time: 1578488382444, zone: zoneValue};
-#  [int, int, int] date = time:getDate(time);
+#  [int, int, int]|error date = time:getDate(time);
 # ```
 #
 # + time - The Time record to get the date representation
 # + return - The year representation with
 #            the month-of-year from 1 (January) to 12 (December) and 
-#            the day-of-month from 1 to 31
-public isolated function getDate(Time time) returns [int, int, int] = @java:Method {
+#            the day-of-month from 1 to 31 or else a `time:Error` if failed to retrieve the date
+public isolated function getDate(Time time) returns [int, int, int]|Error = @java:Method {
     name: "getDate",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -214,15 +214,15 @@ public isolated function getDate(Time time) returns [int, int, int] = @java:Meth
 # ```ballerina
 #  time:TimeZone zoneValue = {id: "America/Panama"};
 #  time:Time time = {time: 1578488382444, zone: zoneValue};
-#  [int, int, int, int] timeGenerated = time:getTime(time);
+#  [int, int, int, int]|error timeGenerated = time:getTime(time);
 # ```
 #
 # + time - The Time record
 # + return - The hour-of-day to represent from 0 to 23,
 #            the minute-of-hour to represent from 0 to 59,
 #            the second-of-minute from 0 to 59,
-#            and the milli-of-second from 0 to 999
-public isolated function getTime(Time time) returns [int, int, int, int] = @java:Method {
+#            and the milli-of-second from 0 to 999 or else a `time:Error` if failed to retrieve the time
+public isolated function getTime(Time time) returns [int, int, int, int]|Error = @java:Method {
     name: "getTime",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -234,14 +234,15 @@ public isolated function getTime(Time time) returns [int, int, int, int] = @java
 #  time:Time|error originalTime = time:parse(timeText, timeFormat);
 #  Duration delta = {years: 1, months: 2};
 #  if (originalTime is time:Time) {
-#      time:Time newTime = time:addDuration(originalTime, delta);
+#      time:Time|error newTime = time:addDuration(originalTime, delta);
 #  }
 # ```
 #
 # + time - The Time record to add the duration 
 # + duration - The duration to be added
-# + return - Time record containing time and zone information after the addition
-public isolated function addDuration(Time time, Duration duration) returns Time = @java:Method {
+# + return - Time record containing time and zone information after the addition or else a `time:Error` if
+#            failed to add duration
+public isolated function addDuration(Time time, Duration duration) returns Time|Error = @java:Method {
     name: "addDuration",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -253,14 +254,15 @@ public isolated function addDuration(Time time, Duration duration) returns Time 
 #  time:Time|error originalTime = time:parse(timeText, timeFormat);
 #  Duration delta = {years: 1, months: 2};
 #  if (originalTime is time:Time) {
-#      time:Time newTime = time:subtractDuration(originalTime, delta);
+#      time:Time|error newTime = time:subtractDuration(originalTime, delta);
 #  }
 # ```
 #
 # + time - The Time record to subtract the duration from
 # + duration - The duration to be subtracted
-# + return - Time record containing time and zone information after the subtraction
-public isolated function subtractDuration(Time time, Duration duration) returns Time = @java:Method {
+# + return - Time record containing time and zone information after the subtraction or else a `time:Error` if
+#            failed to subtract duration
+public isolated function subtractDuration(Time time, Duration duration) returns Time|Error = @java:Method {
     name: "subtractDuration",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
