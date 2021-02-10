@@ -11,9 +11,9 @@ The Time library is one of the standard library modules of the<a target="_blank"
 
 This module provides implementations related to time, date, time zones, and durations.
 
-For more information go to [The Time Module](https://ballerina.io/swan-lake/learn/api-docs/ballerina/time/).
+For more information go to [The Time Module](https://ballerina.io/learn/api-docs/ballerina/time/).
 
-For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/swan-lake/learn/by-example/time.html).
+For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/learn/by-example/time.html).
 
 ## Issues and Projects 
 
