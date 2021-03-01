@@ -1,0 +1,6 @@
+fixes:
+  - "ballerina/time/*/::time-ballerina/"
+
+ignore:
+  - "**/tests"
+
