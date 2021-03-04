@@ -65,4 +65,4 @@ public function utcDiffSeconds(Utc utc1, Utc utc2) returns Seconds = external;
 # Different runs of a program may use different epochs.
 # The values returned by monotonicNow during a run
 # of a program will not decrease.
-public function monotonicNow() returns Seconds = external.
+public function monotonicNow() returns Seconds = external;
