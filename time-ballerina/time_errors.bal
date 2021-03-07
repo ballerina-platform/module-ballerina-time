@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+# The error to be returned when parameters are incorrectly formatted .
 public type FormatError distinct error;
 
+# The generic module level error.  
 public type Error FormatError;
