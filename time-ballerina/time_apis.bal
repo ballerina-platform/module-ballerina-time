@@ -21,12 +21,7 @@ import ballerina/jballerina.java;
 # and nil means native precision(nanosecond precision 9) of clock)
 # + return - The `time:Utc` value corresponding to the current UTC time
 public isolated function utcNow(int? precision = ()) returns Utc {
-    int precisionValue = -1;
-    if (precision is int) {
-        precisionValue = precision;
-    }
-    [int, Seconds] currentUtc = externUtcNow(precisionValue);
-    return <Utc>currentUtc.cloneReadOnly();
+    return <Utc>(externUtcNow(precision ?: -1).cloneReadOnly());
 }
 
 # Monotonic time - seconds from some unspecified epoch
@@ -40,12 +35,7 @@ public isolated function monotonicNow() returns Seconds {
 # + return - The corresponding `time:Utc` or a `time:Error` when the specified timestamp
 # is not adhere to the RFC 3339 format(e.g. `2007-12-03T10:15:30.00Z`)
 public isolated function utcFromString(string timestamp) returns Utc|Error {
-    [int, Seconds]|Error utc = externUtcFromString(timestamp);
-    if (utc is [int, Seconds]) {
-        return <Utc>utc.cloneReadOnly();
-    } else {
-        return utc;
-    }
+    return <Utc>(check externUtcFromString(timestamp).cloneReadOnly());
 }
 
 # Converts a given `time:Utc` time to a RFC 3339 timestamp(e.g. `2007-12-03T10:15:30.00Z`).
@@ -60,16 +50,14 @@ public isolated function utcToString(Utc utc) returns string {
 # + seconds - Number of seconds to be added
 # + return - The resulted `time:Utc` value after the summation
 public isolated function utcAddSeconds(Utc utc, Seconds seconds) returns Utc {
-    int secondsFromEpoch = utc[0];
-    decimal lastSecondFraction = utc[1];
-
+    [int, decimal] [secondsFromEpoch, lastSecondFraction] = utc;
     secondsFromEpoch = secondsFromEpoch + <int>seconds.floor();
     lastSecondFraction = lastSecondFraction + (seconds - seconds.floor());
     if (lastSecondFraction >= 1) {
         secondsFromEpoch = secondsFromEpoch + <int>lastSecondFraction.floor();
         lastSecondFraction = lastSecondFraction - lastSecondFraction.floor();
     }
-    return <Utc>([secondsFromEpoch, lastSecondFraction].cloneReadOnly());
+    return [secondsFromEpoch, lastSecondFraction];
 }
 
 // TODO Try to do in Ballerina
