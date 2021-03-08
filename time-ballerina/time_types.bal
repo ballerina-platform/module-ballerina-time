@@ -74,7 +74,7 @@ public type ZoneOffset readonly & record {|
                                       decimal seconds?;
                                   |};
 
-type ReadableZoneOffset record {|
+type ReadWriteZoneOffset record {|
     int hours;
     int minutes = 0;
     decimal seconds?;

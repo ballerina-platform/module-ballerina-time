@@ -160,19 +160,19 @@ public isolated function utcFromCivil(Civil civilTime) returns Utc|Error {
 public isolated function civilFromString(string dateTimeString) returns Civil|Error {
     Civil|Error civil = externCivilFromString(dateTimeString);
     if (civil is Civil) {
-        ReadableZoneOffset? readableZone = externZoneOffsetFromString(dateTimeString);
-        if (readableZone is ReadableZoneOffset) {
-            if (readableZone["seconds"] is decimal) {
+        ReadWriteZoneOffset? readWriteZone = externZoneOffsetFromString(dateTimeString);
+        if (readWriteZone is ReadWriteZoneOffset) {
+            if (readWriteZone["seconds"] is decimal) {
                 ZoneOffset zoneOffset = {
-                    hours: readableZone.hours,
-                    minutes: readableZone.minutes,
-                    seconds: <decimal>readableZone["seconds"]
+                    hours: readWriteZone.hours,
+                    minutes: readWriteZone.minutes,
+                    seconds: <decimal>readWriteZone["seconds"]
                 };
                 civil["utcOffset"] = zoneOffset;
             } else {
                 ZoneOffset zoneOffset = {
-                    hours: readableZone.hours,
-                    minutes: readableZone.minutes
+                    hours: readWriteZone.hours,
+                    minutes: readWriteZone.minutes
                 };
                 civil["utcOffset"] = zoneOffset;
             }
@@ -259,7 +259,7 @@ isolated function externCivilToString(int year, int month, int day, int hour, in
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
-isolated function externZoneOffsetFromString(string dateTimeString) returns ReadableZoneOffset? = @java:Method {
+isolated function externZoneOffsetFromString(string dateTimeString) returns ReadWriteZoneOffset? = @java:Method {
     name: "externZoneOffsetFromString",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;

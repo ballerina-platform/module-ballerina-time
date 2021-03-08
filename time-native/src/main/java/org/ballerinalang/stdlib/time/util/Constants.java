@@ -47,7 +47,7 @@ public class Constants {
     public static final String TIME_OF_DAY_RECORD_SECOND = "second";
 
     // For `time:ZoneOffset`
-    public static final String READABLE_ZONE_OFFSET_RECORD = "ReadableZoneOffset";
+    public static final String READABLE_ZONE_OFFSET_RECORD = "ReadWriteZoneOffset";
     public static final String ZONE_OFFSET_RECORD = "ZoneOffset";
     public static final String ZONE_OFFSET_RECORD_HOUR = "hours";
     public static final String ZONE_OFFSET_RECORD_MINUTE = "minutes";
