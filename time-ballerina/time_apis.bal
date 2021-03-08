@@ -133,17 +133,17 @@ public isolated function utcToCivil(Utc utc) returns Civil {
 # + civilTime - `Civil` time
 # + return - The corresponding `Utc` value or an error if `civilTime.utcOffset` is missing
 public isolated function utcFromCivil(Civil civilTime) returns Utc|Error {
-    if (civilTime["utcOffset"] is ()) {
+    if (civilTime?.utcOffset is ()) {
         return error FormatError("civilTime.utcOffset must not be null");
     }
-    ZoneOffset utcOffset = <ZoneOffset>civilTime["utcOffset"];
+    ZoneOffset utcOffset = <ZoneOffset>civilTime?.utcOffset;
     decimal seconds = 0.0;
     decimal utcOffsetSeconds = 0.0;
-    if (civilTime["second"] is Seconds) {
-        seconds = <decimal>civilTime["second"];
+    if (civilTime?.second is Seconds) {
+        seconds = <decimal>civilTime?.second;
     }
-    if (utcOffset["seconds"] is decimal) {
-        utcOffsetSeconds = <decimal>utcOffset["seconds"];
+    if (utcOffset?.seconds is decimal) {
+        utcOffsetSeconds = <decimal>utcOffset?.seconds;
     }
     [int, decimal]|Error readableUtc = externUtcFromCivil(civilTime.year, civilTime.month, civilTime.day, civilTime.hour, 
     civilTime.minute, seconds, utcOffset.hours, utcOffset.minutes, utcOffsetSeconds);
@@ -162,19 +162,19 @@ public isolated function civilFromString(string dateTimeString) returns Civil|Er
     if (civil is Civil) {
         ReadWriteZoneOffset? readWriteZone = externZoneOffsetFromString(dateTimeString);
         if (readWriteZone is ReadWriteZoneOffset) {
-            if (readWriteZone["seconds"] is decimal) {
+            if (readWriteZone?.seconds is decimal) {
                 ZoneOffset zoneOffset = {
                     hours: readWriteZone.hours,
                     minutes: readWriteZone.minutes,
-                    seconds: <decimal>readWriteZone["seconds"]
+                    seconds: <decimal>readWriteZone?.seconds
                 };
-                civil["utcOffset"] = zoneOffset;
+                civil.utcOffset = zoneOffset;
             } else {
                 ZoneOffset zoneOffset = {
                     hours: readWriteZone.hours,
                     minutes: readWriteZone.minutes
                 };
-                civil["utcOffset"] = zoneOffset;
+                civil.utcOffset = zoneOffset;
             }
         }
         return civil;
@@ -186,17 +186,17 @@ public isolated function civilFromString(string dateTimeString) returns Civil|Er
 # + civil - `time:Civil` that needs to be converted
 # + return - The corresponding string value or an error if the specified `time:Civil` contains invalid parameters(e.g. `month` > 12)
 public isolated function civilToString(Civil civil) returns string|Error {
-    if (civil["utcOffset"] is ()) {
+    if (civil?.utcOffset is ()) {
         return error FormatError("civil.utcOffset must not be null");
     }
-    ZoneOffset utcOffset = <ZoneOffset>civil["utcOffset"];
+    ZoneOffset utcOffset = <ZoneOffset>civil?.utcOffset;
     decimal seconds = 0.0;
     decimal utcOffsetSeconds = 0.0;
-    if (civil["second"] is Seconds) {
-        seconds = <decimal>civil["second"];
+    if (civil?.second is Seconds) {
+        seconds = <decimal>civil?.second;
     }
-    if (utcOffset["seconds"] is decimal) {
-        utcOffsetSeconds = <decimal>utcOffset["seconds"];
+    if (utcOffset?.seconds is decimal) {
+        utcOffsetSeconds = <decimal>utcOffset?.seconds;
     }
     return externCivilToString(civil.year, civil.month, civil.day, civil.hour, civil.minute, seconds, utcOffset.hours, 
     utcOffset.minutes, utcOffsetSeconds);
