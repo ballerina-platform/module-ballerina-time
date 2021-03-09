@@ -31,6 +31,7 @@ import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.DateTimeException;
 import java.time.Instant;
@@ -38,6 +39,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -51,13 +53,13 @@ import static org.ballerinalang.stdlib.time.util.Constants.ANALOG_GIGA;
  */
 public class TimeValueHandler {
 
-     static final TupleType UTC_TUPLE_TYPE = TypeCreator.createTupleType(
+    static final TupleType UTC_TUPLE_TYPE = TypeCreator.createTupleType(
             Arrays.asList(PredefinedTypes.TYPE_INT, PredefinedTypes.TYPE_DECIMAL));
 
     public static BArray createUtcFromInstant(Instant instant, int precision) {
 
         long secondsFromEpoc = instant.getEpochSecond();
-        BigDecimal lastSecondFraction = new BigDecimal(instant.getNano()).divide(ANALOG_GIGA)
+        BigDecimal lastSecondFraction = new BigDecimal(instant.getNano()).divide(ANALOG_GIGA, MathContext.DECIMAL128)
                 .setScale(precision, RoundingMode.HALF_UP);
         BArray utcTuple = ValueCreator.createTupleValue(UTC_TUPLE_TYPE);
         utcTuple.add(0, secondsFromEpoc);
@@ -69,7 +71,7 @@ public class TimeValueHandler {
     public static BArray createUtcFromInstant(Instant instant) {
 
         long secondsFromEpoc = instant.getEpochSecond();
-        BigDecimal lastSecondFraction = new BigDecimal(instant.getNano()).divide(ANALOG_GIGA);
+        BigDecimal lastSecondFraction = new BigDecimal(instant.getNano()).divide(ANALOG_GIGA, MathContext.DECIMAL128);
         BArray utcTuple = ValueCreator.createTupleValue(UTC_TUPLE_TYPE);
         utcTuple.add(0, secondsFromEpoc);
         utcTuple.add(1, ValueCreator.createDecimalValue(lastSecondFraction));
@@ -93,7 +95,7 @@ public class TimeValueHandler {
     public static BMap<BString, Object> createCivilFromZoneDateTime(ZonedDateTime zonedDateTime) {
 
         BigDecimal second = new BigDecimal(zonedDateTime.getSecond());
-        second = second.add(new BigDecimal(zonedDateTime.getNano()).divide(ANALOG_GIGA));
+        second = second.add(new BigDecimal(zonedDateTime.getNano()).divide(ANALOG_GIGA, MathContext.DECIMAL128));
         BMap<BString, Object> civilMap = ValueCreator.createRecordValue(ModuleUtils.getModule(),
                 Constants.CIVIL_RECORD);
         civilMap.put(StringUtils.fromString(Constants.DATE_RECORD_YEAR), zonedDateTime.getYear());
@@ -112,7 +114,7 @@ public class TimeValueHandler {
 
         ZonedDateTime zonedDateTime = ZonedDateTime.parse(zonedDateTimeString);
         BigDecimal second = new BigDecimal(zonedDateTime.getSecond());
-        second = second.add(new BigDecimal(zonedDateTime.getNano()).divide(ANALOG_GIGA));
+        second = second.add(new BigDecimal(zonedDateTime.getNano()).divide(ANALOG_GIGA, MathContext.DECIMAL128));
         BMap<BString, Object> civilMap = ValueCreator.createRecordValue(ModuleUtils.getModule(),
                 Constants.CIVIL_RECORD);
         civilMap.put(StringUtils.fromString(Constants.DATE_RECORD_YEAR), zonedDateTime.getYear());
@@ -171,10 +173,9 @@ public class TimeValueHandler {
         int intZoneSecond = zoneSecond.decimalValue().setScale(0, RoundingMode.HALF_UP).intValue();
         ZoneId zoneId = ZoneId.of(ZoneOffset.ofHoursMinutesSeconds(
                 Long.valueOf(zoneHour).intValue(), Long.valueOf(zoneMinute).intValue(), intZoneSecond).toString());
-        ZonedDateTime dateTime = ZonedDateTime.of(
+        return ZonedDateTime.of(
                 Long.valueOf(year).intValue(), Long.valueOf(month).intValue(), Long.valueOf(day).intValue(),
                 Long.valueOf(hour).intValue(), Long.valueOf(minute).intValue(), intSecond, intNanoSecond, zoneId);
-        return dateTime;
     }
 
     public static BError createError(Errors errorType, String errorMsg, String details) {
@@ -232,4 +233,35 @@ public class TimeValueHandler {
         return zone;
     }
 
+    public static BArray createUtcFromDate(Date date) {
+
+        // seconds = milliSeconds/1000;
+        long seconds = date.getTime() / 1000;
+        // nanoSecondsAsFraction = (milliSeconds%1000)*(10^6)/(10^9);
+        BigDecimal lastSecondFraction = new BigDecimal(date.getTime() % 1000)
+                .divide(new BigDecimal(1000), MathContext.DECIMAL128)
+                .setScale(Constants.UTC_MAX_PRECISION, RoundingMode.HALF_UP);
+
+        BArray utcTuple = ValueCreator.createTupleValue(UTC_TUPLE_TYPE);
+        utcTuple.add(0, seconds);
+        utcTuple.add(1, ValueCreator.createDecimalValue(lastSecondFraction));
+        utcTuple.freezeDirect();
+        return utcTuple;
+    }
+
+    public static BArray createUtcFromMilliSeconds(long millis) {
+
+        // seconds = milliSeconds/1000;
+        long seconds = millis / 1000;
+        // nanoSecondsAsFraction = (milliSeconds%1000)*(10^6)/(10^9);
+        BigDecimal lastSecondFraction = new BigDecimal(millis % 1000)
+                .divide(new BigDecimal(1000), MathContext.DECIMAL128)
+                .setScale(Constants.UTC_MAX_PRECISION, RoundingMode.HALF_UP);
+
+        BArray utcTuple = ValueCreator.createTupleValue(UTC_TUPLE_TYPE);
+        utcTuple.add(0, seconds);
+        utcTuple.add(1, ValueCreator.createDecimalValue(lastSecondFraction));
+        utcTuple.freezeDirect();
+        return utcTuple;
+    }
 }

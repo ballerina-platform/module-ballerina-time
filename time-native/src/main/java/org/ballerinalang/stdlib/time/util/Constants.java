@@ -28,7 +28,9 @@ import java.math.BigDecimal;
 public class Constants {
     private Constants() {}
     public static final String RECORD_UTC = "Utc";
+    public static final int UTC_MAX_PRECISION = 9;
     public static final BigDecimal ANALOG_GIGA = new BigDecimal(1000000000);
+    public static final BigDecimal ANALOG_KILO = new BigDecimal(1000);
 
     public static final long SECONDS_PER_DAY = 86400;
     public static final int SECONDS_PER_MINUTE = 60;
