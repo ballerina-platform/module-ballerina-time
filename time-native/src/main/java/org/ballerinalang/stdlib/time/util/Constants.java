@@ -18,6 +18,8 @@
 
 package org.ballerinalang.stdlib.time.util;
 
+import java.math.BigDecimal;
+
 /**
  * Constants used in Ballerina Time library.
  *
@@ -25,24 +27,39 @@ package org.ballerinalang.stdlib.time.util;
  */
 public class Constants {
     private Constants() {}
+    public static final String RECORD_UTC = "Utc";
+    public static final int UTC_MAX_PRECISION = 9;
+    public static final BigDecimal ANALOG_GIGA = new BigDecimal(1000000000);
+    public static final BigDecimal ANALOG_KILO = new BigDecimal(1000);
 
-    public static final String STRUCT_TYPE_TIME = "Time";
-    public static final String STRUCT_TYPE_TIMEZONE = "TimeZone";
-    public static final String STRUCT_TYPE_DURATION = "Duration";
+    public static final long SECONDS_PER_DAY = 86400;
+    public static final int SECONDS_PER_MINUTE = 60;
+    public static final int SECONDS_PER_HOUR = 3600;
 
-    public static final String TIME_ERROR = "TimeError";
-    public static final String KEY_ZONED_DATETIME = "ZonedDateTime";
-    public static final String TIME_FIELD = "time";
-    public static final String ZONE_FIELD = "zone";
-    public static final String ZONE_ID_FIELD = "id";
+    // For `time:Date`
+    public static final String DATE_RECORD = "Date";
+    public static final String DATE_RECORD_YEAR = "year";
+    public static final String DATE_RECORD_MONTH = "month";
+    public static final String DATE_RECORD_DAY = "day";
 
-    public static final String YEARS = "years";
-    public static final String MONTHS = "months";
-    public static final String DAYS = "days";
-    public static final String HOURS = "hours";
-    public static final String MINUTES = "minutes";
-    public static final String SECONDS = "seconds";
-    public static final String MILLISECONDS = "milliSeconds";
+    // For `time:TimeOfDay`
+    public static final String TIME_OF_DAY_RECORD = "TimeOfDay";
+    public static final String TIME_OF_DAY_RECORD_HOUR = "hour";
+    public static final String TIME_OF_DAY_RECORD_MINUTE = "minute";
+    public static final String TIME_OF_DAY_RECORD_SECOND = "second";
 
-    public static final int MULTIPLIER_TO_NANO = 1000000;
+    // For `time:ZoneOffset`
+    public static final String READABLE_ZONE_OFFSET_RECORD = "ReadWriteZoneOffset";
+    public static final String ZONE_OFFSET_RECORD = "ZoneOffset";
+    public static final String ZONE_OFFSET_RECORD_HOUR = "hours";
+    public static final String ZONE_OFFSET_RECORD_MINUTE = "minutes";
+    public static final String ZONE_OFFSET_RECORD_SECOND = "seconds";
+
+    // For `time:Civil`
+    public static final String CIVIL_RECORD = "Civil";
+    public static final String CIVIL_RECORD_UTC_OFFSET = "utcOffset";
+    public static final String CIVIL_RECORD_TIME_ABBREV = "timeAbbrev";
+    public static final String CIVIL_RECORD_WHICH = "which";
+
 }
+

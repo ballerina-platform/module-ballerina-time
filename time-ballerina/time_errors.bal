@@ -14,8 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-# Specifies the time error, which occurs in the module.
-public type TimeError distinct error;
+# The generic module level error.  
+public type Error error;
 
-# Represents the Time module related error.
-public type Error TimeError;
+# The error to be returned when parameters are incorrectly formatted .
+public type FormatError distinct Error;
