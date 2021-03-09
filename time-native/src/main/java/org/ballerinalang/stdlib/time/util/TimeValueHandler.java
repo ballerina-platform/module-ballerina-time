@@ -62,6 +62,7 @@ public class TimeValueHandler {
         BArray utcTuple = ValueCreator.createTupleValue(UTC_TUPLE_TYPE);
         utcTuple.add(0, secondsFromEpoc);
         utcTuple.add(1, ValueCreator.createDecimalValue(lastSecondFraction));
+        utcTuple.freezeDirect();
         return utcTuple;
     }
 
@@ -72,6 +73,7 @@ public class TimeValueHandler {
         BArray utcTuple = ValueCreator.createTupleValue(UTC_TUPLE_TYPE);
         utcTuple.add(0, secondsFromEpoc);
         utcTuple.add(1, ValueCreator.createDecimalValue(lastSecondFraction));
+        utcTuple.freezeDirect();
         return utcTuple;
     }
 
@@ -152,6 +154,7 @@ public class TimeValueHandler {
                 civilMap.put(StringUtils.fromString(Constants.ZONE_OFFSET_RECORD_SECOND),
                         zoneInfo.get(Constants.ZONE_OFFSET_RECORD_SECOND).longValue());
             }
+            civilMap.freezeDirect();
             return civilMap;
         }
         return null;

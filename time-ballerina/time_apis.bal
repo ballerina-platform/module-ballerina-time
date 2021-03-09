@@ -21,7 +21,7 @@ import ballerina/jballerina.java;
 # and nil means native precision(nanosecond precision 9) of clock)
 # + return - The `time:Utc` value corresponding to the current UTC time
 public isolated function utcNow(int? precision = ()) returns Utc {
-    return <Utc>(externUtcNow(precision ?: -1).cloneReadOnly());
+    return externUtcNow(precision ?: -1);
 }
 
 # Monotonic time - seconds from some unspecified epoch
@@ -35,7 +35,7 @@ public isolated function monotonicNow() returns Seconds {
 # + return - The corresponding `time:Utc` or a `time:Error` when the specified timestamp
 # is not adhere to the RFC 3339 format(e.g. `2007-12-03T10:15:30.00Z`)
 public isolated function utcFromString(string timestamp) returns Utc|Error {
-    return <Utc>(check externUtcFromString(timestamp).cloneReadOnly());
+    return externUtcFromString(timestamp);
 }
 
 # Converts a given `time:Utc` time to a RFC 3339 timestamp(e.g. `2007-12-03T10:15:30.00Z`).
@@ -132,13 +132,8 @@ public isolated function utcFromCivil(Civil civilTime) returns Utc|Error {
     if (utcOffset?.seconds is decimal) {
         utcOffsetSeconds = <decimal>utcOffset?.seconds;
     }
-    [int, decimal]|Error readableUtc = externUtcFromCivil(civilTime.year, civilTime.month, civilTime.day, civilTime.hour, 
+    return externUtcFromCivil(civilTime.year, civilTime.month, civilTime.day, civilTime.hour,
     civilTime.minute, seconds, utcOffset.hours, utcOffset.minutes, utcOffsetSeconds);
-    if (readableUtc is [int, decimal]) {
-        return <Utc>readableUtc.cloneReadOnly();
-    } else {
-        return readableUtc;
-    }
 }
 
 # Converts a given RFC 3339 timestamp(e.g. `2007-12-03T10:15:30.00Z`) to `time:Civil`.
@@ -147,19 +142,19 @@ public isolated function utcFromCivil(Civil civilTime) returns Utc|Error {
 public isolated function civilFromString(string dateTimeString) returns Civil|Error {
     Civil|Error civil = externCivilFromString(dateTimeString);
     if (civil is Civil) {
-        ReadWriteZoneOffset? readWriteZone = externZoneOffsetFromString(dateTimeString);
-        if (readWriteZone is ReadWriteZoneOffset) {
-            if (readWriteZone?.seconds is decimal) {
+        ZoneOffset? returnedZone = externZoneOffsetFromString(dateTimeString);
+        if (returnedZone is ZoneOffset) {
+            if (returnedZone?.seconds is decimal) {
                 ZoneOffset zoneOffset = {
-                    hours: readWriteZone.hours,
-                    minutes: readWriteZone.minutes,
-                    seconds: <decimal>readWriteZone?.seconds
+                    hours: returnedZone.hours,
+                    minutes: returnedZone.minutes,
+                    seconds: <decimal>returnedZone?.seconds
                 };
                 civil.utcOffset = zoneOffset;
             } else {
                 ZoneOffset zoneOffset = {
-                    hours: readWriteZone.hours,
-                    minutes: readWriteZone.minutes
+                    hours: returnedZone.hours,
+                    minutes: returnedZone.minutes
                 };
                 civil.utcOffset = zoneOffset;
             }
@@ -189,7 +184,7 @@ public isolated function civilToString(Civil civil) returns string|Error {
     utcOffset.minutes, utcOffsetSeconds);
 }
 
-isolated function externUtcNow(int precision) returns [int, decimal] = @java:Method {
+isolated function externUtcNow(int precision) returns Utc = @java:Method {
     name: "externUtcNow",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -199,7 +194,7 @@ isolated function externMonotonicNow() returns Seconds = @java:Method {
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
-isolated function externUtcFromString(string str) returns [int, decimal]|Error = @java:Method {
+isolated function externUtcFromString(string str) returns Utc|Error = @java:Method {
     name: "externUtcFromString",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -230,7 +225,7 @@ isolated function externUtcToCivil(Utc utc) returns Civil = @java:Method {
 } external;
 
 isolated function externUtcFromCivil(int year, int month, int day, int hour, int minute, decimal second, int zoneHour, 
-                                     int zoneMinute, decimal zoneSecond) returns [int, decimal]|Error = @java:Method {
+                                     int zoneMinute, decimal zoneSecond) returns Utc|Error = @java:Method {
     name: "externUtcFromCivil",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -246,7 +241,7 @@ isolated function externCivilToString(int year, int month, int day, int hour, in
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
-isolated function externZoneOffsetFromString(string dateTimeString) returns ReadWriteZoneOffset? = @java:Method {
+isolated function externZoneOffsetFromString(string dateTimeString) returns ZoneOffset? = @java:Method {
     name: "externZoneOffsetFromString",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
