@@ -60,7 +60,6 @@ public isolated function utcAddSeconds(Utc utc, Seconds seconds) returns Utc {
     return [secondsFromEpoch, lastSecondFraction];
 }
 
-// TODO Try to do in Ballerina
 # Returns difference in seconds between utc1 and utc2.
 # This will be positive if utc1 occurs after utc2
 # + utc1 - 1st Utc time as a tuple `[int, decimal]`
