@@ -137,16 +137,18 @@ public isolated function utcFromCivil(Civil civilTime) returns Utc|Error {
         return error FormatError("civilTime.utcOffset must not be null");
     }
     ZoneOffset utcOffset = <ZoneOffset>civilTime?.utcOffset;
-    decimal seconds = 0.0;
+    decimal civilTimeSeconds = 0.0;
     decimal utcOffsetSeconds = 0.0;
-    if (civilTime?.second is Seconds) {
-        seconds = <decimal>civilTime?.second;
+    decimal? civilTimeSecField = civilTime?.second;
+    decimal? utcOffsetSecField = utcOffset?.seconds;
+    if (civilTimeSecField is decimal) {
+        civilTimeSeconds = civilTimeSecField;
     }
-    if (utcOffset?.seconds is decimal) {
-        utcOffsetSeconds = <decimal>utcOffset?.seconds;
+    if (utcOffsetSecField is decimal) {
+        utcOffsetSeconds = utcOffsetSecField;
     }
     return externUtcFromCivil(civilTime.year, civilTime.month, civilTime.day, civilTime.hour,
-    civilTime.minute, seconds, utcOffset.hours, utcOffset.minutes, utcOffsetSeconds);
+    civilTime.minute, civilTimeSeconds, utcOffset.hours, utcOffset.minutes, utcOffsetSeconds);
 }
 
 # Converts a given RFC 3339 timestamp(e.g. `2007-12-03T10:15:30.00Z`) to `time:Civil`.
@@ -160,11 +162,12 @@ public isolated function civilFromString(string dateTimeString) returns Civil|Er
     Civil civil = check externCivilFromString(dateTimeString);
     ZoneOffset? returnedZone = externZoneOffsetFromString(dateTimeString);
     if (returnedZone is ZoneOffset) {
-        if (returnedZone?.seconds is decimal) {
+        decimal? zoneSeconds = returnedZone?.seconds;
+        if (zoneSeconds is decimal) {
             ZoneOffset zoneOffset = {
                 hours: returnedZone.hours,
                 minutes: returnedZone.minutes,
-                seconds: <decimal>returnedZone?.seconds
+                seconds: zoneSeconds
             };
             civil.utcOffset = zoneOffset;
         } else {
