@@ -16,7 +16,7 @@
 
 import ballerina/jballerina.java;
 
-# Returns Utc representing current time.
+# Returns Utc representing current time(current instant of the system clock as seconds from the epoch of 1970-01-01T00:00:00).
 # + precision - Specifies number of zeros after decimal point (e.g. 3 would give millisecond precision
 # and nil means native precision(nanosecond precision 9) of clock)
 # ```ballerina
@@ -27,9 +27,10 @@ public isolated function utcNow(int? precision = ()) returns Utc {
     return externUtcNow(precision ?: -1);
 }
 
-# Monotonic time - seconds from some unspecified epoch
+# Returns no of seconds from unspecified epoch.
+# This API guarantees consistent value increase in subsequent calls with nanoseconds precision.
 # ```ballerina
-# time:Seconds seconds = time:monotonicNow();
+# decimal seconds = time:monotonicNow();
 # ```
 # + return - Number of seconds from an unspecified epoch
 public isolated function monotonicNow() returns Seconds {
@@ -49,8 +50,7 @@ public isolated function utcFromString(string timestamp) returns Utc|Error {
 
 # Converts a given `time:Utc` time to a RFC 3339 timestamp(e.g. `2007-12-03T10:15:30.00Z`).
 # ```ballerina
-# time:Utc utc = time:utcNow();
-# string utcString = time:utcToString(utc);
+# string utcString = time:utcToString(time:utcNow());
 # ```
 # + utc - Utc time as a tuple `[int, decimal]`
 # + return - The corresponding RFC 3339 timestamp string
@@ -58,10 +58,10 @@ public isolated function utcToString(Utc utc) returns string {
     return externUtcToString(utc);
 }
 
-# Returns Utc time that occurs seconds after `utc`. This assumes that all days have 86400 seconds.
+# Returns Utc time that occurs seconds after `utc`. This assumes that all days have 86400 seconds except when utc
+# represents a time during a positive leap second, in which case the corresponding day will be assumed to have 86401 seconds.
 # ```ballerina
-# time:Utc utc1 = time:utcNow();
-# time:Utc utc2 = time:utcAddSeconds(utc1, 20.900);
+# time:Utc utc = time:utcAddSeconds(time:utcNow(), 20.900);
 # ```
 # + utc - Utc time as a tuple `[int, decimal]`
 # + seconds - Number of seconds to be added
@@ -110,33 +110,8 @@ public isolated function dateValidate(Date date) returns Error? {
 # + date - Date value
 # + return - `DayOfWeek` if the `date` is valid or else panic
 public isolated function dayOfWeek(Date date) returns DayOfWeek {
-    int|Error dayNo = externDayOfWeek(date);
-    if (dayNo is int) {
-        match dayNo {
-            0 => {
-                return SUNDAY;
-            }
-            1 => {
-                return MONDAY;
-            }
-            2 => {
-                return TUESDAY;
-            }
-            3 => {
-                return WEDNESDAY;
-            }
-            4 => {
-                return THURSDAY;
-            }
-            5 => {
-                return FRIDAY;
-            }
-            6 => {
-                return SATURDAY;
-            }
-        }
-    }
-    panic <Error>dayNo;
+    int[] daysOfWeek = [SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY];
+    return <DayOfWeek>daysOfWeek[checkpanic externDayOfWeek(date)];
 }
 
 # Converts a given `Utc` timestamp to a `Civil` value.
@@ -182,33 +157,30 @@ public isolated function utcFromCivil(Civil civilTime) returns Utc|Error {
 # + dateTimeString - RFC 3339 timestamp(e.g. `2007-12-03T10:15:30.00Z`) as a string
 # + return - The corresponding `time:Civil` value or an error if the given `dateTimeString` is invalid
 public isolated function civilFromString(string dateTimeString) returns Civil|Error {
-    Civil|Error civil = externCivilFromString(dateTimeString);
-    if (civil is Civil) {
-        ZoneOffset? returnedZone = externZoneOffsetFromString(dateTimeString);
-        if (returnedZone is ZoneOffset) {
-            if (returnedZone?.seconds is decimal) {
-                ZoneOffset zoneOffset = {
-                    hours: returnedZone.hours,
-                    minutes: returnedZone.minutes,
-                    seconds: <decimal>returnedZone?.seconds
-                };
-                civil.utcOffset = zoneOffset;
-            } else {
-                ZoneOffset zoneOffset = {
-                    hours: returnedZone.hours,
-                    minutes: returnedZone.minutes
-                };
-                civil.utcOffset = zoneOffset;
-            }
+    Civil civil = check externCivilFromString(dateTimeString);
+    ZoneOffset? returnedZone = externZoneOffsetFromString(dateTimeString);
+    if (returnedZone is ZoneOffset) {
+        if (returnedZone?.seconds is decimal) {
+            ZoneOffset zoneOffset = {
+                hours: returnedZone.hours,
+                minutes: returnedZone.minutes,
+                seconds: <decimal>returnedZone?.seconds
+            };
+            civil.utcOffset = zoneOffset;
+        } else {
+            ZoneOffset zoneOffset = {
+                hours: returnedZone.hours,
+                minutes: returnedZone.minutes
+            };
+            civil.utcOffset = zoneOffset;
         }
-        return civil;
     }
-    return <Error>civil;
+    return civil;
 }
 
 # Obtain a RFC 3339 timestamp(e.g. `2007-12-03T10:15:30.00Z`) from a given `time:Civil`.
 # ```ballerina
-# time:Civil civil = check time:civilFromString("2007-12-03T10:15:30.00Z")
+# time:Civil civil = check time:civilFromString("2007-12-03T10:15:30.00Z");
 # string|time:Error civilString = time:civilToString(civil);
 # ```
 # + civil - `time:Civil` that needs to be converted
