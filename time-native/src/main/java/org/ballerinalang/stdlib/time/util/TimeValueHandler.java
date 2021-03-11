@@ -264,4 +264,19 @@ public class TimeValueHandler {
         utcTuple.freezeDirect();
         return utcTuple;
     }
+
+    // Return the ZonedDateTime value that belongs to the `Z` time zone.
+    public static ZonedDateTime createZonedDateTimeFromUtc(BArray utc) {
+        long secondsFromEpoc = 0;
+        BigDecimal lastSecondFraction = new BigDecimal(0);
+        if (utc.getLength() == 2) {
+            secondsFromEpoc = utc.getInt(0);
+            lastSecondFraction = new BigDecimal(utc.getValues()[1].toString()).multiply(Constants.ANALOG_GIGA);
+        } else if (utc.getLength() == 1) {
+            secondsFromEpoc = utc.getInt(0);
+        } else {
+            return null;
+        }
+        return Instant.ofEpochSecond(secondsFromEpoc, lastSecondFraction.intValue()).atZone(ZoneId.of("Z"));
+    }
 }
