@@ -75,13 +75,13 @@ public type TimeOfDay record {
 # if any of the three fields are < 0, then all must be <= 0
 # Semantic is that durations should be left out
 public type ZoneOffset readonly & record {|
-                                      int hours;
-                                      int minutes = 0;
-                                      # IETF zone files have historical zones that are offset by
-                                      # integer seconds; we use Seconds type so that this is a subtype
-                                      # of Delta
-                                      decimal seconds?;
-                                  |};
+    int hours;
+    int minutes = 0;
+    # IETF zone files have historical zones that are offset by
+    # integer seconds; we use Seconds type so that this is a subtype
+    # of Delta
+    decimal seconds?;
+|};
 
 type ReadWriteZoneOffset record {|
     int hours;
