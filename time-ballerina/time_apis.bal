@@ -33,7 +33,7 @@ public isolated function utcNow(int? precision = ()) returns Utc {
 # decimal seconds = time:monotonicNow();
 # ```
 # + return - Number of seconds from an unspecified epoch
-public isolated function monotonicNow() returns Seconds {
+public isolated function monotonicNow() returns decimal {
     return externMonotonicNow();
 }
 
