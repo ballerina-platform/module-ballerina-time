@@ -14,8 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-# The generic module level error.  
-public type Error error;
+# The generic module level error.
+public type Error FormatError;
 
-# The error to be returned when parameters are incorrectly formatted .
-public type FormatError distinct Error;
+# The error to be returned when arguments are invalid.
+public type FormatError distinct error;
