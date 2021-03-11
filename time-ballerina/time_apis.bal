@@ -110,8 +110,8 @@ public isolated function dateValidate(Date date) returns Error? {
 # + date - Date value
 # + return - `DayOfWeek` if the `date` is valid or else panic
 public isolated function dayOfWeek(Date date) returns DayOfWeek {
-    int[] daysOfWeek = [SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY];
-    return <DayOfWeek>daysOfWeek[checkpanic externDayOfWeek(date)];
+    DayOfWeek[] daysOfWeek = [SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY];
+    return daysOfWeek[checkpanic externDayOfWeek(date)];
 }
 
 # Converts a given `Utc` timestamp to a `Civil` value.
