@@ -15,7 +15,7 @@
 // under the License.
 
 # The generic module level error.
-public type Error FormatError;
+public type Error error;
 
 # The error to be returned when arguments are invalid.
-public type FormatError distinct error;
+public type FormatError distinct Error;
