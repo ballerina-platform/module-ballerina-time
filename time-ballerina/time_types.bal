@@ -51,14 +51,22 @@ public type Date record {
     int day;
 };
 
-# The day of weel according to the US convention.
+# Represents Sunday from integer 0.
 public const int SUNDAY = 0;
+# Monday represents from integer 1.
 public const int MONDAY = 1;
+# Tuesday represents from integer 2.
 public const int TUESDAY = 2;
+# Wednesday represents from integer 3.
 public const int WEDNESDAY = 3;
+# Thursday represents from integer 4.
 public const int THURSDAY = 4;
+# Friday represents from integer 5.
 public const int FRIDAY = 5;
+# Saturday represents from integer 6.
 public const int SATURDAY = 6;
+
+# The day of weel according to the US convention.
 public type DayOfWeek SUNDAY|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY;
 
 # Time within a day
@@ -89,7 +97,9 @@ type ReadWriteZoneOffset record {|
     decimal seconds?;
 |};
 
+# Represents the `Z` zone, hours: 0 and minutes: 0.
 public final ZoneOffset Z = {hours: 0};
+# Represents the type that can be either zero or one.
 public type ZERO_OR_ONE 0|1;
 
 # Time within some region relative to a
