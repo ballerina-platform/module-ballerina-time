@@ -118,3 +118,7 @@ public type Civil record {
     string timeAbbrev?;
     ZERO_OR_ONE which?;
 };
+
+# Defualt zone value represation in different formats.
+public type UtcZoneHandling "0" | "GMT" | "UT" | "Z";
+

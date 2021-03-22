@@ -205,6 +205,14 @@ public isolated function civilToString(Civil civil) returns string|Error {
     utcOffset.minutes, utcOffsetSeconds);
 }
 
+public isolated function utcToEmailString(Utc utc, UtcZoneHandling zh = "0") returns string {
+    string passingZh = zh;
+    if zh == "0" {
+        passingZh = "Z";
+    }
+    return externUtcToEmailString(utc, passingZh);
+}
+
 isolated function externUtcNow(int precision) returns Utc = @java:Method {
     name: "externUtcNow",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
@@ -264,5 +272,10 @@ isolated function externCivilToString(int year, int month, int day, int hour, in
 
 isolated function externZoneOffsetFromString(string dateTimeString) returns ZoneOffset? = @java:Method {
     name: "externZoneOffsetFromString",
+    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+} external;
+
+isolated function externUtcToEmailString(Utc utc, string zh) returns string = @java:Method {
+    name: "externUtcToEmailString",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
