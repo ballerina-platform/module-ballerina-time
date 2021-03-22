@@ -34,6 +34,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Extern methods used in Ballerina Time library.
@@ -154,6 +155,13 @@ public class ExternMethods {
         } catch (DateTimeException e) {
             return TimeValueHandler.createError(Errors.FormatError, e.getMessage());
         }
+    }
+
+    public static BString externUtcToEmailString(BArray utc, BString zh) {
+
+        Instant time = TimeValueHandler.createInstantFromUtc(utc);
+        return StringUtils.fromString(ZonedDateTime.ofInstant(time,
+        ZoneId.of(zh.getValue())).format(DateTimeFormatter.RFC_1123_DATE_TIME));
     }
 
 }
