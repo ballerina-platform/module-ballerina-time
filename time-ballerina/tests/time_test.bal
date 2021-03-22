@@ -396,3 +396,13 @@ isolated function testCivilToString() {
         test:assertFail(msg = civilStr.message());
     }
 }
+
+@test:Config {}
+isolated function testUtcToEmailString() {
+    Utc|Error utc = utcFromString("2007-12-03T10:15:30.00Z");
+    if (utc is Utc) {
+        test:assertEquals(utcToEmailString(utc), "Mon, 3 Dec 2007 10:15:30 GMT");
+    } else {
+        test:assertFail(msg = utc.message());
+    }
+}
