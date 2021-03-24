@@ -13,7 +13,6 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
 import ballerina/jballerina.java;
 
 # Returns Utc representing current time(current instant of the system clock as seconds from the epoch of 1970-01-01T00:00:00).
@@ -137,18 +136,13 @@ public isolated function utcFromCivil(Civil civilTime) returns Utc|Error {
         return error FormatError("civilTime.utcOffset must not be null");
     }
     ZoneOffset utcOffset = <ZoneOffset>civilTime?.utcOffset;
-    decimal civilTimeSeconds = 0.0;
-    decimal utcOffsetSeconds = 0.0;
     decimal? civilTimeSecField = civilTime?.second;
     decimal? utcOffsetSecField = utcOffset?.seconds;
-    if (civilTimeSecField is decimal) {
-        civilTimeSeconds = civilTimeSecField;
-    }
-    if (utcOffsetSecField is decimal) {
-        utcOffsetSeconds = utcOffsetSecField;
-    }
-    return externUtcFromCivil(civilTime.year, civilTime.month, civilTime.day, civilTime.hour,
-    civilTime.minute, civilTimeSeconds, utcOffset.hours, utcOffset.minutes, utcOffsetSeconds);
+    decimal civilTimeSeconds = (civilTimeSecField is Seconds) ? civilTimeSecField : 0.0;
+    decimal utcOffsetSeconds = (utcOffsetSecField is decimal) ? utcOffsetSecField : 0.0;
+
+    return externUtcFromCivil(civilTime.year, civilTime.month, civilTime.day, civilTime.hour, civilTime.minute, 
+    civilTimeSeconds, utcOffset.hours, utcOffset.minutes, utcOffsetSeconds);
 }
 
 # Converts a given RFC 3339 timestamp(e.g. `2007-12-03T10:15:30.00Z`) to `time:Civil`.
@@ -159,26 +153,7 @@ public isolated function utcFromCivil(Civil civilTime) returns Utc|Error {
 # + dateTimeString - RFC 3339 timestamp(e.g. `2007-12-03T10:15:30.00Z`) as a string
 # + return - The corresponding `time:Civil` value or an error if the given `dateTimeString` is invalid
 public isolated function civilFromString(string dateTimeString) returns Civil|Error {
-    Civil civil = check externCivilFromString(dateTimeString);
-    ZoneOffset? returnedZone = externZoneOffsetFromString(dateTimeString);
-    if (returnedZone is ZoneOffset) {
-        decimal? zoneSeconds = returnedZone?.seconds;
-        if (zoneSeconds is decimal) {
-            ZoneOffset zoneOffset = {
-                hours: returnedZone.hours,
-                minutes: returnedZone.minutes,
-                seconds: zoneSeconds
-            };
-            civil.utcOffset = zoneOffset;
-        } else {
-            ZoneOffset zoneOffset = {
-                hours: returnedZone.hours,
-                minutes: returnedZone.minutes
-            };
-            civil.utcOffset = zoneOffset;
-        }
-    }
-    return civil;
+    return check externCivilFromString(dateTimeString);
 }
 
 # Obtain a RFC 3339 timestamp(e.g. `2007-12-03T10:15:30.00Z`) from a given `time:Civil`.
@@ -193,24 +168,61 @@ public isolated function civilToString(Civil civil) returns string|Error {
         return error FormatError("civil.utcOffset must not be null");
     }
     ZoneOffset utcOffset = <ZoneOffset>civil?.utcOffset;
-    decimal seconds = 0.0;
-    decimal utcOffsetSeconds = 0.0;
-    if (civil?.second is Seconds) {
-        seconds = <decimal>civil?.second;
-    }
-    if (utcOffset?.seconds is decimal) {
-        utcOffsetSeconds = <decimal>utcOffset?.seconds;
-    }
-    return externCivilToString(civil.year, civil.month, civil.day, civil.hour, civil.minute, seconds, utcOffset.hours, 
-    utcOffset.minutes, utcOffsetSeconds);
+    decimal? civilTimeSecField = civil?.second;
+    decimal? utcOffsetSecField = utcOffset?.seconds;
+    decimal civilTimeSeconds = (civilTimeSecField is Seconds) ? civilTimeSecField : 0.0;
+    decimal utcOffsetSeconds = (utcOffsetSecField is decimal) ? utcOffsetSecField : 0.0;
+
+    return externCivilToString(civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds, utcOffset.
+    hours, utcOffset.minutes, utcOffsetSeconds);
 }
 
+# Converts a given UTC to an email formatted string(e.g `Mon, 3 Dec 2007 10:15:30 GMT`).
+# ```ballerina
+# time:Utc utc = time:utcNow();
+# string emailFormattedString = time:utcToEmailString(utc);
+# ```
+# + utc - The UTC value to be formatted
+# + zh - Type of the zone value to be added
+# + return - The corresponding formatted string
 public isolated function utcToEmailString(Utc utc, UtcZoneHandling zh = "0") returns string {
-    string passingZh = zh;
-    if zh == "0" {
-        passingZh = "Z";
+    return externUtcToEmailString(utc, zh);
+}
+
+# Converts a given RFC 5322 formatted(e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`) string to a civil record.
+# ```ballerina
+# time:Civil|time:Error emailDateTime = time:civilFromEmailString("Wed, 10 Mar 2021 19:51:55 -0820");
+# ```
+# + dateTimeString - RFC 5322 formatted(e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`) string to be converted
+# + return - The corresponding civil record or an error if the given string is incorrectly formatted.
+public isolated function civilFromEmailString(string dateTimeString) returns Civil|Error {
+    return check externCivilFromEmailString(dateTimeString);
+}
+
+# Converts a given Civil record to RFC 5322 format(e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`).
+# ```ballerina
+# time:Civil civil = check time:civilFromString("2021-04-12T23:20:50.520+05:30[Asia/Colombo]");
+# string|time:Error emailDateTime = time:civilToEmailString(civil, "GMT");
+# ```
+# + civil - The civil record to be converted
+# + zoneHandling - Indicate how to handle the zone by specifying the preference whether to give preference to zone
+# offset or time abbreviation. Also, this can configure to use zone offset to the execution and use time abbreviation as a comment.
+# + return - RFC 5322 formatted(e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`) string or
+# an error if the specified `time:Civil` contains invalid parameters(e.g. `month` > 12)
+public isolated function civilToEmailString(Civil civil, HeaderZoneHandling zoneHandling) returns string|Error {
+    if civil?.utcOffset is () {
+        return error FormatError("civil.utcOffset must not be null");
     }
-    return externUtcToEmailString(utc, passingZh);
+    ZoneOffset utcOffset = <ZoneOffset>civil?.utcOffset;
+    decimal? civilTimeSecField = civil?.second;
+    decimal? utcOffsetSecField = utcOffset?.seconds;
+    string? timeAbbrevField = civil?.timeAbbrev;
+    decimal civilTimeSeconds = (civilTimeSecField is Seconds) ? civilTimeSecField : 0.0;
+    decimal utcOffsetSeconds = (utcOffsetSecField is decimal) ? utcOffsetSecField : 0.0;
+    string timeAbbrev = (timeAbbrevField is string) ? timeAbbrevField : "";
+
+    return externCivilToEmailString(civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds, 
+    utcOffset.hours, utcOffset.minutes, utcOffsetSeconds, timeAbbrev, zoneHandling);
 }
 
 isolated function externUtcNow(int precision) returns Utc = @java:Method {
@@ -270,12 +282,19 @@ isolated function externCivilToString(int year, int month, int day, int hour, in
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
-isolated function externZoneOffsetFromString(string dateTimeString) returns ZoneOffset? = @java:Method {
-    name: "externZoneOffsetFromString",
+isolated function externUtcToEmailString(Utc utc, string zh) returns string = @java:Method {
+    name: "externUtcToEmailString",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
-isolated function externUtcToEmailString(Utc utc, string zh) returns string = @java:Method {
-    name: "externUtcToEmailString",
+isolated function externCivilFromEmailString(string dateTimeString) returns Civil|Error = @java:Method {
+    name: "externCivilFromEmailString",
+    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+} external;
+
+isolated function externCivilToEmailString(int year, int month, int day, int hour, int minute, decimal second, 
+                                           int zoneHour, int zoneMinute, decimal zoneSecond, string timeAbber, 
+                                           HeaderZoneHandling zoneHandling) returns string|Error = @java:Method {
+    name: "externCivilToEmailString",
     'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
 } external;
