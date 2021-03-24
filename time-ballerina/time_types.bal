@@ -99,6 +99,7 @@ type ReadWriteZoneOffset record {|
 
 # Represents the `Z` zone, hours: 0 and minutes: 0.
 public final ZoneOffset Z = {hours: 0};
+
 # Represents the type that can be either zero or one.
 public type ZERO_OR_ONE 0|1;
 
@@ -120,5 +121,11 @@ public type Civil record {
 };
 
 # Defualt zone value represation in different formats.
-public type UtcZoneHandling "0" | "GMT" | "UT" | "Z";
+public type UtcZoneHandling "0"|"GMT"|"UT"|"Z";
 
+# Indicate how to handle both `zoneOffset` and `timeAbbrev`.
+public enum HeaderZoneHandling {
+    PREFER_TIME_ABBREV,
+    PREFER_ZONE_OFFSET,
+    ZONE_OFFSET_WITH_TIME_ABBREV_COMMENT
+}
