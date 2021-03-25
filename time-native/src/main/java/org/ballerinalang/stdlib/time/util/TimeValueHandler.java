@@ -108,6 +108,8 @@ public class TimeValueHandler {
                 ValueCreator.createDecimalValue(second));
         civilMap.put(StringUtils.fromString(Constants.CIVIL_RECORD_TIME_ABBREV),
                 StringUtils.fromString(zonedDateTime.getZone().toString()));
+        civilMap.put(StringUtils.fromString(Constants.CIVIL_RECORD_DAY_OF_WEEK),
+                (zonedDateTime.getDayOfWeek().getValue() % 7));
         return civilMap;
     }
 
@@ -133,6 +135,8 @@ public class TimeValueHandler {
             civilMap.put(StringUtils.fromString(Constants.CIVIL_RECORD_UTC_OFFSET),
                     createZoneOffsetFromZonedDateTime(zonedDateTime));
         }
+        civilMap.put(StringUtils.fromString(Constants.CIVIL_RECORD_DAY_OF_WEEK),
+                (zonedDateTime.getDayOfWeek().getValue() % 7));
         return civilMap;
     }
 
@@ -155,6 +159,8 @@ public class TimeValueHandler {
                 StringUtils.fromString(zonedDateTime.getZone().toString()));
         civilMap.put(StringUtils.fromString(Constants.CIVIL_RECORD_UTC_OFFSET),
                 createZoneOffsetFromZonedDateTime(zonedDateTime));
+        civilMap.put(StringUtils.fromString(Constants.CIVIL_RECORD_DAY_OF_WEEK),
+                (zonedDateTime.getDayOfWeek().getValue() % 7));
         return civilMap;
     }
 

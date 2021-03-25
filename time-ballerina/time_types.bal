@@ -118,6 +118,7 @@ public type Civil record {
     # standard time and one for daylight savings time
     string timeAbbrev?;
     ZERO_OR_ONE which?;
+    DayOfWeek dayOfWeek?;
 };
 
 # Defualt zone value represation in different formats.

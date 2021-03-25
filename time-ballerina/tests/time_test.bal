@@ -207,7 +207,8 @@ isolated function testUtcToCivil() {
             hour: 23,
             minute: 20,
             second: 50.52,
-            timeAbbrev: "Z"
+            timeAbbrev: "Z",
+            dayOfWeek: MONDAY
         };
         test:assertEquals(civil, expectedCivil);
     } else {
@@ -324,7 +325,8 @@ isolated function testCivilFromStringWithZone() {
         minute: 20,
         second: 50.52,
         timeAbbrev: "Asia/Colombo",
-        utcOffset: zoneOffset
+        utcOffset: zoneOffset,
+        dayOfWeek: MONDAY
     };
     Civil|Error civil = civilFromString(dateString);
     if (civil is Civil) {
@@ -344,7 +346,8 @@ isolated function testCivilFromStringWithoutZone() {
         hour: 23,
         minute: 20,
         second: 50.52,
-        timeAbbrev: "Z"
+        timeAbbrev: "Z",
+        dayOfWeek: MONDAY
     };
     Civil|Error civil = civilFromString(dateString);
     if (civil is Civil) {
@@ -365,7 +368,8 @@ isolated function testCivilFromStringWithoutSecond() {
         hour: 23,
         minute: 20,
         timeAbbrev: "Asia/Colombo",
-        utcOffset: zoneOffset
+        utcOffset: zoneOffset,
+        dayOfWeek: MONDAY
     };
     Civil|Error civil = civilFromString(dateString);
     if (civil is Civil) {
@@ -429,7 +433,8 @@ isolated function testCivilFromEmailString() {
         minute: 51,
         second: 55,
         timeAbbrev: "America/Los_Angeles",
-        utcOffset: zoneOffset
+        utcOffset: zoneOffset,
+        dayOfWeek: WEDNESDAY
     };
     Civil|Error civil = civilFromEmailString(dateString);
     if (civil is Civil) {
