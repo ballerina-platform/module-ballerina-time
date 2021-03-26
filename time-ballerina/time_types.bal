@@ -83,7 +83,7 @@ type TimeOfDayFields record {
 # + month - month as an integer(1 <= month <= 12)  
 # + year - year as an integer  
 # + day - day as an integer(1 <= day <= 31)  
-public type OptionalDateFields record {
+type OptionalDateFields record {
     int year?;
     int month?;
     int day?;
@@ -94,7 +94,7 @@ public type OptionalDateFields record {
 # + hour - hour as an integer(0 <= hour <= 23)  
 # + minute - minute as an integer(0 <= minute <= 59)   
 # + second - second as decimal value with nanoseconds precision
-public type OptionalTimeOfDayFields record {
+type OptionalTimeOfDayFields record {
     int hour?;
     int minute?;
     Seconds second?;
