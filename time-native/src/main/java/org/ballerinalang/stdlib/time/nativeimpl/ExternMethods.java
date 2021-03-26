@@ -34,6 +34,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Extern methods used in Ballerina Time library.
@@ -127,21 +128,30 @@ public class ExternMethods {
 
         try {
             ZonedDateTime dateTime = TimeValueHandler.createZoneDateTimeFromCivilValues(year, month, day, hour,
-                    minute, second, zoneHour, zoneMinute, zoneSecond);
+                    minute, second, zoneHour, zoneMinute, zoneSecond, null,
+                    Constants.HeaderZoneHandling.PREFER_ZONE_OFFSET.toString());
             return TimeValueHandler.createUtcFromInstant(dateTime.toInstant());
         } catch (DateTimeException e) {
             return TimeValueHandler.createError(Errors.FormatError, e.getMessage());
         }
     }
 
-    public static BMap<BString, Object> externCivilFromString(BString dateTimeString) {
+    public static Object externCivilFromString(BString dateTimeString) {
 
-        return TimeValueHandler.createCivilFromZoneDateTimeString(dateTimeString.getValue());
+        try {
+            return TimeValueHandler.createCivilFromZoneDateTimeString(dateTimeString.getValue());
+        } catch (DateTimeException e) {
+            return TimeValueHandler.createError(Errors.FormatError, e.getMessage());
+        }
     }
 
-    public static Object externZoneOffsetFromString(BString dateTimeString) {
+    public static Object externCivilFromEmailString(BString dateTimeString) {
 
-        return TimeValueHandler.createZoneOffsetDateTime(dateTimeString.getValue());
+        try {
+            return TimeValueHandler.createCivilFromEmailString(dateTimeString.getValue());
+        } catch (DateTimeException | IllegalArgumentException e) {
+            return TimeValueHandler.createError(Errors.FormatError, e.getMessage());
+        }
     }
 
     public static Object externCivilToString(long year, long month, long day, long hour, long minute, BDecimal second,
@@ -149,8 +159,35 @@ public class ExternMethods {
 
         try {
             ZonedDateTime dateTime = TimeValueHandler.createZoneDateTimeFromCivilValues(year, month, day, hour,
-                    minute, second, zoneHour, zoneMinute, zoneSecond);
+                    minute, second, zoneHour, zoneMinute, zoneSecond, null,
+                    Constants.HeaderZoneHandling.PREFER_ZONE_OFFSET.toString());
             return StringUtils.fromString(dateTime.toInstant().toString());
+        } catch (DateTimeException e) {
+            return TimeValueHandler.createError(Errors.FormatError, e.getMessage());
+        }
+    }
+
+    public static BString externUtcToEmailString(BArray utc, BString zh) {
+
+        Instant time = TimeValueHandler.createInstantFromUtc(utc);
+        return StringUtils.fromString(ZonedDateTime.ofInstant(time,
+                ZoneId.of(Constants.GMT_STRING_VALUE)).format(DateTimeFormatter.RFC_1123_DATE_TIME)
+                .replace(Constants.GMT_STRING_VALUE, zh.getValue()));
+    }
+
+    public static Object externCivilToEmailString(long year, long month, long day, long hour, long minute,
+                                                  BDecimal second, long zoneHour, long zoneMinute, BDecimal zoneSecond,
+                                                  BString zoneAbbr, BString zoneHandling) {
+
+        try {
+            ZonedDateTime dateTime = TimeValueHandler.createZoneDateTimeFromCivilValues(year, month, day, hour,
+                    minute, second, zoneHour, zoneMinute, zoneSecond, zoneAbbr, zoneHandling.getValue());
+            if (Constants.HeaderZoneHandling.PREFER_ZONE_OFFSET.toString().equals(zoneHandling.getValue())) {
+                return StringUtils.fromString(dateTime.format(DateTimeFormatter.ofPattern(
+                        Constants.EMAIL_DATE_TIME_FORMAT_WITHOUT_COMMENT)));
+            }
+            return StringUtils.fromString(dateTime.format(DateTimeFormatter.ofPattern(
+                    Constants.EMAIL_DATE_TIME_FORMAT)));
         } catch (DateTimeException e) {
             return TimeValueHandler.createError(Errors.FormatError, e.getMessage());
         }

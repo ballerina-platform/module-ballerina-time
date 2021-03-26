@@ -207,7 +207,8 @@ isolated function testUtcToCivil() {
             hour: 23,
             minute: 20,
             second: 50.52,
-            timeAbbrev: "Z"
+            timeAbbrev: "Z",
+            dayOfWeek: MONDAY
         };
         test:assertEquals(civil, expectedCivil);
     } else {
@@ -324,7 +325,8 @@ isolated function testCivilFromStringWithZone() {
         minute: 20,
         second: 50.52,
         timeAbbrev: "Asia/Colombo",
-        utcOffset: zoneOffset
+        utcOffset: zoneOffset,
+        dayOfWeek: MONDAY
     };
     Civil|Error civil = civilFromString(dateString);
     if (civil is Civil) {
@@ -344,7 +346,8 @@ isolated function testCivilFromStringWithoutZone() {
         hour: 23,
         minute: 20,
         second: 50.52,
-        timeAbbrev: "Z"
+        timeAbbrev: "Z",
+        dayOfWeek: MONDAY
     };
     Civil|Error civil = civilFromString(dateString);
     if (civil is Civil) {
@@ -365,7 +368,8 @@ isolated function testCivilFromStringWithoutSecond() {
         hour: 23,
         minute: 20,
         timeAbbrev: "Asia/Colombo",
-        utcOffset: zoneOffset
+        utcOffset: zoneOffset,
+        dayOfWeek: MONDAY
     };
     Civil|Error civil = civilFromString(dateString);
     if (civil is Civil) {
@@ -394,5 +398,92 @@ isolated function testCivilToString() {
         test:assertEquals(civilStr, expectedStr);
     } else {
         test:assertFail(msg = civilStr.message());
+    }
+}
+
+@test:Config {}
+isolated function testUtcToEmailString() {
+    Utc|Error utc = utcFromString("2007-12-03T10:15:30.00Z");
+    if (utc is Utc) {
+        test:assertEquals(utcToEmailString(utc, "GMT"), "Mon, 3 Dec 2007 10:15:30 GMT");
+    } else {
+        test:assertFail(msg = utc.message());
+    }
+}
+
+@test:Config {}
+isolated function testUtcToEmailStringWithZ() {
+    Utc|Error utc = utcFromString("2007-12-03T10:15:30.00Z");
+    if (utc is Utc) {
+        test:assertEquals(utcToEmailString(utc, "Z"), "Mon, 3 Dec 2007 10:15:30 Z");
+    } else {
+        test:assertFail(msg = utc.message());
+    }
+}
+
+@test:Config {}
+isolated function testCivilFromEmailString() {
+    string dateString = "Wed, 10 Mar 2021 19:51:55 -0800 (PST)";
+    ZoneOffset zoneOffset = {hours: -8, minutes: 0};
+    Civil expectedCivil = {
+        year: 2021,
+        month: 3,
+        day: 10,
+        hour: 19,
+        minute: 51,
+        second: 55,
+        timeAbbrev: "America/Los_Angeles",
+        utcOffset: zoneOffset,
+        dayOfWeek: WEDNESDAY
+    };
+    Civil|Error civil = civilFromEmailString(dateString);
+    if (civil is Civil) {
+        test:assertEquals(civil, expectedCivil);
+    } else {
+        test:assertFail(msg = civil.message());
+    }
+}
+
+@test:Config {}
+isolated function testCivilToEmailString() {
+    string expectedString = "Wed, 10 Mar 2021 19:51:55 -0800 (PST)";
+    ZoneOffset zoneOffset = {hours: 8, minutes: 0};
+    Civil civil = {
+        year: 2021,
+        month: 3,
+        day: 10,
+        hour: 19,
+        minute: 51,
+        second: 55,
+        timeAbbrev: "America/Los_Angeles",
+        utcOffset: zoneOffset
+    };
+    string|Error emailString = civilToEmailString(civil, ZONE_OFFSET_WITH_TIME_ABBREV_COMMENT);
+    if (emailString is string) {
+        test:assertEquals(emailString, expectedString);
+    } else {
+        test:assertFail(msg = emailString.message());
+    }
+}
+
+@test:Config {}
+isolated function testCivilToEmailStringWithZonePreference() {
+    string expectedString = "Wed, 10 Mar 2021 19:51:55 -0820";
+    ZoneOffset zoneOffset = {hours: -8, minutes: -20};
+    Civil civil = {
+        year: 2021,
+        month: 3,
+        day: 10,
+        hour: 19,
+        minute: 51,
+        second: 55,
+        timeAbbrev: "America/Los_Angeles",
+        utcOffset: zoneOffset
+    };
+    string|Error emailString = civilToEmailString(civil, PREFER_ZONE_OFFSET);
+    if (emailString is string) {
+        test:assertEquals(emailString, expectedString);
+    } else {
+        test:assertFail(msg = emailString.message());
     }
 }
