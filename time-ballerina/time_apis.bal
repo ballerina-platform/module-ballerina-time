@@ -69,7 +69,7 @@ public isolated function utcAddSeconds(Utc utc, Seconds seconds) returns Utc {
     [int, decimal] [secondsFromEpoch, lastSecondFraction] = utc;
     secondsFromEpoch = secondsFromEpoch + <int>seconds.floor();
     lastSecondFraction = lastSecondFraction + (seconds - seconds.floor());
-    if (lastSecondFraction >= <decimal>1.0) {
+    if (lastSecondFraction >= 1.0d) {
         secondsFromEpoch = secondsFromEpoch + <int>lastSecondFraction.floor();
         lastSecondFraction = lastSecondFraction - lastSecondFraction.floor();
     }
