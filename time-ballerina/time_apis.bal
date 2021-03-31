@@ -202,7 +202,7 @@ public isolated function civilFromEmailString(string dateTimeString) returns Civ
 # Converts a given Civil record to RFC 5322 format(e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`).
 # ```ballerina
 # time:Civil civil = check time:civilFromString("2021-04-12T23:20:50.520+05:30[Asia/Colombo]");
-# string|time:Error emailDateTime = time:civilToEmailString(civil, "GMT");
+# string|time:Error emailDateTime = time:civilToEmailString(civil, time:PREFER_ZONE_OFFSET);
 # ```
 # + civil - The civil record to be converted
 # + zoneHandling - Indicate how to handle the zone by specifying the preference whether to give preference to zone
