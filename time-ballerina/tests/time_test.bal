@@ -86,6 +86,12 @@ isolated function testUtcToString() {
 }
 
 @test:Config {}
+isolated function testUtcToStringWithoutFraction() {
+    string utcString = utcToString([482196050]);
+    test:assertEquals(utcString, "1985-04-12T23:20:50Z");
+}
+
+@test:Config {}
 isolated function testUtcAddSeconds() {
     Utc|Error utc1 = utcFromString("2021-04-12T23:20:50.520Z");
     if (utc1 is Utc) {
@@ -386,6 +392,52 @@ isolated function testCivilFromStringWithoutSecond() {
         hour: 23,
         minute: 20,
         timeAbbrev: "Asia/Colombo",
+        utcOffset: zoneOffset,
+        dayOfWeek: MONDAY
+    };
+    Civil|Error civil = civilFromString(dateString);
+    if (civil is Civil) {
+        test:assertEquals(civil, expectedCivil);
+    } else {
+        test:assertFail(msg = civil.message());
+    }
+}
+
+@test:Config {}
+isolated function testCivilFromStringWithoutZoneMinutes() {
+    string dateString = "2021-04-12T23:20:50.520+05";
+    ZoneOffset zoneOffset = {hours: 5, minutes: 0};
+    Civil expectedCivil = {
+        year: 2021,
+        month: 4,
+        day: 12,
+        hour: 23,
+        minute: 20,
+        second: 50.52,
+        timeAbbrev: "+05:00",
+        utcOffset: zoneOffset,
+        dayOfWeek: MONDAY
+    };
+    Civil|Error civil = civilFromString(dateString);
+    if (civil is Civil) {
+        test:assertEquals(civil, expectedCivil);
+    } else {
+        test:assertFail(msg = civil.message());
+    }
+}
+
+@test:Config {}
+isolated function testCivilFromStringWithZoneSeconds() {
+    string dateString = "2021-04-12T23:20:50.520+05:30:45";
+    ZoneOffset zoneOffset = {hours: 5, minutes: 30, seconds: 45d};
+    Civil expectedCivil = {
+        year: 2021,
+        month: 4,
+        day: 12,
+        hour: 23,
+        minute: 20,
+        second: 50.52,
+        timeAbbrev: "+05:30:45",
         utcOffset: zoneOffset,
         dayOfWeek: MONDAY
     };
