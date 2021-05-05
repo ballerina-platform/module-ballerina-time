@@ -450,6 +450,17 @@ isolated function testCivilFromStringWithZoneSeconds() {
 }
 
 @test:Config {}
+isolated function testCivilFromStringWithInvalidInput() {
+    string dateString = "2021-04-12T23:20:50.520.05:30:45";
+    Civil|Error err = civilFromString(dateString);
+    if (err is Error) {
+        test:assertEquals(err.message(), "Text '2021-04-12T23:20:50.520.05:30:45' could not be parsed at index 23");
+    } else {
+        test:assertFail(msg = "Expected time:Error not found");
+    }
+}
+
+@test:Config {}
 isolated function testCivilToString() {
     ZoneOffset zoneOffset = {hours: 5, minutes: 30};
     Civil civil = {
@@ -521,6 +532,27 @@ isolated function testCivilToStringWithoutOffset() {
 }
 
 @test:Config {}
+isolated function testCivilToStringWithInvalidInput() {
+    ZoneOffset zoneOffset = {hours: 5, minutes: 30};
+    Civil civil = {
+        year: 2021,
+        month: 3,
+        day: 5,
+        hour: 45,
+        minute: 33,
+        second: 28.839564,
+        timeAbbrev: "Asia/Colombo",
+        utcOffset: zoneOffset
+    };
+    string|Error err = civilToString(civil);
+    if (err is Error) {
+        test:assertEquals(err.message(), "Invalid value for HourOfDay (valid values 0 - 23): 45");
+    } else {
+        test:assertFail(msg = "Expected `time:Error` not found");
+    }
+}
+
+@test:Config {}
 isolated function testUtcToEmailString() {
     Utc|Error utc = utcFromString("2007-12-03T10:15:30.00Z");
     if (utc is Utc) {
@@ -560,6 +592,17 @@ isolated function testCivilFromEmailString() {
         test:assertEquals(civil, expectedCivil);
     } else {
         test:assertFail(msg = civil.message());
+    }
+}
+
+@test:Config {}
+isolated function testCivilFromEmailStringWithInvalidInput() {
+    string dateString = "Wed, 10 2021 19:51:55 -0800 (PST)";
+    Civil|Error err = civilFromEmailString(dateString);
+    if (err is Error) {
+        test:assertEquals(err.message(), "Text 'Wed, 10 2021 19:51:55 -0800 (PST)' could not be parsed at index 8");
+    } else {
+        test:assertFail(msg = "Expected time:Error not found");
     }
 }
 
@@ -622,5 +665,27 @@ isolated function testCivilToEmailStringWithoutOffset() {
         test:assertEquals(emailString.message(), "civil.utcOffset must not be null");
     } else {
         test:assertFail("Expected `time:Error` not found");
+    }
+}
+
+@test:Config {}
+isolated function testCivilToEmailStringWithInvalidInput() {
+    string expectedString = "Wed, 10 Mar 2021 19:51:55 -0800 (PST)";
+    ZoneOffset zoneOffset = {hours: 8, minutes: 0};
+    Civil civil = {
+        year: 2021,
+        month: 30, // Invalid month
+        day: 10,
+        hour: 19,
+        minute: 51,
+        second: 55,
+        timeAbbrev: "America/Los_Angeles",
+        utcOffset: zoneOffset
+    };
+    string|Error err = civilToEmailString(civil, ZONE_OFFSET_WITH_TIME_ABBREV_COMMENT);
+    if (err is Error) {
+        test:assertEquals(err.message(), "Invalid value for MonthOfYear (valid values 1 - 12): 30");
+    } else {
+        test:assertFail(msg = "Expected time:Error not found");
     }
 }
