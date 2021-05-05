@@ -293,6 +293,24 @@ isolated function testUtcFromCivilWithInvalidValue() {
 }
 
 @test:Config {}
+isolated function testUtcFromCivilWithoutOffset() {
+    Civil civil = {
+        year: 2021,
+        month: 4,
+        day: 13,
+        hour: 4,
+        minute: 70,
+        timeAbbrev: "Asia/Colombo"
+    };
+    Utc|Error utc = utcFromCivil(civil);
+    if (utc is Error) {
+        test:assertEquals(utc.message(), "civilTime.utcOffset must not be null");
+    } else {
+        test:assertFail("Expected `time:Error` not found");
+    }
+}
+
+@test:Config {}
 isolated function testCivilFromString() {
     string dateString = "2021-04-12T23:20:50.520Z";
     Civil|Error civil = civilFromString(dateString);
@@ -402,6 +420,24 @@ isolated function testCivilToString() {
 }
 
 @test:Config {}
+isolated function testCivilToStringWithoutOffset() {
+    Civil civil = {
+        year: 2021,
+        month: 4,
+        day: 13,
+        hour: 4,
+        minute: 70,
+        timeAbbrev: "Asia/Colombo"
+    };
+    string|Error civilStr = civilToString(civil);
+    if (civilStr is Error) {
+        test:assertEquals(civilStr.message(), "civil.utcOffset must not be null");
+    } else {
+        test:assertFail("Expected `time:Error` not found");
+    }
+}
+
+@test:Config {}
 isolated function testUtcToEmailString() {
     Utc|Error utc = utcFromString("2007-12-03T10:15:30.00Z");
     if (utc is Utc) {
@@ -485,5 +521,23 @@ isolated function testCivilToEmailStringWithZonePreference() {
         test:assertEquals(emailString, expectedString);
     } else {
         test:assertFail(msg = emailString.message());
+    }
+}
+
+@test:Config {}
+isolated function testCivilToEmailStringWithoutOffset() {
+    Civil civil = {
+        year: 2021,
+        month: 4,
+        day: 13,
+        hour: 4,
+        minute: 70,
+        timeAbbrev: "Asia/Colombo"
+    };
+    string|Error emailString = civilToEmailString(civil, PREFER_ZONE_OFFSET);
+    if (emailString is Error) {
+        test:assertEquals(emailString.message(), "civil.utcOffset must not be null");
+    } else {
+        test:assertFail("Expected `time:Error` not found");
     }
 }
