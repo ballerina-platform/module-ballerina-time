@@ -472,6 +472,37 @@ isolated function testCivilToString() {
 }
 
 @test:Config {}
+isolated function testCivilToStringWithTimeOfDay() {
+    ZoneOffset zoneOffset = {hours: 5, minutes: 30};
+    TimeOfDay timeOfDay = {
+        year: 2021,
+        month: 3,
+        day: 5,
+        hour: 0,
+        minute: 33,
+        second: 28.839564,
+        utcOffset: zoneOffset
+    };
+    Civil civil = {
+        year: timeOfDay?.year ?: 0,
+        month: timeOfDay?.month ?: 0,
+        day: timeOfDay?.day ?: 0,
+        hour: timeOfDay.hour,
+        minute: timeOfDay.minute,
+        second: timeOfDay?.second ?: 0,
+        timeAbbrev: "Asia/Colombo",
+        utcOffset: zoneOffset
+    };
+    string|Error civilStr = civilToString(civil);
+    string expectedStr = "2021-03-04T19:03:28.839564Z";
+    if (civilStr is string) {
+        test:assertEquals(civilStr, expectedStr);
+    } else {
+        test:assertFail(msg = civilStr.message());
+    }
+}
+
+@test:Config {}
 isolated function testCivilToStringWithoutOffset() {
     Civil civil = {
         year: 2021,
