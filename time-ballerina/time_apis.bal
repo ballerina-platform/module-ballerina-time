@@ -15,12 +15,12 @@
 // under the License.
 import ballerina/jballerina.java;
 
-# Returns Utc representing current time(current instant of the system clock as seconds from the epoch of 1970-01-01T00:00:00).
-# + precision - Specifies number of zeros after decimal point (e.g. 3 would give millisecond precision
-# and nil means native precision(nanosecond precision 9) of clock)
+# Returns UTC representing current time(current instant of the system clock as seconds from the epoch of 1970-01-01T00:00:00).
 # ```ballerina
 # time:Utc utc = time:utcNow();
 # ```
+# + precision - Specifies number of zeros after decimal point (e.g. 3 would give millisecond precision
+# and nil means native precision(nanosecond precision 9) of clock)
 # + return - The `time:Utc` value corresponding to the current UTC time
 public isolated function utcNow(int? precision = ()) returns Utc {
     return externUtcNow(precision ?: -1);

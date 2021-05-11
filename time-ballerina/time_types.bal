@@ -23,7 +23,7 @@ public type Seconds decimal;
 # compared using the Ballerina <, <=, >, >= operators.
 # First member of tuple is int representing integral number of
 # seconds from the epoch.
-# Epoch is traditional Unix epoch of 1970-01-01T00:00:00Z
+# Epoch is traditional UNIX epoch of 1970-01-01T00:00:00Z
 # Second member of tuple is decimal giving the fraction of
 # a second.
 # For times before the epoch, n is negative and f is
