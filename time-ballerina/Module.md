@@ -1,7 +1,14 @@
-## Package Overview
+## Module Overview
 
-This package provides implementations related to the UTC and localized time. In the world of cloud computing, the most essential type of time is UTC. 
-Therefore, the more focus on this module is to give the most precise UTC and also handle some complex use cases such as leap seconds and daylight time-saving.
+In the world of cloud computing, the most essential type of time is UTC. Coordinated Universal Time (UTC) is the primary time standard on which the world agreed.
+
+UTC is independent of daylight saving time and provides a unique time value for the entire world. 
+The definition of UTC started in the epoc `1970-01-01T00:00:00Z`. Initially, humans form a day into 86400 seconds. 
+However, the Earth rotation does not adhere to this time duration as Earth slows and the day is getting longer. 
+As a result, a solar day in 2012 is longer than 86400 SI seconds. 
+To correct this incompatibility, additional seconds have been added to the UTC scale which is known as leap-seconds.
+
+The more focus on this module is to give the most precise UTC with nanoseconds precision and also handle some complex use cases such as leap seconds and daylight time-saving.
 
 ### UTC Time
 The `time:Utc` is the tuple representation of the UTC. The UTC represents the number of seconds from a
@@ -28,7 +35,7 @@ The localized time represents using `time:Civil` record. It includes the followi
 - daylight time-saving information
 
 ### APIs
-Parallel to the aforementioned time representations, this package includes a set of APIs to facilitate time conversions
+Parallel to the aforementioned time representations, this module includes a set of APIs to facilitate time conversions
 and manipulations using a set of high-level APIs. Those conversion APIs can be listed as follows.
 
 ### The String Representations of UTC
@@ -69,5 +76,6 @@ time:Civil civil = time:utcToCivil(utc);
 time:Utc utc = time:utcFromCivil(civil);
 ```
 
-To learn more about these APIs, see the [time example](https://ballerina.io/learn/by-example/time.html).
+### Examples 
+- [Time example](https://ballerina.io/learn/by-example/time.html).
 
