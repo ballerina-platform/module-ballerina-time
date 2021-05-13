@@ -1,4 +1,4 @@
-## Module Overview
+## Overview
 
 This module provides a set of APIs that have the capabilities to generate and manipulate UTC and localized time.
 
