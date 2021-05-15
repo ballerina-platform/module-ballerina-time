@@ -61,10 +61,6 @@ allprojects {
     }
 }
 
-subprojects {
-    apply plugin: 'java'
-}
-
 def moduleVersion = project.version.replace("-SNAPSHOT", "")
 
 release {
