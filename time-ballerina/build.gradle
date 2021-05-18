@@ -54,12 +54,13 @@ def stripBallerinaExtensionVersion(String extVersion) {
 apply plugin: 'io.ballerina.plugin'
 
 ballerina {
+    packageOrganization = packageOrg
     module = packageName
     langVersion = ballerinaLangVersion
     testCoverageParam = "--code-coverage --jacoco-xml --includes=org.ballerinalang.stdlib.time.*:ballerina.time.*"
 }
 
-task updateTomlVersions {
+task updateTomlFiles {
     doLast {
         def newConfig = ballerinaConfigFile.text.replace("@project.version@", project.version)
         newConfig = newConfig.replace("@toml.version@", tomlVersion)
@@ -68,7 +69,7 @@ task updateTomlVersions {
     }
 }
 
-task revertTomlFile {
+task revertTomlFiles {
     doLast {
         ballerinaConfigFile.text = originalConfig
     }
@@ -92,6 +93,8 @@ publishing {
         }
     }
 }
+
+updateTomlFiles.dependsOn unpackJballerinaTools
 
 build.dependsOn ":${packageName}-native:build"
 build.dependsOn unpackJballerinaTools
