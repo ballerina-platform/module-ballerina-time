@@ -1,6 +1,6 @@
 ## Package Overview
 
-The Time library is one of the standard library packages of the<a target="_blank" href="https://ballerina.io/"> Ballerina
+The `time` library is one of the standard library packages of the<a target="_blank" href="https://ballerina.io/"> Ballerina
 </a> language.
 
 This package provides implementations related to UTC and localized time generation and conversions.
