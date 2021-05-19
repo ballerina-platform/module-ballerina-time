@@ -21,10 +21,10 @@ public type Seconds decimal;
 # This is represented by a tuple of length 2.
 # The tuple is an ordered type and so the values can be
 # compared using the Ballerina <, <=, >, >= operators.
-# First member of tuple is int representing integral number of
+# The first member of the tuple is int representing an integral number of
 # seconds from the epoch.
-# Epoch is traditional Unix epoch of 1970-01-01T00:00:00Z
-# Second member of tuple is decimal giving the fraction of
+# Epoch is the traditional UNIX epoch of 1970-01-01T00:00:00Z.
+# The second member of the tuple is a decimal giving the fraction of
 # a second.
 # For times before the epoch, n is negative and f is
 # non-negative. In other words, the UTC time represented
