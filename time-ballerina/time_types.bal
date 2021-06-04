@@ -54,7 +54,7 @@ public const int FRIDAY = 5;
 # Saturday represents from integer 6.
 public const int SATURDAY = 6;
 
-# The day of weel according to the US convention.
+# The day of week according to the US convention.
 public type DayOfWeek SUNDAY|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY;
 
 # Fields of the Date record.
