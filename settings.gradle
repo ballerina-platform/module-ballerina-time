@@ -11,9 +11,14 @@ plugins {
 }
 
 rootProject.name = 'time'
-include(':build-config:checkstyle')
-include 'time-native'
-include 'time-ballerina'
+
+include ':checkstyle'
+include ':time-native'
+include ':time-ballerina'
+
+project(':checkstyle').projectDir = file("build-config${File.separator}checkstyle")
+project(':time-native').projectDir = file('native')
+project(':time-ballerina').projectDir = file('ballerina')
 
 gradleEnterprise {
     buildScan {
