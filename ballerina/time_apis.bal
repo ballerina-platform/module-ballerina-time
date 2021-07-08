@@ -227,74 +227,74 @@ public isolated function civilToEmailString(Civil civil, HeaderZoneHandling zone
 
 isolated function externUtcNow(int precision) returns Utc = @java:Method {
     name: "externUtcNow",
-    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
 isolated function externMonotonicNow() returns Seconds = @java:Method {
     name: "externMonotonicNow",
-    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
 isolated function externUtcFromString(string str) returns Utc|Error = @java:Method {
     name: "externUtcFromString",
-    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
 isolated function externUtcToString(Utc utc) returns string = @java:Method {
     name: "externUtcToString",
-    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
 isolated function externUtcDiffSeconds(Utc utc1, Utc utc2) returns Seconds = @java:Method {
     name: "externUtcDiffSeconds",
-    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
 isolated function externDateValidate(Date date) returns Error? = @java:Method {
     name: "externDateValidate",
-    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
 isolated function externDayOfWeek(Date date) returns int|Error = @java:Method {
     name: "externDayOfWeek",
-    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
 isolated function externUtcToCivil(Utc utc) returns Civil = @java:Method {
     name: "externUtcToCivil",
-    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
 isolated function externUtcFromCivil(int year, int month, int day, int hour, int minute, decimal second, int zoneHour, 
                                      int zoneMinute, decimal zoneSecond) returns Utc|Error = @java:Method {
     name: "externUtcFromCivil",
-    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
 isolated function externCivilFromString(string dateTimeString) returns Civil|Error = @java:Method {
     name: "externCivilFromString",
-    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
 isolated function externCivilToString(int year, int month, int day, int hour, int minute, decimal second, int zoneHour, 
                                       int zoneMinute, decimal zoneSecond) returns string|Error = @java:Method {
     name: "externCivilToString",
-    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
 isolated function externUtcToEmailString(Utc utc, string zh) returns string = @java:Method {
     name: "externUtcToEmailString",
-    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
 isolated function externCivilFromEmailString(string dateTimeString) returns Civil|Error = @java:Method {
     name: "externCivilFromEmailString",
-    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
 isolated function externCivilToEmailString(int year, int month, int day, int hour, int minute, decimal second, 
                                            int zoneHour, int zoneMinute, decimal zoneSecond, string timeAbber, 
                                            HeaderZoneHandling zoneHandling) returns string|Error = @java:Method {
     name: "externCivilToEmailString",
-    'class: "org.ballerinalang.stdlib.time.nativeimpl.ExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;

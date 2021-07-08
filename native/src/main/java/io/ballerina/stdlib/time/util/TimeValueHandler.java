@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.time.util;
+package io.ballerina.stdlib.time.util;
 
 import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.ErrorCreator;
@@ -45,7 +45,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static org.ballerinalang.stdlib.time.util.Constants.ANALOG_GIGA;
+import static io.ballerina.stdlib.time.util.Constants.ANALOG_GIGA;
 
 /**
  * A util class for the time package's native implementation.

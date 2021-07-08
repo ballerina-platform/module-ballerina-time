@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.time.util;
+package io.ballerina.stdlib.time.util;
 
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Module;

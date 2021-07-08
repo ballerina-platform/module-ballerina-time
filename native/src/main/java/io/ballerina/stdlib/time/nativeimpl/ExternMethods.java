@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.time.nativeimpl;
+package io.ballerina.stdlib.time.nativeimpl;
 
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
@@ -24,9 +24,9 @@ import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
-import org.ballerinalang.stdlib.time.util.Constants;
-import org.ballerinalang.stdlib.time.util.Errors;
-import org.ballerinalang.stdlib.time.util.TimeValueHandler;
+import io.ballerina.stdlib.time.util.Constants;
+import io.ballerina.stdlib.time.util.Errors;
+import io.ballerina.stdlib.time.util.TimeValueHandler;
 
 import java.math.BigDecimal;
 import java.time.DateTimeException;
