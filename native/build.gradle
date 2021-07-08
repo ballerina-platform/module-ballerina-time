@@ -60,7 +60,7 @@ tasks.withType(Checkstyle) {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            groupId "org.ballerinalang"
+            groupId project.group
             artifactId "time-native"
             version = project.version
             artifact jar

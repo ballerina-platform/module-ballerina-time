@@ -18,6 +18,6 @@
 
 module io.ballerina.stdlib.time {
     requires io.ballerina.runtime;
-    exports org.ballerinalang.stdlib.time.nativeimpl;
-    exports org.ballerinalang.stdlib.time.util;
+    exports io.ballerina.stdlib.time.nativeimpl;
+    exports io.ballerina.stdlib.time.util;
 }
