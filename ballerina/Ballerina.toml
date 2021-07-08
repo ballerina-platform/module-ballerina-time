@@ -4,7 +4,5 @@ name = "time"
 version = "@toml.version@"
 
 [[platform.java11.dependency]]
-path = "../time-native/build/libs/time-native-@project.version@.jar"
-groupId = "ballerina"
-artifactId = "time"
+path = "../native/build/libs/time-native-@project.version@.jar"
 version = "@project.version@"
