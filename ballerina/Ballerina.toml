@@ -1,9 +1,9 @@
 [package]
 org = "ballerina"
 name = "time"
-version = "@toml.version@"
+version = "2.0.0"
 distribution = "slbeta3"
 
 [[platform.java11.dependency]]
-path = "../native/build/libs/time-native-@project.version@.jar"
-version = "@project.version@"
+path = "../native/build/libs/time-native-2.0.0-SNAPSHOT.jar"
+version = "2.0.0-SNAPSHOT"
