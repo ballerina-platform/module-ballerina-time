@@ -5,5 +5,5 @@ version = "2.0.0"
 distribution = "slbeta3"
 
 [[platform.java11.dependency]]
-path = "../native/build/libs/time-native-2.0.0-SNAPSHOT.jar"
-version = "2.0.0-SNAPSHOT"
+path = "../native/build/libs/time-native-2.0.0.jar"
+version = "2.0.0"
