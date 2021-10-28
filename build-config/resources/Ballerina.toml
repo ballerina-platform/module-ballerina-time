@@ -2,6 +2,10 @@
 org = "ballerina"
 name = "time"
 version = "@toml.version@"
+authors = ["Ballerina"]
+keywords = ["time", "utc", "epoch", "civil"]
+repository = "https://github.com/ballerina-platform/module-ballerina-time"
+license = ["Apache-2.0"]
 distribution = "slbeta3"
 
 [[platform.java11.dependency]]
