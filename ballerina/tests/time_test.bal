@@ -670,7 +670,6 @@ isolated function testCivilToEmailStringWithoutOffset() {
 
 @test:Config {}
 isolated function testCivilToEmailStringWithInvalidInput() {
-    string expectedString = "Wed, 10 Mar 2021 19:51:55 -0800 (PST)";
     ZoneOffset zoneOffset = {hours: 8, minutes: 0};
     Civil civil = {
         year: 2021,
