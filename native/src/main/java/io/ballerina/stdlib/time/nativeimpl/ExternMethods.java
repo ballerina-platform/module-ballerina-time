@@ -54,7 +54,7 @@ public class ExternMethods {
         if (precision > 0 && precision <= 9) {
             precisionValue = precision;
         }
-        return TimeValueHandler.createUtcFromInstant(currentUtcTimeInstant, precisionValue);
+        return new Utc(currentUtcTimeInstant, precisionValue).build();
     }
 
     public static BDecimal externMonotonicNow() {
@@ -67,7 +67,7 @@ public class ExternMethods {
 
         try {
             Instant utcTimeInstant = ZonedDateTime.parse(str.getValue()).toInstant();
-            return TimeValueHandler.createUtcFromInstant(utcTimeInstant);
+            return new Utc(utcTimeInstant).build();
         } catch (DateTimeException e) {
             return TimeValueHandler.createError(Errors.FormatError,
                     "Provided '" + str.getValue() + "' is not adhere to the expected format '2007-12-03T10:15:30.00Z'");
@@ -76,14 +76,14 @@ public class ExternMethods {
 
     public static BString externUtcToString(BArray utc) {
 
-        Instant time = TimeValueHandler.createInstantFromUtc(utc);
+        Instant time = new Utc(utc).generateInstant();
         return StringUtils.fromString(time.toString());
     }
 
     public static BDecimal externUtcDiffSeconds(BArray utc1, BArray utc2) {
 
-        Instant time1 = TimeValueHandler.createInstantFromUtc(utc1);
-        Instant time2 = TimeValueHandler.createInstantFromUtc(utc2);
+        Instant time1 = new Utc(utc1).generateInstant();
+        Instant time2 = new Utc(utc2).generateInstant();
         time1 = time1.minusNanos(time2.getNano());
         time1 = time1.minusSeconds(time2.getEpochSecond());
         BigDecimal nanoSeconds = new BigDecimal(time1.getNano()).divide(Constants.ANALOG_GIGA);
@@ -93,9 +93,9 @@ public class ExternMethods {
 
     public static Object externDateValidate(BMap date) {
 
-        int year = Math.toIntExact(date.getIntValue(StringUtils.fromString(Constants.DATE_RECORD_YEAR)));
-        int month = Math.toIntExact(date.getIntValue(StringUtils.fromString(Constants.DATE_RECORD_MONTH)));
-        int day = Math.toIntExact(date.getIntValue(StringUtils.fromString(Constants.DATE_RECORD_DAY)));
+        int year = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_YEAR_BSTRING));
+        int month = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_MONTH_BSTRING));
+        int day = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_DAY_BSTRING));
         try {
             LocalDate.of(year, month, day);
             return null;
@@ -106,9 +106,9 @@ public class ExternMethods {
 
     public static Object externDayOfWeek(BMap date) {
 
-        int year = Math.toIntExact(date.getIntValue(StringUtils.fromString(Constants.DATE_RECORD_YEAR)));
-        int month = Math.toIntExact(date.getIntValue(StringUtils.fromString(Constants.DATE_RECORD_MONTH)));
-        int day = Math.toIntExact(date.getIntValue(StringUtils.fromString(Constants.DATE_RECORD_DAY)));
+        int year = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_YEAR_BSTRING));
+        int month = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_MONTH_BSTRING));
+        int day = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_DAY_BSTRING));
         try {
             return ((LocalDate.of(year, month, day).getDayOfWeek().getValue()) % 7);
         } catch (DateTimeException e) {
@@ -118,7 +118,7 @@ public class ExternMethods {
 
     public static BMap externUtcToCivil(BArray utc) {
 
-        Instant time = TimeValueHandler.createInstantFromUtc(utc);
+        Instant time = new Utc(utc).generateInstant();
         ZonedDateTime zonedDateTime = time.atZone(ZoneId.of("Z"));
         return TimeValueHandler.createCivilFromZoneDateTime(zonedDateTime);
     }
@@ -130,7 +130,7 @@ public class ExternMethods {
             ZonedDateTime dateTime = TimeValueHandler.createZoneDateTimeFromCivilValues(year, month, day, hour,
                     minute, second, zoneHour, zoneMinute, zoneSecond, null,
                     Constants.HeaderZoneHandling.PREFER_ZONE_OFFSET.toString());
-            return TimeValueHandler.createUtcFromInstant(dateTime.toInstant());
+            return new Utc(dateTime.toInstant()).build();
         } catch (DateTimeException e) {
             return TimeValueHandler.createError(Errors.FormatError, e.getMessage());
         }
@@ -169,7 +169,7 @@ public class ExternMethods {
 
     public static BString externUtcToEmailString(BArray utc, BString zh) {
 
-        Instant time = TimeValueHandler.createInstantFromUtc(utc);
+        Instant time = new Utc(utc).generateInstant();
         return StringUtils.fromString(ZonedDateTime.ofInstant(time,
                 ZoneId.of(Constants.GMT_STRING_VALUE)).format(DateTimeFormatter.RFC_1123_DATE_TIME)
                 .replace(Constants.GMT_STRING_VALUE, zh.getValue()));
