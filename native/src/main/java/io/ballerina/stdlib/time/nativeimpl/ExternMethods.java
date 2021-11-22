@@ -93,9 +93,9 @@ public class ExternMethods {
 
     public static Object externDateValidate(BMap date) {
 
-        int year = Math.toIntExact(date.getIntValue(StringUtils.fromString(Constants.DATE_RECORD_YEAR)));
-        int month = Math.toIntExact(date.getIntValue(StringUtils.fromString(Constants.DATE_RECORD_MONTH)));
-        int day = Math.toIntExact(date.getIntValue(StringUtils.fromString(Constants.DATE_RECORD_DAY)));
+        int year = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_YEAR_BSTRING));
+        int month = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_MONTH_BSTRING));
+        int day = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_DAY_BSTRING));
         try {
             LocalDate.of(year, month, day);
             return null;
@@ -106,9 +106,9 @@ public class ExternMethods {
 
     public static Object externDayOfWeek(BMap date) {
 
-        int year = Math.toIntExact(date.getIntValue(StringUtils.fromString(Constants.DATE_RECORD_YEAR)));
-        int month = Math.toIntExact(date.getIntValue(StringUtils.fromString(Constants.DATE_RECORD_MONTH)));
-        int day = Math.toIntExact(date.getIntValue(StringUtils.fromString(Constants.DATE_RECORD_DAY)));
+        int year = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_YEAR_BSTRING));
+        int month = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_MONTH_BSTRING));
+        int day = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_DAY_BSTRING));
         try {
             return ((LocalDate.of(year, month, day).getDayOfWeek().getValue()) % 7);
         } catch (DateTimeException e) {

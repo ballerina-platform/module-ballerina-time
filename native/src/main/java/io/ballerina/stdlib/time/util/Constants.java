@@ -18,6 +18,9 @@
 
 package io.ballerina.stdlib.time.util;
 
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BString;
+
 import java.math.BigDecimal;
 
 /**
@@ -44,12 +47,18 @@ public class Constants {
     public static final String DATE_RECORD_YEAR = "year";
     public static final String DATE_RECORD_MONTH = "month";
     public static final String DATE_RECORD_DAY = "day";
+    public static final BString DATE_RECORD_YEAR_BSTRING = StringUtils.fromString(DATE_RECORD_YEAR);
+    public static final BString DATE_RECORD_MONTH_BSTRING = StringUtils.fromString(DATE_RECORD_MONTH);
+    public static final BString DATE_RECORD_DAY_BSTRING = StringUtils.fromString(DATE_RECORD_DAY);
 
     // For `time:TimeOfDay`
     public static final String TIME_OF_DAY_RECORD = "TimeOfDay";
     public static final String TIME_OF_DAY_RECORD_HOUR = "hour";
     public static final String TIME_OF_DAY_RECORD_MINUTE = "minute";
     public static final String TIME_OF_DAY_RECORD_SECOND = "second";
+    public static final BString TIME_OF_DAY_RECORD_HOUR_BSTRING = StringUtils.fromString(TIME_OF_DAY_RECORD_HOUR);
+    public static final BString TIME_OF_DAY_RECORD_MINUTE_BSTRING = StringUtils.fromString(TIME_OF_DAY_RECORD_MINUTE);
+    public static final BString TIME_OF_DAY_RECORD_SECOND_BSTRING = StringUtils.fromString(TIME_OF_DAY_RECORD_SECOND);
 
     // For `time:ZoneOffset`
     public static final String READABLE_ZONE_OFFSET_RECORD = "ReadWriteZoneOffset";
@@ -57,6 +66,9 @@ public class Constants {
     public static final String ZONE_OFFSET_RECORD_HOUR = "hours";
     public static final String ZONE_OFFSET_RECORD_MINUTE = "minutes";
     public static final String ZONE_OFFSET_RECORD_SECOND = "seconds";
+    public static final BString ZONE_OFFSET_RECORD_HOUR_BSTRING = StringUtils.fromString(ZONE_OFFSET_RECORD_HOUR);
+    public static final BString ZONE_OFFSET_RECORD_MINUTE_BSTRING = StringUtils.fromString(ZONE_OFFSET_RECORD_MINUTE);
+    public static final BString ZONE_OFFSET_RECORD_SECOND_BSTRING = StringUtils.fromString(ZONE_OFFSET_RECORD_SECOND);
 
     // For `time:Civil`
     public static final String CIVIL_RECORD = "Civil";
@@ -64,6 +76,9 @@ public class Constants {
     public static final String CIVIL_RECORD_TIME_ABBREV = "timeAbbrev";
     public static final String CIVIL_RECORD_WHICH = "which";
     public static final String CIVIL_RECORD_DAY_OF_WEEK = "dayOfWeek";
+    public static final BString CIVIL_RECORD_UTC_OFFSET_BSTRING = StringUtils.fromString(CIVIL_RECORD_UTC_OFFSET);
+    public static final BString CIVIL_RECORD_TIME_ABBREV_BSTRING = StringUtils.fromString(CIVIL_RECORD_TIME_ABBREV);
+    public static final BString CIVIL_RECORD_DAY_OF_WEEK_BSTRING = StringUtils.fromString(CIVIL_RECORD_DAY_OF_WEEK);
 
     /**
      * Mapping enumeration for Ballerina level HeaderZoneHandling.

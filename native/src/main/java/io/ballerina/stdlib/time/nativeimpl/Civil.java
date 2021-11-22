@@ -51,8 +51,7 @@ public class Civil {
         setCommonCivilFields();
         BigDecimal second = new BigDecimal(zonedDateTime.getSecond());
         second = second.add(new BigDecimal(zonedDateTime.getNano()).divide(ANALOG_GIGA, MathContext.DECIMAL128));
-        civilMap.put(StringUtils.fromString(Constants.TIME_OF_DAY_RECORD_SECOND),
-                ValueCreator.createDecimalValue(second));
+        civilMap.put(Constants.TIME_OF_DAY_RECORD_SECOND_BSTRING, ValueCreator.createDecimalValue(second));
 
         return civilMap;
 
@@ -67,11 +66,10 @@ public class Civil {
         second = second.add(new BigDecimal(zonedDateTime.getNano()).divide(ANALOG_GIGA, MathContext.DECIMAL128));
 
         if (isSecondExists(zonedDateTimeString)) {
-            civilMap.put(StringUtils.fromString(Constants.TIME_OF_DAY_RECORD_SECOND),
-                    ValueCreator.createDecimalValue(second));
+            civilMap.put(Constants.TIME_OF_DAY_RECORD_SECOND_BSTRING, ValueCreator.createDecimalValue(second));
         }
         if (isLocalTimeZoneExists(zonedDateTimeString)) {
-            civilMap.put(StringUtils.fromString(Constants.CIVIL_RECORD_UTC_OFFSET),
+            civilMap.put(Constants.CIVIL_RECORD_UTC_OFFSET_BSTRING,
                     createZoneOffsetFromZonedDateTime(zonedDateTime));
         }
 
@@ -87,9 +85,8 @@ public class Civil {
         setCommonCivilFields();
         BigDecimal second = new BigDecimal(zonedDateTime.getSecond());
         second = second.add(new BigDecimal(zonedDateTime.getNano()).divide(ANALOG_GIGA, MathContext.DECIMAL128));
-        civilMap.put(StringUtils.fromString(Constants.TIME_OF_DAY_RECORD_SECOND),
-                ValueCreator.createDecimalValue(second));
-        civilMap.put(StringUtils.fromString(Constants.CIVIL_RECORD_UTC_OFFSET),
+        civilMap.put(Constants.TIME_OF_DAY_RECORD_SECOND_BSTRING, ValueCreator.createDecimalValue(second));
+        civilMap.put(Constants.CIVIL_RECORD_UTC_OFFSET_BSTRING,
                 createZoneOffsetFromZonedDateTime(zonedDateTime));
 
         return civilMap;
@@ -98,15 +95,14 @@ public class Civil {
 
     private void setCommonCivilFields() {
 
-        civilMap.put(StringUtils.fromString(Constants.DATE_RECORD_YEAR), zonedDateTime.getYear());
-        civilMap.put(StringUtils.fromString(Constants.DATE_RECORD_MONTH), zonedDateTime.getMonthValue());
-        civilMap.put(StringUtils.fromString(Constants.DATE_RECORD_DAY), zonedDateTime.getDayOfMonth());
-        civilMap.put(StringUtils.fromString(Constants.TIME_OF_DAY_RECORD_HOUR), zonedDateTime.getHour());
-        civilMap.put(StringUtils.fromString(Constants.TIME_OF_DAY_RECORD_MINUTE), zonedDateTime.getMinute());
-        civilMap.put(StringUtils.fromString(Constants.CIVIL_RECORD_TIME_ABBREV),
+        civilMap.put(Constants.DATE_RECORD_YEAR_BSTRING, zonedDateTime.getYear());
+        civilMap.put(Constants.DATE_RECORD_MONTH_BSTRING, zonedDateTime.getMonthValue());
+        civilMap.put(Constants.DATE_RECORD_DAY_BSTRING, zonedDateTime.getDayOfMonth());
+        civilMap.put(Constants.TIME_OF_DAY_RECORD_HOUR_BSTRING, zonedDateTime.getHour());
+        civilMap.put(Constants.TIME_OF_DAY_RECORD_MINUTE_BSTRING, zonedDateTime.getMinute());
+        civilMap.put(Constants.CIVIL_RECORD_TIME_ABBREV_BSTRING,
                 StringUtils.fromString(zonedDateTime.getZone().toString()));
-        civilMap.put(StringUtils.fromString(Constants.CIVIL_RECORD_DAY_OF_WEEK),
-                (zonedDateTime.getDayOfWeek().getValue() % 7));
+        civilMap.put(Constants.CIVIL_RECORD_DAY_OF_WEEK_BSTRING, (zonedDateTime.getDayOfWeek().getValue() % 7));
     }
 
     private boolean isLocalTimeZoneExists(String time) {
@@ -127,21 +123,21 @@ public class Civil {
                 Constants.READABLE_ZONE_OFFSET_RECORD);
         Map<String, Integer> zoneInfo = zoneOffsetMapFromString(zonedDateTime.getOffset().toString());
         if (zoneInfo.get(Constants.ZONE_OFFSET_RECORD_HOUR) != null) {
-            civilMap.put(StringUtils.fromString(Constants.ZONE_OFFSET_RECORD_HOUR),
+            civilMap.put(Constants.ZONE_OFFSET_RECORD_HOUR_BSTRING,
                     zoneInfo.get(Constants.ZONE_OFFSET_RECORD_HOUR).longValue());
         } else {
-            civilMap.put(StringUtils.fromString(Constants.ZONE_OFFSET_RECORD_HOUR), 0);
+            civilMap.put(Constants.ZONE_OFFSET_RECORD_HOUR_BSTRING, 0);
         }
 
         if (zoneInfo.get(Constants.ZONE_OFFSET_RECORD_MINUTE) != null) {
-            civilMap.put(StringUtils.fromString(Constants.ZONE_OFFSET_RECORD_MINUTE),
+            civilMap.put(Constants.ZONE_OFFSET_RECORD_MINUTE_BSTRING,
                     zoneInfo.get(Constants.ZONE_OFFSET_RECORD_MINUTE).longValue());
         } else {
-            civilMap.put(StringUtils.fromString(Constants.ZONE_OFFSET_RECORD_MINUTE), 0);
+            civilMap.put(Constants.ZONE_OFFSET_RECORD_MINUTE_BSTRING, 0);
         }
 
         if (zoneInfo.get(Constants.ZONE_OFFSET_RECORD_SECOND) != null) {
-            civilMap.put(StringUtils.fromString(Constants.ZONE_OFFSET_RECORD_SECOND),
+            civilMap.put(Constants.ZONE_OFFSET_RECORD_SECOND_BSTRING,
                     zoneInfo.get(Constants.ZONE_OFFSET_RECORD_SECOND).longValue());
         }
         civilMap.freezeDirect();
