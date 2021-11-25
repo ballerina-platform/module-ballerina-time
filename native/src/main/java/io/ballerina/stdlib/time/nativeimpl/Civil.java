@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- package io.ballerina.stdlib.time.nativeimpl;
+package io.ballerina.stdlib.time.nativeimpl;
 
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
@@ -23,12 +23,12 @@ import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.stdlib.time.util.Constants;
 import io.ballerina.stdlib.time.util.ModuleUtils;
+import io.ballerina.stdlib.time.util.Utils;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -41,13 +41,43 @@ import static io.ballerina.stdlib.time.util.Constants.ANALOG_GIGA;
  */
 public class Civil {
 
-    private ZonedDateTime zonedDateTime = ZonedDateTime.now();
-    private BMap<BString, Object> civilMap = ValueCreator.createRecordValue(ModuleUtils.getModule(),
+    private final ZonedDateTime zonedDateTime;
+    private boolean isSecondExists = false;
+    private boolean isLocalTimeZoneExists = false;
+    private final BMap<BString, Object> civilMap = ValueCreator.createRecordValue(ModuleUtils.getModule(),
             Constants.CIVIL_RECORD);
 
-    public BMap<BString, Object> buildFromZonedDateTime(ZonedDateTime zonedDateTime) {
+    public Civil() {
+
+        zonedDateTime = ZonedDateTime.now();
+    }
+
+    public Civil(ZonedDateTime zonedDateTime) {
 
         this.zonedDateTime = zonedDateTime;
+    }
+
+    public Civil(String zonedDateTimeString, Constants.CivilInputStringTypes inputStringTypes) {
+
+        if (Constants.CivilInputStringTypes.EMAIL_STRING.toString().equals(inputStringTypes.toString())) {
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(Constants.EMAIL_DATE_TIME_FORMAT);
+            this.zonedDateTime = ZonedDateTime.parse(zonedDateTimeString, dateTimeFormatter);
+            this.isSecondExists = true;
+            this.isLocalTimeZoneExists = true;
+        } else {
+            this.zonedDateTime = ZonedDateTime.parse(zonedDateTimeString);
+            this.isSecondExists = isSecondExists(zonedDateTimeString);
+            this.isLocalTimeZoneExists = isLocalTimeZoneExists(zonedDateTimeString);
+        }
+    }
+
+    public ZonedDateTime getZonedDateTime() {
+
+        return zonedDateTime;
+    }
+
+    public BMap<BString, Object> build() {
+
         setCommonCivilFields();
         BigDecimal second = new BigDecimal(zonedDateTime.getSecond());
         second = second.add(new BigDecimal(zonedDateTime.getNano()).divide(ANALOG_GIGA, MathContext.DECIMAL128));
@@ -57,37 +87,19 @@ public class Civil {
 
     }
 
-    public BMap<BString, Object> buildFromZonedDateTimeString(String zonedDateTimeString) {
+    public BMap<BString, Object> buildWithZone() {
 
-        ZonedDateTime zonedDateTime = ZonedDateTime.parse(zonedDateTimeString);
-        this.zonedDateTime = zonedDateTime;
         setCommonCivilFields();
         BigDecimal second = new BigDecimal(zonedDateTime.getSecond());
         second = second.add(new BigDecimal(zonedDateTime.getNano()).divide(ANALOG_GIGA, MathContext.DECIMAL128));
 
-        if (isSecondExists(zonedDateTimeString)) {
+        if (this.isSecondExists) {
             civilMap.put(Constants.TIME_OF_DAY_RECORD_SECOND_BSTRING, ValueCreator.createDecimalValue(second));
         }
-        if (isLocalTimeZoneExists(zonedDateTimeString)) {
+        if (this.isLocalTimeZoneExists) {
             civilMap.put(Constants.CIVIL_RECORD_UTC_OFFSET_BSTRING,
                     createZoneOffsetFromZonedDateTime(zonedDateTime));
         }
-
-        return civilMap;
-
-    }
-
-    public BMap<BString, Object> buildFromEmailString(String zonedDateTimeString) {
-
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(Constants.EMAIL_DATE_TIME_FORMAT);
-        ZonedDateTime zonedDateTime = ZonedDateTime.parse(zonedDateTimeString, dateTimeFormatter);
-        this.zonedDateTime = zonedDateTime;
-        setCommonCivilFields();
-        BigDecimal second = new BigDecimal(zonedDateTime.getSecond());
-        second = second.add(new BigDecimal(zonedDateTime.getNano()).divide(ANALOG_GIGA, MathContext.DECIMAL128));
-        civilMap.put(Constants.TIME_OF_DAY_RECORD_SECOND_BSTRING, ValueCreator.createDecimalValue(second));
-        civilMap.put(Constants.CIVIL_RECORD_UTC_OFFSET_BSTRING,
-                createZoneOffsetFromZonedDateTime(zonedDateTime));
 
         return civilMap;
 
@@ -119,60 +131,8 @@ public class Civil {
 
     public BMap<BString, Object> createZoneOffsetFromZonedDateTime(ZonedDateTime zonedDateTime) {
 
-        BMap<BString, Object> civilMap = ValueCreator.createRecordValue(ModuleUtils.getModule(),
-                Constants.READABLE_ZONE_OFFSET_RECORD);
-        Map<String, Integer> zoneInfo = zoneOffsetMapFromString(zonedDateTime.getOffset().toString());
-        if (zoneInfo.get(Constants.ZONE_OFFSET_RECORD_HOUR) != null) {
-            civilMap.put(Constants.ZONE_OFFSET_RECORD_HOUR_BSTRING,
-                    zoneInfo.get(Constants.ZONE_OFFSET_RECORD_HOUR).longValue());
-        } else {
-            civilMap.put(Constants.ZONE_OFFSET_RECORD_HOUR_BSTRING, 0);
-        }
-
-        if (zoneInfo.get(Constants.ZONE_OFFSET_RECORD_MINUTE) != null) {
-            civilMap.put(Constants.ZONE_OFFSET_RECORD_MINUTE_BSTRING,
-                    zoneInfo.get(Constants.ZONE_OFFSET_RECORD_MINUTE).longValue());
-        } else {
-            civilMap.put(Constants.ZONE_OFFSET_RECORD_MINUTE_BSTRING, 0);
-        }
-
-        if (zoneInfo.get(Constants.ZONE_OFFSET_RECORD_SECOND) != null) {
-            civilMap.put(Constants.ZONE_OFFSET_RECORD_SECOND_BSTRING,
-                    zoneInfo.get(Constants.ZONE_OFFSET_RECORD_SECOND).longValue());
-        }
-        civilMap.freezeDirect();
-        return civilMap;
-    }
-
-    public Map<String, Integer> zoneOffsetMapFromString(String dateTime) {
-
-        Map<String, Integer> zone = new HashMap<>();
-        if (dateTime.strip().startsWith("+")) {
-            dateTime = dateTime.replaceFirst("\\+", "");
-            String[] zoneInfo = dateTime.split(":");
-            if (zoneInfo.length > 0 && zoneInfo[0] != null) {
-                zone.put(Constants.ZONE_OFFSET_RECORD_HOUR, Integer.parseInt(zoneInfo[0]));
-            }
-            if (zoneInfo.length > 1 && zoneInfo[1] != null) {
-                zone.put(Constants.ZONE_OFFSET_RECORD_MINUTE, Integer.parseInt(zoneInfo[1]));
-            }
-            if (zoneInfo.length > 2 && zoneInfo[2] != null) {
-                zone.put(Constants.ZONE_OFFSET_RECORD_SECOND, Integer.parseInt(zoneInfo[2]));
-            }
-        } else if (dateTime.strip().startsWith("-")) {
-            dateTime = dateTime.replaceFirst("\\-", "");
-            String[] zoneInfo = dateTime.split(":");
-            if (zoneInfo.length > 0 && zoneInfo[0] != null) {
-                zone.put(Constants.ZONE_OFFSET_RECORD_HOUR, Integer.parseInt(zoneInfo[0]) * -1);
-            }
-            if (zoneInfo.length > 1 && zoneInfo[1] != null) {
-                zone.put(Constants.ZONE_OFFSET_RECORD_MINUTE, Integer.parseInt(zoneInfo[1]) * -1);
-            }
-            if (zoneInfo.length > 2 && zoneInfo[2] != null) {
-                zone.put(Constants.ZONE_OFFSET_RECORD_SECOND, Integer.parseInt(zoneInfo[2]) * -1);
-            }
-        }
-        return zone;
+        Map<String, Integer> zoneInfo = Utils.zoneOffsetMapFromString(zonedDateTime.getOffset().toString());
+        return Utils.createZoneOffsetFromZoneInfoMap(zoneInfo);
     }
 
 }
