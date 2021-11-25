@@ -692,7 +692,8 @@ isolated function testCivilToEmailStringWithInvalidInput() {
 @test:Config {}
 isolated function testLoadSystemZone() returns Error? {
     final Zone systemZone = check loadSystemZone();
-    test:assertTrue(systemZone.fixedOffset() is ());
+
+    //test:assertTrue(systemZone.fixedOffset() is ()); // Cannot test this extensively since this may change in different environments (or docker images).
 }
 
 @test:Config {}
