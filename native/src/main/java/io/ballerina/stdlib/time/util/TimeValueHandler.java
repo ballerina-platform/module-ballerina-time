@@ -18,21 +18,13 @@
 
 package io.ballerina.stdlib.time.util;
 
-import io.ballerina.runtime.api.creators.ErrorCreator;
-import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BDecimal;
-import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.stdlib.time.nativeimpl.Civil;
 import io.ballerina.stdlib.time.nativeimpl.Utc;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.DateTimeException;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
@@ -46,50 +38,31 @@ public class TimeValueHandler {
 
     public static BMap<BString, Object> createCivilFromZoneDateTime(ZonedDateTime zonedDateTime) {
 
-        return new Civil().buildFromZonedDateTime(zonedDateTime);
+        return new Civil(zonedDateTime).build();
     }
 
     public static BMap<BString, Object> createCivilFromZoneDateTimeString(String zonedDateTimeString) {
 
-        return new Civil().buildFromZonedDateTimeString(zonedDateTimeString);
+        return new Civil(zonedDateTimeString, Constants.CivilInputStringTypes.DEFAULT_STRING).buildWithZone();
     }
 
     public static BMap<BString, Object> createCivilFromEmailString(String zonedDateTimeString) {
 
-        return new Civil().buildFromEmailString(zonedDateTimeString);
+        return new Civil(zonedDateTimeString, Constants.CivilInputStringTypes.EMAIL_STRING).buildWithZone();
     }
 
     public static ZonedDateTime createZoneDateTimeFromCivilValues(long year, long month, long day, long hour,
                                                                   long minute, BDecimal second, long zoneHour,
                                                                   long zoneMinute, BDecimal zoneSecond,
-                                                                  BString zoneAbbr, String zoneHandling)
-            throws DateTimeException {
+                                                                  BString zoneAbbr, String zoneHandling) {
 
-        ZoneId zoneId;
-        int intSecond = second.decimalValue().setScale(0, RoundingMode.FLOOR).intValue();
-        int intNanoSecond = second.decimalValue().subtract(new BigDecimal(intSecond)).multiply(Constants.ANALOG_GIGA)
-                .setScale(0, RoundingMode.HALF_UP).intValue();
-        int intZoneSecond = zoneSecond.decimalValue().setScale(0, RoundingMode.HALF_UP).intValue();
-        if (Constants.HeaderZoneHandling.PREFER_ZONE_OFFSET.toString().equals(zoneHandling)) {
-            zoneId = ZoneId.of(ZoneOffset.ofHoursMinutesSeconds(
-                    Long.valueOf(zoneHour).intValue(), Long.valueOf(zoneMinute).intValue(), intZoneSecond).toString());
-        } else {
-            zoneId = ZoneId.of(zoneAbbr.getValue());
-        }
-        return ZonedDateTime.of(
-                Long.valueOf(year).intValue(), Long.valueOf(month).intValue(), Long.valueOf(day).intValue(),
-                Long.valueOf(hour).intValue(), Long.valueOf(minute).intValue(), intSecond, intNanoSecond, zoneId);
-    }
-
-    public static BError createError(Errors errorType, String errorMsg) {
-
-        return ErrorCreator.createDistinctError(errorType.name(), ModuleUtils.getModule(),
-                StringUtils.fromString(errorMsg));
+        return Utils.createZoneDateTimeFromCivilValues(year, month, day, hour, minute, second, zoneHour, zoneMinute,
+                zoneSecond, zoneAbbr, zoneHandling);
     }
 
     public static Map<String, Integer> zoneOffsetMapFromString(String dateTime) {
 
-        return new Civil().zoneOffsetMapFromString(dateTime);
+        return Utils.zoneOffsetMapFromString(dateTime);
     }
 
     public static BArray createUtcFromDate(Date date) {
