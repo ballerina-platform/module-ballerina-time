@@ -45,3 +45,5 @@ velocity.log*
 
 # VSCode
 .vscode
+.project
+.settings/
