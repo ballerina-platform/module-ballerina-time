@@ -43,7 +43,7 @@ public class TimeValueHandler {
 
     public static BMap<BString, Object> createCivilFromZoneDateTimeString(String zonedDateTimeString) {
 
-        return new Civil(zonedDateTimeString, Constants.CivilInputStringTypes.DEFAULT_STRING).buildWithZone();
+        return new Civil(zonedDateTimeString, Constants.CivilInputStringTypes.RFC3339_STRING).buildWithZone();
     }
 
     public static BMap<BString, Object> createCivilFromEmailString(String zonedDateTimeString) {

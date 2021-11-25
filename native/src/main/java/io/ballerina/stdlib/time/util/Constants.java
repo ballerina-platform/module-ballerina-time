@@ -89,5 +89,14 @@ public class Constants {
         PREFER_ZONE_OFFSET,
         ZONE_OFFSET_WITH_TIME_ABBREV_COMMENT
     }
+
+    /**
+     * String types that can generates a Civil record.
+     *
+     */
+    public enum CivilInputStringTypes {
+        RFC3339_STRING, // RFC 3339
+        EMAIL_STRING
+    }
 }
 
