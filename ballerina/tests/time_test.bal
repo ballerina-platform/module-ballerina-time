@@ -65,7 +65,7 @@ isolated function testUtcFromStringWithInvalidFormat() {
     if (utc is Utc) {
         test:assertFail("Expected time:Error not found");
     } else {
-        test:assertEquals(utc.message(), 
+        test:assertEquals(utc.message(),
         "Provided '2007-12-0310:15:30.00Z' is not adhere to the expected format '2007-12-03T10:15:30.00Z'");
     }
 }
@@ -686,5 +686,85 @@ isolated function testCivilToEmailStringWithInvalidInput() {
         test:assertEquals(err.message(), "Invalid value for MonthOfYear (valid values 1 - 12): 30");
     } else {
         test:assertFail(msg = "Expected time:Error not found");
+    }
+}
+
+@test:Config {}
+isolated function testLoadSystemZone() returns Error? {
+    final Zone systemZone = check loadSystemZone();
+    test:assertTrue(systemZone.fixedOffset() is ());
+}
+
+@test:Config {}
+isolated function testGetZone() returns Error? {
+    Zone? systemZone1 = getZone("Asia/Colombo");
+    if systemZone1 is Zone {
+        test:assertTrue(systemZone1.fixedOffset() is ());
+    } else {
+        test:assertFail(msg = "Expected time:Zone not found");
+    }
+
+    Zone? systemZone2 = getZone("Greenwich");
+    if systemZone2 is Zone {
+        ZoneOffset? zoneOffset = systemZone2.fixedOffset();
+        if zoneOffset is ZoneOffset {
+            test:assertEquals(zoneOffset, {hours: 0, minutes: 0});
+        } else {
+            test:assertFail(msg = "Expected time:ZoneOffset not found");
+        }
+    } else {
+        test:assertFail(msg = "Expected time:Zone not found");
+    }
+
+    Zone? systemZone3 = getZone("Etc/GMT-9");
+    if systemZone3 is Zone {
+        ZoneOffset? zoneOffset = systemZone3.fixedOffset();
+        if zoneOffset is ZoneOffset {
+            test:assertEquals(zoneOffset, {hours: 9, minutes: 0});
+        } else {
+            test:assertFail(msg = "Expected time:ZoneOffset not found");
+        }
+    } else {
+        test:assertFail(msg = "Expected time:Zone not found");
+    }
+}
+
+@test:Config {}
+isolated function testZoneUtcFromCivil() returns Error? {
+    Civil civil = {
+        year: 2021,
+        month: 3,
+        day: 10,
+        hour: 19,
+        minute: 51,
+        second: 55,
+        timeAbbrev: "America/Los_Angeles"
+    };
+    Zone? zone = getZone("Etc/GMT-9");
+    if zone is Zone {
+        test:assertEquals(check zone.utcFromCivil(civil), <Utc>[1615434715, 0]);
+    } else {
+        test:assertFail(msg = "Expected time:Zone not found");
+    }
+}
+
+@test:Config {}
+isolated function testZoneUtcToCivil() returns Error? {
+    Utc utc = check utcFromString("2007-12-03T10:15:30.00Z");
+    Civil civil = {
+        year: 2007,
+        month: 12,
+        day: 3,
+        hour: 19,
+        minute: 15,
+        second: 30,
+        timeAbbrev: "Etc/GMT-9",
+        dayOfWeek: 1
+    };
+    Zone? zone = getZone("Etc/GMT-9");
+    if zone is Zone {
+        test:assertEquals(zone.utcToCivil(utc), civil);
+    } else {
+        test:assertFail(msg = "Expected time:Zone not found");
     }
 }
