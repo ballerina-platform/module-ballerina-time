@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+import ballerina/jballerina.java;
+
 # Holds the seconds as a decimal value.  
 public type Seconds decimal;
 
@@ -172,3 +174,80 @@ public enum HeaderZoneHandling {
     PREFER_ZONE_OFFSET,
     ZONE_OFFSET_WITH_TIME_ABBREV_COMMENT
 }
+
+# Abstract object representation to handle time zones.  
+public type Zone readonly & object {
+    public isolated function fixedOffset() returns ZoneOffset?;
+    public isolated function utcFromCivil(Civil civil) returns Utc|Error;
+    public isolated function utcToCivil(Utc utc) returns Civil;
+};
+
+# Localized time zone implementation to handle time zones.  
+public readonly class TimeZone {
+    *Zone;
+    public isolated function init(string? zoneId = ()) returns Error? {
+        if zoneId is string {
+            externTimeZoneInitWithId(self, zoneId);
+        } else {
+            check externTimeZoneInitWithSystemZone(self);
+        }
+    }
+    public isolated function fixedOffset() returns ZoneOffset? {
+        return externTimeZoneFixedOffset(self);
+    }
+
+    public isolated function utcFromCivil(Civil civil) returns Utc|Error {
+        string? timeAbbrevField = civil?.timeAbbrev;
+        if timeAbbrevField is () {
+            return error FormatError("civil.timeAbbrev must not be null");
+        }
+        decimal? civilTimeSecField = civil?.second;
+        decimal civilTimeSeconds = (civilTimeSecField is Seconds) ? civilTimeSecField : 0.0;
+        string timeAbbrev = <string>timeAbbrevField;
+
+        return externTimeZoneUtcFromCivil(self, civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds, timeAbbrev, PREFER_TIME_ABBREV);
+    }
+    public isolated function utcToCivil(Utc utc) returns Civil {
+        return externTimeZoneUtcToCivil(self, utc);
+    }
+}
+
+# Load the default time zone of the system.
+# + return - Zone value or error when the zone ID of the system is in invalid format. 
+public isolated function loadSystemZone() returns Zone|Error {
+    return check new TimeZone();
+}
+
+# Return the time zone object of a given zone ID.
+#
+# + id - Time zone ID (e.g. "Continent/City")
+# + return - Corresponding ime zone object or null 
+public isolated function getZone(string id) returns Zone? {
+    TimeZone|Error timeZone = new TimeZone(id);
+    if timeZone is TimeZone {
+        return timeZone;
+    }
+    return;
+}
+
+isolated function externTimeZoneInitWithSystemZone(TimeZone timeZone) returns Error? = @java:Method {
+    'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternMethods"
+} external;
+
+isolated function externTimeZoneInitWithId(TimeZone timeZone, string zoneId) = @java:Method {
+    'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternMethods"
+} external;
+
+isolated function externTimeZoneFixedOffset(TimeZone timeZone) returns ZoneOffset? = @java:Method {
+    'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternMethods"
+} external;
+
+isolated function externTimeZoneUtcToCivil(TimeZone timeZone, Utc utc) returns Civil = @java:Method {
+    'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternMethods"
+} external;
+
+isolated function externTimeZoneUtcFromCivil(TimeZone timeZone, int year, int month, int day,
+int hour, int minute, decimal second, string timeAbber, HeaderZoneHandling zoneHandling)
+returns Utc|Error = @java:Method {
+    'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternMethods"
+} external;
