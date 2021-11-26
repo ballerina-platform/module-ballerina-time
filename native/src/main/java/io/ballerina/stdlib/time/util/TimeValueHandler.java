@@ -36,6 +36,10 @@ import java.util.Map;
  */
 public class TimeValueHandler {
 
+    private TimeValueHandler() {
+
+    }
+
     public static BMap<BString, Object> createCivilFromZoneDateTime(ZonedDateTime zonedDateTime) {
 
         return new Civil(zonedDateTime).build();
