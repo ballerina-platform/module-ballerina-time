@@ -120,7 +120,7 @@ public class Utils {
 
     public static BError createError(Errors errorType, String errorMsg) {
 
-        return ErrorCreator.createDistinctError(errorType.name(), ModuleUtils.getModule(),
-                StringUtils.fromString(errorMsg));
+        return ErrorCreator.createError(ModuleUtils.getModule(), errorType.name(),
+                StringUtils.fromString(errorMsg), null, null);
     }
 }
