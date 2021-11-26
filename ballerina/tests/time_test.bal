@@ -750,7 +750,30 @@ isolated function testZoneUtcFromCivil() returns Error? {
 }
 
 @test:Config {}
-isolated function testZoneUtcToCivil() returns Error? {
+isolated function testZoneUtcFromCivilWithoutTimeAbbrev() returns Error? {
+    Civil civil = {
+        year: 2021,
+        month: 3,
+        day: 10,
+        hour: 19,
+        minute: 51,
+        second: 55
+    };
+    Zone? zone = getZone("Etc/GMT-9");
+    if zone is Zone {
+        Utc|Error utc = zone.utcFromCivil(civil);
+        if utc is Error {
+            test:assertEquals(utc.message(), "civil.timeAbbrev must not be null");
+        } else {
+            test:assertFail("Expected time:Error not found");
+        }
+    } else {
+        test:assertFail(msg = "Expected time:Zone not found");
+    }
+}
+
+@test:Config {}
+isolated function testZoneUtcToCivil1() returns Error? {
     Utc utc = check utcFromString("2007-12-03T10:15:30.00Z");
     Civil civil = {
         year: 2007,
@@ -763,6 +786,27 @@ isolated function testZoneUtcToCivil() returns Error? {
         dayOfWeek: 1
     };
     Zone? zone = getZone("Etc/GMT-9");
+    if zone is Zone {
+        test:assertEquals(zone.utcToCivil(utc), civil);
+    } else {
+        test:assertFail(msg = "Expected time:Zone not found");
+    }
+}
+
+@test:Config {}
+isolated function testZoneUtcToCivil2() returns Error? {
+    Utc utc = check utcFromString("2007-12-03T10:15:30.00Z");
+    Civil civil = {
+        year: 2007,
+        month: 12,
+        day: 3,
+        hour: 15,
+        minute: 45,
+        second: 30,
+        timeAbbrev: "Asia/Colombo",
+        dayOfWeek: 1
+    };
+    Zone? zone = getZone("Asia/Colombo");
     if zone is Zone {
         test:assertEquals(zone.utcToCivil(utc), civil);
     } else {
