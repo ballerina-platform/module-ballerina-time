@@ -40,6 +40,10 @@ import java.util.Map;
  */
 public class Utils {
 
+    private Utils() {
+
+    }
+
     public static Map<String, Integer> zoneOffsetMapFromString(String dateTime) {
 
         Map<String, Integer> zone = new HashMap<>();

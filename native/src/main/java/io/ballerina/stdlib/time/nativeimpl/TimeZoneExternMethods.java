@@ -37,6 +37,10 @@ public class TimeZoneExternMethods {
 
     private static final String ZONE_ID_ENTRY = "zoneId";
 
+    private TimeZoneExternMethods() {
+
+    }
+
     public static Object externTimeZoneInitWithSystemZone(BObject timeZoneObj) {
 
         try {
@@ -63,6 +67,7 @@ public class TimeZoneExternMethods {
     public static Object externTimeZoneUtcFromCivil(BObject timeZoneObj, long year, long month, long day, long hour,
                                                     long minute, BDecimal second, BString zoneAbbr,
                                                     BString zoneHandling) {
+
         Zone zone = (Zone) timeZoneObj.getNativeData(ZONE_ID_ENTRY);
         ZonedDateTime zonedDateTime = Utils.createZoneDateTimeFromCivilValues(year, month, day, hour, minute,
                 second, 0, 0, BDecimal.valueOf(0), zoneAbbr, zoneHandling.getValue());
