@@ -19,7 +19,7 @@ import ballerina/test;
 isolated function testUtcNow() {
     Utc|Error oldUtc = utcFromString("2007-12-03T10:15:30.00Z");
     Utc currentUtc = utcNow();
-    if (oldUtc is Utc) {
+    if oldUtc is Utc {
         test:assertTrue(currentUtc[0] > oldUtc[0]);
     } else {
         test:assertFail(msg = oldUtc.message());
@@ -51,7 +51,7 @@ isolated function testMonotonicNow() {
 @test:Config {}
 isolated function testUtcFromString() {
     Utc|Error utc = utcFromString("2007-12-03T10:15:30.00Z");
-    if (utc is Utc) {
+    if utc is Utc {
         test:assertEquals(utc[0], 1196676930);
         test:assertEquals(utc[1], <decimal>0.0);
     } else {
@@ -62,7 +62,7 @@ isolated function testUtcFromString() {
 @test:Config {}
 isolated function testUtcFromStringWithInvalidFormat() {
     Utc|Error utc = utcFromString("2007-12-0310:15:30.00Z");
-    if (utc is Utc) {
+    if utc is Utc {
         test:assertFail("Expected time:Error not found");
     } else {
         test:assertEquals(utc.message(),
@@ -75,7 +75,7 @@ isolated function testUtcToString() {
     Utc|Error utc = utcFromString("1985-04-12T23:20:50.520Z");
     int expectedSecondsFromEpoch = 482196050;
     decimal expectedSecondFraction = 0.52;
-    if (utc is Utc) {
+    if utc is Utc {
         test:assertEquals(utc[0], expectedSecondsFromEpoch);
         test:assertEquals(utc[1], expectedSecondFraction);
         string utcString = utcToString(utc);
@@ -94,7 +94,7 @@ isolated function testUtcToStringWithoutFraction() {
 @test:Config {}
 isolated function testUtcAddSeconds() {
     Utc|Error utc1 = utcFromString("2021-04-12T23:20:50.520Z");
-    if (utc1 is Utc) {
+    if utc1 is Utc {
         Utc utc2 = utcAddSeconds(utc1, 20.900);
         string utcString = utcToString(utc2);
         test:assertEquals(utcString, "2021-04-12T23:21:11.420Z");
@@ -108,11 +108,11 @@ isolated function testUtcDiffSeconds() {
     Utc|Error utc1 = utcFromString("2021-04-12T23:20:50.520Z");
     Utc|Error utc2 = utcFromString("2021-04-11T23:20:50.520Z");
     decimal expectedSeconds1 = 86400;
-    if (utc1 is Utc && utc2 is Utc) {
+    if utc1 is Utc && utc2 is Utc {
         test:assertEquals(utcDiffSeconds(utc1, utc2), expectedSeconds1);
-    } else if (utc1 is Error) {
+    } else if utc1 is Error {
         test:assertFail(msg = utc1.message());
-    } else if (utc2 is Error) {
+    } else if utc2 is Error {
         test:assertFail(msg = utc2.message());
     } else {
         test:assertFail("Unknown error");
@@ -121,11 +121,11 @@ isolated function testUtcDiffSeconds() {
     Utc|Error utc3 = utcFromString("2021-04-12T23:20:50.520Z");
     Utc|Error utc4 = utcFromString("2021-04-11T23:20:55.640Z");
     decimal expectedSeconds2 = 86394.88;
-    if (utc3 is Utc && utc4 is Utc) {
+    if utc3 is Utc && utc4 is Utc {
         test:assertEquals(utcDiffSeconds(utc3, utc4), expectedSeconds2);
-    } else if (utc3 is Error) {
+    } else if utc3 is Error {
         test:assertFail(msg = utc3.message());
-    } else if (utc4 is Error) {
+    } else if utc4 is Error {
         test:assertFail(msg = utc4.message());
     } else {
         test:assertFail("Unknown error");
@@ -134,11 +134,11 @@ isolated function testUtcDiffSeconds() {
     Utc|Error utc5 = utcFromString("2021-04-12T23:20:50.520Z");
     Utc|Error utc6 = utcFromString("2021-04-11T23:20:55.640Z");
     decimal expectedSecond3 = -86394.88;
-    if (utc5 is Utc && utc6 is Utc) {
+    if utc5 is Utc && utc6 is Utc {
         test:assertEquals(utcDiffSeconds(utc6, utc5), expectedSecond3);
-    } else if (utc5 is Error) {
+    } else if utc5 is Error {
         test:assertFail(msg = utc5.message());
-    } else if (utc6 is Error) {
+    } else if utc6 is Error {
         test:assertFail(msg = utc6.message());
     } else {
         test:assertFail("Unknown error");
@@ -149,7 +149,7 @@ isolated function testUtcDiffSeconds() {
 isolated function testDateValidateUsingValidDate() {
     Date date = {year: 1994, month: 11, day: 7};
     Error? err = dateValidate(date);
-    if (err is Error) {
+    if err is Error {
         test:assertFail(msg = err.message());
     }
 }
@@ -159,7 +159,7 @@ isolated function testDateValidateUsingInvalidDate() {
     // Invalid number of days for a leap year
     Date date1 = {year: 1994, month: 2, day: 29};
     Error? err1 = dateValidate(date1);
-    if (err1 is Error) {
+    if err1 is Error {
         test:assertEquals(err1.message(), "Invalid date 'February 29' as '1994' is not a leap year");
     } else {
         test:assertFail("Expected error not found");
@@ -168,7 +168,7 @@ isolated function testDateValidateUsingInvalidDate() {
     // Out of range month
     Date date2 = {year: 1994, month: 50, day: 10};
     Error? err2 = dateValidate(date2);
-    if (err2 is Error) {
+    if err2 is Error {
         test:assertEquals(err2.message(), "Invalid value for MonthOfYear (valid values 1 - 12): 50");
     } else {
         test:assertFail("Expected error not found");
@@ -177,7 +177,7 @@ isolated function testDateValidateUsingInvalidDate() {
     // Out of range day
     Date date3 = {year: 1994, month: 4, day: 60};
     Error? err3 = dateValidate(date3);
-    if (err3 is Error) {
+    if err3 is Error {
         test:assertEquals(err3.message(), "Invalid value for DayOfMonth (valid values 1 - 28/31): 60");
     } else {
         test:assertFail("Expected error not found");
@@ -194,7 +194,7 @@ isolated function testDayOfWeekUsingValidDate() {
 isolated function testDayOfWeekUsingInvalidDate() {
     Date date = {year: 1994, month: 2, day: 29};
     DayOfWeek|error err = trap dayOfWeek(date);
-    if (err is Error) {
+    if err is Error {
         test:assertEquals(err.message(), "Invalid date 'February 29' as '1994' is not a leap year");
     } else {
         test:assertFail("Expected panic did not occur");
@@ -204,7 +204,7 @@ isolated function testDayOfWeekUsingInvalidDate() {
 @test:Config {}
 isolated function testUtcToCivil() {
     Utc|Error utc = utcFromString("2021-04-12T23:20:50.520Z");
-    if (utc is Utc) {
+    if utc is Utc {
         Civil civil = utcToCivil(utc);
         Civil expectedCivil = {
             year: 2021,
@@ -242,11 +242,11 @@ isolated function testUtcFromCivil() {
         utcOffset: zoneOffset
     };
     Utc|Error utc = utcFromCivil(civil);
-    if (expectedUtc is Utc && utc is Utc) {
+    if expectedUtc is Utc && utc is Utc {
         test:assertEquals(utc, expectedUtc);
-    } else if (expectedUtc is Error) {
+    } else if expectedUtc is Error {
         test:assertFail(msg = expectedUtc.message());
-    } else if (utc is Error) {
+    } else if utc is Error {
         test:assertFail(msg = utc.message());
     } else {
         test:assertFail("Unknown error");
@@ -267,11 +267,11 @@ isolated function testUtcFromCivilWithoutSecond() {
         utcOffset: zoneOffset
     };
     Utc|Error utc = utcFromCivil(civil);
-    if (expectedUtc is Utc && utc is Utc) {
+    if expectedUtc is Utc && utc is Utc {
         test:assertEquals(utc, expectedUtc);
-    } else if (expectedUtc is Error) {
+    } else if expectedUtc is Error {
         test:assertFail(msg = expectedUtc.message());
-    } else if (utc is Error) {
+    } else if utc is Error {
         test:assertFail(msg = utc.message());
     } else {
         test:assertFail("Unknown error");
@@ -291,7 +291,7 @@ isolated function testUtcFromCivilWithInvalidValue() {
         utcOffset: zoneOffset
     };
     Utc|Error utc = utcFromCivil(civil);
-    if (utc is Error) {
+    if utc is Error {
         test:assertEquals(utc.message(), "Invalid value for MinuteOfHour (valid values 0 - 59): 70");
     } else {
         test:assertFail("Expected `time:Error` not found");
@@ -309,7 +309,7 @@ isolated function testUtcFromCivilWithoutOffset() {
         timeAbbrev: "Asia/Colombo"
     };
     Utc|Error utc = utcFromCivil(civil);
-    if (utc is Error) {
+    if utc is Error {
         test:assertEquals(utc.message(), "civilTime.utcOffset must not be null");
     } else {
         test:assertFail("Expected `time:Error` not found");
@@ -320,11 +320,11 @@ isolated function testUtcFromCivilWithoutOffset() {
 isolated function testCivilFromString() {
     string dateString = "2021-04-12T23:20:50.520Z";
     Civil|Error civil = civilFromString(dateString);
-    if (civil is Civil) {
+    if civil is Civil {
         Utc|Error utc = utcFromString(dateString);
-        if (utc is Utc) {
+        if utc is Utc {
             Civil|Error expectedCivil = utcToCivil(utc);
-            if (expectedCivil is Civil) {
+            if expectedCivil is Civil {
                 test:assertEquals(civil, expectedCivil);
             } else {
                 test:assertFail(expectedCivil.message());
@@ -353,7 +353,7 @@ isolated function testCivilFromStringWithZone() {
         dayOfWeek: MONDAY
     };
     Civil|Error civil = civilFromString(dateString);
-    if (civil is Civil) {
+    if civil is Civil {
         test:assertEquals(civil, expectedCivil);
     } else {
         test:assertFail(msg = civil.message());
@@ -374,7 +374,7 @@ isolated function testCivilFromStringWithoutZone() {
         dayOfWeek: MONDAY
     };
     Civil|Error civil = civilFromString(dateString);
-    if (civil is Civil) {
+    if civil is Civil {
         test:assertEquals(civil, expectedCivil);
     } else {
         test:assertFail(msg = civil.message());
@@ -396,7 +396,7 @@ isolated function testCivilFromStringWithoutSecond() {
         dayOfWeek: MONDAY
     };
     Civil|Error civil = civilFromString(dateString);
-    if (civil is Civil) {
+    if civil is Civil {
         test:assertEquals(civil, expectedCivil);
     } else {
         test:assertFail(msg = civil.message());
@@ -419,7 +419,7 @@ isolated function testCivilFromStringWithoutZoneMinutes() {
         dayOfWeek: MONDAY
     };
     Civil|Error civil = civilFromString(dateString);
-    if (civil is Civil) {
+    if civil is Civil {
         test:assertEquals(civil, expectedCivil);
     } else {
         test:assertFail(msg = civil.message());
@@ -442,7 +442,7 @@ isolated function testCivilFromStringWithZoneSeconds() {
         dayOfWeek: MONDAY
     };
     Civil|Error civil = civilFromString(dateString);
-    if (civil is Civil) {
+    if civil is Civil {
         test:assertEquals(civil, expectedCivil);
     } else {
         test:assertFail(msg = civil.message());
@@ -453,7 +453,7 @@ isolated function testCivilFromStringWithZoneSeconds() {
 isolated function testCivilFromStringWithInvalidInput() {
     string dateString = "2021-04-12T23:20:50.520.05:30:45";
     Civil|Error err = civilFromString(dateString);
-    if (err is Error) {
+    if err is Error {
         test:assertEquals(err.message(), "Text '2021-04-12T23:20:50.520.05:30:45' could not be parsed at index 23");
     } else {
         test:assertFail(msg = "Expected time:Error not found");
@@ -475,7 +475,7 @@ isolated function testCivilToString() {
     };
     string|Error civilStr = civilToString(civil);
     string expectedStr = "2021-03-04T19:03:28.839564Z";
-    if (civilStr is string) {
+    if civilStr is string {
         test:assertEquals(civilStr, expectedStr);
     } else {
         test:assertFail(msg = civilStr.message());
@@ -506,7 +506,7 @@ isolated function testCivilToStringWithTimeOfDay() {
     };
     string|Error civilStr = civilToString(civil);
     string expectedStr = "2021-03-04T19:03:28.839564Z";
-    if (civilStr is string) {
+    if civilStr is string {
         test:assertEquals(civilStr, expectedStr);
     } else {
         test:assertFail(msg = civilStr.message());
@@ -524,7 +524,7 @@ isolated function testCivilToStringWithoutOffset() {
         timeAbbrev: "Asia/Colombo"
     };
     string|Error civilStr = civilToString(civil);
-    if (civilStr is Error) {
+    if civilStr is Error {
         test:assertEquals(civilStr.message(), "civil.utcOffset must not be null");
     } else {
         test:assertFail("Expected `time:Error` not found");
@@ -545,7 +545,7 @@ isolated function testCivilToStringWithInvalidInput() {
         utcOffset: zoneOffset
     };
     string|Error err = civilToString(civil);
-    if (err is Error) {
+    if err is Error {
         test:assertEquals(err.message(), "Invalid value for HourOfDay (valid values 0 - 23): 45");
     } else {
         test:assertFail(msg = "Expected `time:Error` not found");
@@ -555,7 +555,7 @@ isolated function testCivilToStringWithInvalidInput() {
 @test:Config {}
 isolated function testUtcToEmailString() {
     Utc|Error utc = utcFromString("2007-12-03T10:15:30.00Z");
-    if (utc is Utc) {
+    if utc is Utc {
         test:assertEquals(utcToEmailString(utc, "GMT"), "Mon, 3 Dec 2007 10:15:30 GMT");
     } else {
         test:assertFail(msg = utc.message());
@@ -565,7 +565,7 @@ isolated function testUtcToEmailString() {
 @test:Config {}
 isolated function testUtcToEmailStringWithZ() {
     Utc|Error utc = utcFromString("2007-12-03T10:15:30.00Z");
-    if (utc is Utc) {
+    if utc is Utc {
         test:assertEquals(utcToEmailString(utc, "Z"), "Mon, 3 Dec 2007 10:15:30 Z");
     } else {
         test:assertFail(msg = utc.message());
@@ -588,7 +588,7 @@ isolated function testCivilFromEmailString() {
         dayOfWeek: WEDNESDAY
     };
     Civil|Error civil = civilFromEmailString(dateString);
-    if (civil is Civil) {
+    if civil is Civil {
         test:assertEquals(civil, expectedCivil);
     } else {
         test:assertFail(msg = civil.message());
@@ -599,7 +599,7 @@ isolated function testCivilFromEmailString() {
 isolated function testCivilFromEmailStringWithInvalidInput() {
     string dateString = "Wed, 10 2021 19:51:55 -0800 (PST)";
     Civil|Error err = civilFromEmailString(dateString);
-    if (err is Error) {
+    if err is Error {
         test:assertEquals(err.message(), "Text 'Wed, 10 2021 19:51:55 -0800 (PST)' could not be parsed at index 8");
     } else {
         test:assertFail(msg = "Expected time:Error not found");
@@ -621,7 +621,7 @@ isolated function testCivilToEmailString() {
         utcOffset: zoneOffset
     };
     string|Error emailString = civilToEmailString(civil, ZONE_OFFSET_WITH_TIME_ABBREV_COMMENT);
-    if (emailString is string) {
+    if emailString is string {
         test:assertEquals(emailString, expectedString);
     } else {
         test:assertFail(msg = emailString.message());
@@ -643,7 +643,7 @@ isolated function testCivilToEmailStringWithZonePreference() {
         utcOffset: zoneOffset
     };
     string|Error emailString = civilToEmailString(civil, PREFER_ZONE_OFFSET);
-    if (emailString is string) {
+    if emailString is string {
         test:assertEquals(emailString, expectedString);
     } else {
         test:assertFail(msg = emailString.message());
@@ -661,7 +661,7 @@ isolated function testCivilToEmailStringWithoutOffset() {
         timeAbbrev: "Asia/Colombo"
     };
     string|Error emailString = civilToEmailString(civil, PREFER_ZONE_OFFSET);
-    if (emailString is Error) {
+    if emailString is Error {
         test:assertEquals(emailString.message(), "civil.utcOffset must not be null");
     } else {
         test:assertFail("Expected `time:Error` not found");
@@ -682,7 +682,7 @@ isolated function testCivilToEmailStringWithInvalidInput() {
         utcOffset: zoneOffset
     };
     string|Error err = civilToEmailString(civil, ZONE_OFFSET_WITH_TIME_ABBREV_COMMENT);
-    if (err is Error) {
+    if err is Error {
         test:assertEquals(err.message(), "Invalid value for MonthOfYear (valid values 1 - 12): 30");
     } else {
         test:assertFail(msg = "Expected time:Error not found");
@@ -691,8 +691,8 @@ isolated function testCivilToEmailStringWithInvalidInput() {
 
 @test:Config {}
 isolated function testLoadSystemZone() returns Error? {
-    final Zone systemZone = check loadSystemZone();
-
+    _ = check loadSystemZone();
+    //final Zone systemZone = check loadSystemZone();
     //test:assertTrue(systemZone.fixedOffset() is ()); // Cannot test this extensively since this may change in different environments (or docker images).
 }
 
