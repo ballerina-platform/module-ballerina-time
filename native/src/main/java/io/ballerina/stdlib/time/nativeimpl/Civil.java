@@ -47,11 +47,6 @@ public class Civil {
     private final BMap<BString, Object> civilMap = ValueCreator.createRecordValue(ModuleUtils.getModule(),
             Constants.CIVIL_RECORD);
 
-    public Civil() {
-
-        zonedDateTime = ZonedDateTime.now();
-    }
-
     public Civil(ZonedDateTime zonedDateTime) {
 
         this.zonedDateTime = zonedDateTime;
