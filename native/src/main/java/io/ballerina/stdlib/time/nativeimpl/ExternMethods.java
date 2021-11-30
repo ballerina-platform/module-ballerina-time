@@ -27,6 +27,7 @@ import io.ballerina.runtime.api.values.BString;
 import io.ballerina.stdlib.time.util.Constants;
 import io.ballerina.stdlib.time.util.Errors;
 import io.ballerina.stdlib.time.util.TimeValueHandler;
+import io.ballerina.stdlib.time.util.Utils;
 
 import java.math.BigDecimal;
 import java.time.DateTimeException;
@@ -69,7 +70,7 @@ public class ExternMethods {
             Instant utcTimeInstant = ZonedDateTime.parse(str.getValue()).toInstant();
             return new Utc(utcTimeInstant).build();
         } catch (DateTimeException e) {
-            return TimeValueHandler.createError(Errors.FormatError,
+            return Utils.createError(Errors.FormatError,
                     "Provided '" + str.getValue() + "' is not adhere to the expected format '2007-12-03T10:15:30.00Z'");
         }
     }
@@ -100,7 +101,7 @@ public class ExternMethods {
             LocalDate.of(year, month, day);
             return null;
         } catch (DateTimeException e) {
-            return TimeValueHandler.createError(Errors.FormatError, e.getMessage());
+            return Utils.createError(Errors.FormatError, e.getMessage());
         }
     }
 
@@ -112,7 +113,7 @@ public class ExternMethods {
         try {
             return ((LocalDate.of(year, month, day).getDayOfWeek().getValue()) % 7);
         } catch (DateTimeException e) {
-            return TimeValueHandler.createError(Errors.FormatError, e.getMessage());
+            return Utils.createError(Errors.FormatError, e.getMessage());
         }
     }
 
@@ -132,7 +133,7 @@ public class ExternMethods {
                     Constants.HeaderZoneHandling.PREFER_ZONE_OFFSET.toString());
             return new Utc(dateTime.toInstant()).build();
         } catch (DateTimeException e) {
-            return TimeValueHandler.createError(Errors.FormatError, e.getMessage());
+            return Utils.createError(Errors.FormatError, e.getMessage());
         }
     }
 
@@ -141,7 +142,7 @@ public class ExternMethods {
         try {
             return TimeValueHandler.createCivilFromZoneDateTimeString(dateTimeString.getValue());
         } catch (DateTimeException e) {
-            return TimeValueHandler.createError(Errors.FormatError, e.getMessage());
+            return Utils.createError(Errors.FormatError, e.getMessage());
         }
     }
 
@@ -150,7 +151,7 @@ public class ExternMethods {
         try {
             return TimeValueHandler.createCivilFromEmailString(dateTimeString.getValue());
         } catch (DateTimeException | IllegalArgumentException e) {
-            return TimeValueHandler.createError(Errors.FormatError, e.getMessage());
+            return Utils.createError(Errors.FormatError, e.getMessage());
         }
     }
 
@@ -163,7 +164,7 @@ public class ExternMethods {
                     Constants.HeaderZoneHandling.PREFER_ZONE_OFFSET.toString());
             return StringUtils.fromString(dateTime.toInstant().toString());
         } catch (DateTimeException e) {
-            return TimeValueHandler.createError(Errors.FormatError, e.getMessage());
+            return Utils.createError(Errors.FormatError, e.getMessage());
         }
     }
 
@@ -189,7 +190,7 @@ public class ExternMethods {
             return StringUtils.fromString(dateTime.format(DateTimeFormatter.ofPattern(
                     Constants.EMAIL_DATE_TIME_FORMAT)));
         } catch (DateTimeException e) {
-            return TimeValueHandler.createError(Errors.FormatError, e.getMessage());
+            return Utils.createError(Errors.FormatError, e.getMessage());
         }
     }
 

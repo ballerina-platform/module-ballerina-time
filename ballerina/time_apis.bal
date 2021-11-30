@@ -69,7 +69,7 @@ public isolated function utcAddSeconds(Utc utc, Seconds seconds) returns Utc {
     [int, decimal] [secondsFromEpoch, lastSecondFraction] = utc;
     secondsFromEpoch = secondsFromEpoch + <int>seconds.floor();
     lastSecondFraction = lastSecondFraction + (seconds - seconds.floor());
-    if (lastSecondFraction >= 1.0d) {
+    if lastSecondFraction >= 1.0d {
         secondsFromEpoch = secondsFromEpoch + <int>lastSecondFraction.floor();
         lastSecondFraction = lastSecondFraction - lastSecondFraction.floor();
     }
@@ -132,7 +132,7 @@ public isolated function utcToCivil(Utc utc) returns Civil {
 # + civilTime - `Civil` time
 # + return - The corresponding `Utc` value or an error if `civilTime.utcOffset` is missing
 public isolated function utcFromCivil(Civil civilTime) returns Utc|Error {
-    if (civilTime?.utcOffset is ()) {
+    if civilTime?.utcOffset is () {
         return error FormatError("civilTime.utcOffset must not be null");
     }
     ZoneOffset utcOffset = <ZoneOffset>civilTime?.utcOffset;
@@ -164,7 +164,7 @@ public isolated function civilFromString(string dateTimeString) returns Civil|Er
 # + civil - `time:Civil` that needs to be converted
 # + return - The corresponding string value or an error if the specified `time:Civil` contains invalid parameters(e.g. `month` > 12)
 public isolated function civilToString(Civil civil) returns string|Error {
-    if (civil?.utcOffset is ()) {
+    if civil?.utcOffset is () {
         return error FormatError("civil.utcOffset must not be null");
     }
     ZoneOffset utcOffset = <ZoneOffset>civil?.utcOffset;
