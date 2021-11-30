@@ -33,11 +33,11 @@ import java.time.ZonedDateTime;
  *
  * @since 2.0.2
  */
-public class TimeZoneExternMethods {
+public class TimeZoneExternUtils {
 
     private static final String ZONE_ID_ENTRY = "zoneId";
 
-    private TimeZoneExternMethods() {
+    private TimeZoneExternUtils() {
 
     }
 

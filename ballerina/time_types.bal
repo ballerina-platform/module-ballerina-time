@@ -262,23 +262,23 @@ public isolated function getZone(string id) returns Zone? {
 }
 
 isolated function externTimeZoneInitWithSystemZone(TimeZone timeZone) returns Error? = @java:Method {
-    'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternUtils"
 } external;
 
 isolated function externTimeZoneInitWithId(TimeZone timeZone, string zoneId) = @java:Method {
-    'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternUtils"
 } external;
 
 isolated function externTimeZoneFixedOffset(TimeZone timeZone) returns ZoneOffset? = @java:Method {
-    'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternUtils"
 } external;
 
 isolated function externTimeZoneUtcToCivil(TimeZone timeZone, Utc utc) returns Civil = @java:Method {
-    'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternUtils"
 } external;
 
 isolated function externTimeZoneUtcFromCivil(TimeZone timeZone, int year, int month, int day,
 int hour, int minute, decimal second, string timeAbber, HeaderZoneHandling zoneHandling)
 returns Utc|Error = @java:Method {
-    'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternMethods"
+    'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternUtils"
 } external;
