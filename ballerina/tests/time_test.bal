@@ -763,7 +763,7 @@ isolated function testZoneUtcFromCivilWithoutTimeAbbrev() returns Error? {
     if zone is Zone {
         Utc|Error utc = zone.utcFromCivil(civil);
         if utc is Error {
-            test:assertEquals(utc.message(), "civil.timeAbbrev must not be null");
+            test:assertEquals(utc.message(), "Abbreviation for the local time is required for the conversion");
         } else {
             test:assertFail("Expected time:Error not found");
         }

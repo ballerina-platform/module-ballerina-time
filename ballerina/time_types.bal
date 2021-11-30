@@ -224,13 +224,12 @@ public readonly class TimeZone {
     # + civil - `Civil` time
     # + return - The corresponding `Utc` value or an error if `civil.timeAbbrev` is missing
     public isolated function utcFromCivil(Civil civil) returns Utc|Error {
-        string? timeAbbrevField = civil?.timeAbbrev;
-        if timeAbbrevField is () {
-            return error FormatError("civil.timeAbbrev must not be null");
+        string? timeAbbrev = civil?.timeAbbrev;
+        if timeAbbrev is () {
+            return error FormatError("Abbreviation for the local time is required for the conversion");
         }
         decimal? civilTimeSecField = civil?.second;
         decimal civilTimeSeconds = (civilTimeSecField is Seconds) ? civilTimeSecField : 0.0;
-        string timeAbbrev = <string>timeAbbrevField;
 
         return externTimeZoneUtcFromCivil(self, civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds, timeAbbrev, PREFER_TIME_ABBREV);
     }
