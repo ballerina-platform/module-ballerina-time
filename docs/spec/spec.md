@@ -7,8 +7,7 @@ _Updated_: 2021/12/04
 _Issue_: [#2263](https://github.com/ballerina-platform/ballerina-standard-library/issues/2263)
 
 # Introduction
-This is the specification for Time standard library, which is used to generate and convert time values in the [Ballerina programming language](https://ballerina.io/), which is an open-source programming language for the cloud
-that makes it easier to use, combine, and create network services.
+This is the specification for Time standard library, which is used to generate and convert time values in the [Ballerina programming language](https://ballerina.io/), which is an open-source programming language for the cloud that makes it easier to use, combine, and create network services.
 
 # Contents
 1. [Overview](#1-overview)
