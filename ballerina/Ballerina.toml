@@ -9,5 +9,5 @@ license = ["Apache-2.0"]
 distribution = "slbeta6"
 
 [[platform.java11.dependency]]
-path = "../native/build/libs/time-native-2.1.0-SNAPSHOT.jar"
-version = "2.1.0-SNAPSHOT"
+path = "../native/build/libs/time-native-2.1.0.jar"
+version = "2.1.0"
