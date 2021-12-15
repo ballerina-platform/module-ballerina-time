@@ -42,7 +42,7 @@ and manipulations using a set of high-level APIs. Those conversion APIs can be l
 ### The String Representations of UTC
 ```ballerina
 // Converts from RFC 3339 timestamp to UTC.
-time:Utc utc = check time:utcFromString("2007-12-0310:15:30.00Z");
+time:Utc utc = check time:utcFromString("2007-12-03T10:15:30.00Z");
 
 // Converts a given `time:Utc` time to a RFC 3339 timestamp.
 string utcString = time:utcToString(utc);
