@@ -496,7 +496,24 @@ isolated function testCivilToEmailStringWithZonePreference() returns Error? {
 }
 
 @test:Config {}
-isolated function testCivilToEmailStringWithoutOffset() {
+isolated function testCivilToEmailStringWithIncorrectInput() {
+    ZoneOffset zoneOffset = {hours: -8, minutes: -20};
+    Civil civil = {
+        year: 2021,
+        month: 4,
+        day: 13,
+        hour: 4,
+        minute: 70,
+        timeAbbrev: "Asia/Colombo",
+        utcOffset: zoneOffset
+    };
+    string|Error err = civilToEmailString(civil, PREFER_ZONE_OFFSET);
+    test:assertTrue(err is Error);
+    test:assertEquals((<Error>err).message(), "Invalid value for MinuteOfHour (valid values 0 - 59): 70");
+}
+
+@test:Config {}
+isolated function testCivilToEmailStringWithoutZoneOffset() {
     Civil civil = {
         year: 2021,
         month: 4,
@@ -507,7 +524,7 @@ isolated function testCivilToEmailStringWithoutOffset() {
     };
     string|Error err = civilToEmailString(civil, PREFER_ZONE_OFFSET);
     test:assertTrue(err is Error);
-    test:assertEquals((<Error>err).message(), "civil.utcOffset must not be null");
+    test:assertEquals((<Error>err).message(), "civilTime.utcOffset must not be null with time:PREFER_ZONE_OFFSET");
 }
 
 @test:Config {}
@@ -621,4 +638,27 @@ isolated function testZoneUtcToCivil2() returns Error? {
     Zone? zone = getZone("Asia/Colombo");
     test:assertTrue(zone is Zone);
     test:assertEquals((<Zone>zone).utcToCivil(utc), civil);
+}
+
+@test:Config {}
+isolated function testZoneToEmailStringConversion() returns Error? {
+    Zone? systemZone = getZone("Asia/Colombo");
+    test:assertTrue(systemZone is Zone);
+    Civil civil = (<Zone>systemZone).utcToCivil(check utcFromString("2007-12-03T10:15:30.00Z"));
+    test:assertEquals(civilToEmailString(civil, PREFER_TIME_ABBREV), "Mon, 03 Dec 2007 15:45:30 +0530 (IST)");
+}
+
+@test:Config {}
+isolated function testZoneToEmailStringConversionWithIncorrectArgument() returns Error? {
+    Zone? systemZone = getZone("Asia/Colombo");
+    test:assertTrue(systemZone is Zone);
+    Civil civil = (<Zone>systemZone).utcToCivil(check utcFromString("2007-12-03T10:15:30.00Z"));
+
+    string|Error err1 = civilToEmailString(civil, PREFER_ZONE_OFFSET);
+    test:assertTrue(err1 is Error);
+    test:assertEquals((<Error>err1).message(), "civilTime.utcOffset must not be null with time:PREFER_ZONE_OFFSET");
+
+    string|Error err2 = civilToEmailString(civil, ZONE_OFFSET_WITH_TIME_ABBREV_COMMENT);
+    test:assertTrue(err2 is Error);
+    test:assertEquals((<Error>err2).message(), "civilTime.utcOffset must not be null with time:ZONE_OFFSET_WITH_TIME_ABBREV_COMMENT");
 }
