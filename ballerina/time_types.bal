@@ -25,7 +25,7 @@ public type Seconds decimal;
 # compared using the Ballerina <, <=, >, >= operators.
 # The first member of the tuple is int representing an integral number of
 # seconds from the epoch.
-# Epoch is the traditional UNIX epoch of 1970-01-01T00:00:00Z.
+# Epoch is the traditional UNIX epoch of `1970-01-01T00:00:00Z`.
 # The second member of the tuple is a decimal giving the fraction of
 # a second.
 # For times before the epoch, n is negative and f is
@@ -61,9 +61,9 @@ public type DayOfWeek SUNDAY|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY;
 
 # Fields of the Date record.
 #
-# + month - month as an integer(1 <= month <= 12)  
-# + year - year as an integer  
-# + day - day as an integer(1 <= day <= 31)  
+# + month - Month as an integer (1 <= month <= 12)
+# + year - Year as an integer
+# + day - Day as an integer (1 <= day <= 31)
 type DateFields record {
     int year;
     int month;
@@ -71,9 +71,9 @@ type DateFields record {
 };
 
 # Fields of the TimeOfDay record.
-# + hour - hour as an integer(0 <= hour <= 23)  
-# + minute - minute as an integer(0 <= minute <= 59)   
-# + second - second as decimal value with nanoseconds precision
+# + hour - Hour as an integer(0 <= hour <= 23)
+# + minute - Minute as an integer(0 <= minute <= 59)
+# + second - Second as decimal value with nanoseconds precision
 type TimeOfDayFields record {
     int hour;
     int minute;
@@ -82,9 +82,9 @@ type TimeOfDayFields record {
 
 # Date in proleptic Gregorian calendar with all the fields beign optional.
 #
-# + month - month as an integer(1 <= month <= 12)  
-# + year - year as an integer  
-# + day - day as an integer(1 <= day <= 31)  
+# + month - Month as an integer(1 <= month <= 12)
+# + year - Year as an integer
+# + day - Day as an integer (1 <= day <= 31)
 type OptionalDateFields record {
     int year?;
     int month?;
@@ -93,9 +93,9 @@ type OptionalDateFields record {
 
 # TimeOfDay with all the fields beign optional.
 #
-# + hour - hour as an integer(0 <= hour <= 23)  
-# + minute - minute as an integer(0 <= minute <= 59)   
-# + second - second as decimal value with nanoseconds precision
+# + hour - Hour as an integer(0 <= hour <= 23)
+# + minute - Minute as an integer(0 <= minute <= 59)
+# + second - Second as decimal value with nanoseconds precision
 type OptionalTimeOfDayFields record {
     int hour?;
     int minute?;
@@ -104,7 +104,7 @@ type OptionalTimeOfDayFields record {
 
 # Date in proleptic Gregorian calendar.
 #
-# + utcOffset - optional zone offset 
+# + utcOffset - Optional zone offset
 public type Date record {
     *DateFields;
     *OptionalTimeOfDayFields;
@@ -114,7 +114,7 @@ public type Date record {
 # Time within a day
 # Not always duration from midnight.
 #
-# + utcOffset - optional zone offset 
+# + utcOffset - Optional zone offset
 public type TimeOfDay record {
     *OptionalDateFields;
     *TimeOfDayFields;
@@ -149,12 +149,12 @@ public type ZERO_OR_ONE 0|1;
 
 # Time within some region relative to a
 # time scale stipulated by civilian authorities.
-# + utcOffset - optional zone offset 
-# + timeAbbrev - the string representation of the time zone
-# + which - if present, abbreviation for the local time (e.g. EDT, EST) in effect at the time represented by this record;
+# + utcOffset - An optional zone offset
+# + timeAbbrev - The string representation of the time zone
+# + which - If present, abbreviation for the local time (e.g., EDT, EST) in effect at the time represented by this record;
 # this is quite the same as the name of a time zone one time zone can have two abbreviations: one for
 # standard time and one for daylight savings time
-# + dayOfWeek - day of the week(SUNDAY, MONDAY, TUESDAY, ... SATURDAY)
+# + dayOfWeek - Day of the week (e.g., SUNDAY, MONDAY, TUESDAY, ... SATURDAY)
 public type Civil record {
     // the date time in that region
     *DateFields;
@@ -219,10 +219,10 @@ public readonly class TimeZone {
         return externTimeZoneFixedOffset(self);
     }
 
-    # Converts a given `Civil` value to an `Utc` timestamp based on the time zone value.
+    # Converts a given `time:Civil` value to an `time:Utc` timestamp based on the time zone value.
     #
-    # + civil - `Civil` time
-    # + return - The corresponding `Utc` value or an error if `civil.timeAbbrev` is missing
+    # + civil - `time:Civil` time
+    # + return - The corresponding `time:Utc` value or an error if `civil.timeAbbrev` is missing
     public isolated function utcFromCivil(Civil civil) returns Utc|Error {
         string? timeAbbrev = civil?.timeAbbrev;
         if timeAbbrev is () {
@@ -234,10 +234,10 @@ public readonly class TimeZone {
         return externTimeZoneUtcFromCivil(self, civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds, timeAbbrev, PREFER_TIME_ABBREV);
     }
 
-    # Converts a given `Utc` timestamp to a `Civil` value based on the time zone value.
+    # Converts a given `time:Utc` timestamp to a `time:Civil` value based on the time zone value.
     #
-    # + utc - `Utc` timestamp
-    # + return - The corresponding `Civil` value
+    # + utc - `time:Utc` timestamp
+    # + return - The corresponding `time:Civil` value
     public isolated function utcToCivil(Utc utc) returns Civil {
         return externTimeZoneUtcToCivil(self, utc);
     }
@@ -251,7 +251,7 @@ public isolated function loadSystemZone() returns Zone|Error {
 
 # Return the time zone object of a given zone ID.
 #
-# + id - Time zone ID (e.g. "Continent/City")
+# + id - Time zone ID (e.g., "Continent/City")
 # + return - Corresponding ime zone object or null 
 public isolated function getZone(string id) returns Zone? {
     TimeZone|Error timeZone = new TimeZone(id);
