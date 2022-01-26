@@ -207,7 +207,7 @@ public isolated function civilFromEmailString(string dateTimeString) returns Civ
 # + civil - The civil record to be converted
 # + zoneHandling - Indicate how to handle the zone by specifying the preference whether to give preference to zone
 # offset or time abbreviation. Also, this can configure to use zone offset to the execution and use time abbreviation as a comment.
-# + return - RFC 5322 formatted(e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`) string or
+# + return - RFC 5322 formatted (e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`) string or
 # an error if the specified `time:Civil` contains invalid parameters (e.g., `month` > 12)
 public isolated function civilToEmailString(Civil civil, HeaderZoneHandling zoneHandling) returns string|Error {
     if civil?.utcOffset is () {
