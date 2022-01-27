@@ -15,7 +15,7 @@
 // under the License.
 import ballerina/jballerina.java;
 
-# Returns the UTC representing the current time (current instant of the system clock in seconds from the epoch of 1970-01-01T00:00:00).
+# Returns the UTC representing the current time (current instant of the system clock in seconds from the epoch of `1970-01-01T00:00:00`).
 # ```ballerina
 # time:Utc utc = time:utcNow();
 # ```
@@ -36,18 +36,18 @@ public isolated function monotonicNow() returns decimal {
     return externMonotonicNow();
 }
 
-# Converts from RFC 3339 timestamp(e.g. `2007-12-03T10:15:30.00Z`) to Utc.
+# Converts from RFC 3339 timestamp (e.g., `2007-12-03T10:15:30.00Z`) to Utc.
 # ```ballerina
 # time:Utc|time:Error utc = time:utcFromString("2007-12-0310:15:30.00Z");
 # ```
-# + timestamp - RFC 3339 timestamp(e.g. `2007-12-03T10:15:30.00Z`) value as a string
+# + timestamp - RFC 3339 timestamp (e.g., `2007-12-03T10:15:30.00Z`) value as a string
 # + return - The corresponding `time:Utc` or a `time:Error` when the specified timestamp
-# is not adhere to the RFC 3339 format(e.g. `2007-12-03T10:15:30.00Z`)
+# is not adhere to the RFC 3339 format (e.g., `2007-12-03T10:15:30.00Z`)
 public isolated function utcFromString(string timestamp) returns Utc|Error {
     return externUtcFromString(timestamp);
 }
 
-# Converts a given `time:Utc` time to a RFC 3339 timestamp(e.g. `2007-12-03T10:15:30.00Z`).
+# Converts a given `time:Utc` time to a RFC 3339 timestamp (e.g., `2007-12-03T10:15:30.00Z`).
 # ```ballerina
 # string utcString = time:utcToString(time:utcNow());
 # ```
@@ -57,7 +57,7 @@ public isolated function utcToString(Utc utc) returns string {
     return externUtcToString(utc);
 }
 
-# Returns Utc time that occurs seconds after `utc`. This assumes that all days have 86400 seconds except when utc
+# Returns UTC time that occurs seconds after `utc`. This assumes that all days have 86400 seconds except when utc
 # represents a time during a positive leap second, in which case the corresponding day will be assumed to have 86401 seconds.
 # ```ballerina
 # time:Utc utc = time:utcAddSeconds(time:utcNow(), 20.900);
@@ -76,8 +76,8 @@ public isolated function utcAddSeconds(Utc utc, Seconds seconds) returns Utc {
     return [secondsFromEpoch, lastSecondFraction];
 }
 
-# Returns difference in seconds between utc1 and utc2.
-# This will be positive if utc1 occurs after utc2
+# Returns difference in seconds between `utc1` and `utc2`.
+# This will be positive if `utc1` occurs after `utc2`
 # ```ballerina
 # time:Utc utc1 = time:utcNow();
 # time:Utc utc2 = check time:utcFromString("2021-04-12T23:20:50.520Z");
@@ -107,19 +107,19 @@ public isolated function dateValidate(Date date) returns Error? {
 # time:DayOfWeek day = time:dayOfWeek(date);
 # ```
 # + date - Date value
-# + return - `DayOfWeek` if the `date` is valid or else panic
+# + return - `time:DayOfWeek` if the `date` is valid or else panic
 public isolated function dayOfWeek(Date date) returns DayOfWeek {
     DayOfWeek[] daysOfWeek = [SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY];
     return daysOfWeek[checkpanic externDayOfWeek(date)];
 }
 
-# Converts a given `Utc` timestamp to a `Civil` value.
+# Converts a given `time:Utc` timestamp to a `time:Civil` value.
 # ```ballerina
 # time:Utc utc = time:utcNow();
 # time:Civil civil = time:utcToCivil(utc);
 # ```
-# + utc - `Utc` timestamp
-# + return - The corresponding `Civil` value
+# + utc - `time:Utc` timestamp
+# + return - The corresponding `time:Civil` value
 public isolated function utcToCivil(Utc utc) returns Civil {
     return externUtcToCivil(utc);
 }
@@ -129,8 +129,8 @@ public isolated function utcToCivil(Utc utc) returns Civil {
 # time:Civil civil = time:utcToCivil(time:utcNow());
 # time:Utc utc = time:utcFromCivil(civil);
 # ```
-# + civilTime - `Civil` time
-# + return - The corresponding `Utc` value or an error if `civilTime.utcOffset` is missing
+# + civilTime - `time:Civil` time
+# + return - The corresponding `time:Utc` value or an error if `civilTime.utcOffset` is missing
 public isolated function utcFromCivil(Civil civilTime) returns Utc|Error {
     if civilTime?.utcOffset is () {
         return error FormatError("civilTime.utcOffset must not be null");
@@ -145,24 +145,24 @@ public isolated function utcFromCivil(Civil civilTime) returns Utc|Error {
     civilTimeSeconds, utcOffset.hours, utcOffset.minutes, utcOffsetSeconds);
 }
 
-# Converts a given RFC 3339 timestamp(e.g. `2007-12-03T10:15:30.00Z`) to `time:Civil`.
+# Converts a given RFC 3339 timestamp(e.g., `2007-12-03T10:15:30.00Z`) to `time:Civil`.
 # ```ballerina
 # time:Civil|time:Error civil1 = time:civilFromString("2021-04-12T23:20:50.520+05:30[Asia/Colombo]");
 # time:Civil|time:Error civil2 = time:civilFromString("2007-12-03T10:15:30.00Z");
 # ```
-# + dateTimeString - RFC 3339 timestamp(e.g. `2007-12-03T10:15:30.00Z`) as a string
+# + dateTimeString - RFC 3339 timestamp (e.g., `2007-12-03T10:15:30.00Z`) as a string
 # + return - The corresponding `time:Civil` value or an error if the given `dateTimeString` is invalid
 public isolated function civilFromString(string dateTimeString) returns Civil|Error {
     return check externCivilFromString(dateTimeString);
 }
 
-# Obtain a RFC 3339 timestamp(e.g. `2007-12-03T10:15:30.00Z`) from a given `time:Civil`.
+# Obtain a RFC 3339 timestamp (e.g., `2007-12-03T10:15:30.00Z`) from a given `time:Civil`.
 # ```ballerina
 # time:Civil civil = check time:civilFromString("2007-12-03T10:15:30.00Z");
 # string|time:Error civilString = time:civilToString(civil);
 # ```
 # + civil - `time:Civil` that needs to be converted
-# + return - The corresponding string value or an error if the specified `time:Civil` contains invalid parameters(e.g. `month` > 12)
+# + return - The corresponding string value or an error if the specified `time:Civil` contains invalid parameters (e.g., `month` > 12)
 public isolated function civilToString(Civil civil) returns string|Error {
     if civil?.utcOffset is () {
         return error FormatError("civil.utcOffset must not be null");
@@ -177,7 +177,7 @@ public isolated function civilToString(Civil civil) returns string|Error {
     hours, utcOffset.minutes, utcOffsetSeconds);
 }
 
-# Converts a given UTC to an email formatted string(e.g `Mon, 3 Dec 2007 10:15:30 GMT`).
+# Converts a given UTC to an email formatted string (e.g `Mon, 3 Dec 2007 10:15:30 GMT`).
 # ```ballerina
 # time:Utc utc = time:utcNow();
 # string emailFormattedString = time:utcToEmailString(utc);
@@ -189,17 +189,17 @@ public isolated function utcToEmailString(Utc utc, UtcZoneHandling zh = "0") ret
     return externUtcToEmailString(utc, zh);
 }
 
-# Converts a given RFC 5322 formatted(e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`) string to a civil record.
+# Converts a given RFC 5322 formatted (e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`) string to a civil record.
 # ```ballerina
 # time:Civil|time:Error emailDateTime = time:civilFromEmailString("Wed, 10 Mar 2021 19:51:55 -0820");
 # ```
-# + dateTimeString - RFC 5322 formatted(e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`) string to be converted
+# + dateTimeString - RFC 5322 formatted (e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`) string to be converted
 # + return - The corresponding civil record or an error if the given string is incorrectly formatted.
 public isolated function civilFromEmailString(string dateTimeString) returns Civil|Error {
     return check externCivilFromEmailString(dateTimeString);
 }
 
-# Converts a given Civil record to RFC 5322 format(e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`).
+# Converts a given Civil record to RFC 5322 format (e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`).
 # ```ballerina
 # time:Civil civil = check time:civilFromString("2021-04-12T23:20:50.520+05:30[Asia/Colombo]");
 # string|time:Error emailDateTime = time:civilToEmailString(civil, time:PREFER_ZONE_OFFSET);
@@ -207,8 +207,8 @@ public isolated function civilFromEmailString(string dateTimeString) returns Civ
 # + civil - The civil record to be converted
 # + zoneHandling - Indicate how to handle the zone by specifying the preference whether to give preference to zone
 # offset or time abbreviation. Also, this can configure to use zone offset to the execution and use time abbreviation as a comment.
-# + return - RFC 5322 formatted(e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`) string or
-# an error if the specified `time:Civil` contains invalid parameters(e.g. `month` > 12)
+# + return - RFC 5322 formatted (e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`) string or
+# an error if the specified `time:Civil` contains invalid parameters (e.g., `month` > 12)
 public isolated function civilToEmailString(Civil civil, HeaderZoneHandling zoneHandling) returns string|Error {
     if civil?.utcOffset is () {
         return error FormatError("civil.utcOffset must not be null");
