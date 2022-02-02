@@ -141,7 +141,7 @@ public isolated function utcFromCivil(Civil civilTime) returns Utc|Error {
     decimal civilTimeSeconds = (civilTimeSecField is Seconds) ? civilTimeSecField : 0.0;
     decimal utcOffsetSeconds = (utcOffsetSecField is decimal) ? utcOffsetSecField : 0.0;
 
-    return externUtcFromCivil(civilTime.year, civilTime.month, civilTime.day, civilTime.hour, civilTime.minute, 
+    return externUtcFromCivil(civilTime.year, civilTime.month, civilTime.day, civilTime.hour, civilTime.minute,
     civilTimeSeconds, utcOffset.hours, utcOffset.minutes, utcOffsetSeconds);
 }
 
@@ -210,19 +210,29 @@ public isolated function civilFromEmailString(string dateTimeString) returns Civ
 # + return - RFC 5322 formatted (e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`) string or
 # an error if the specified `time:Civil` contains invalid parameters (e.g., `month` > 12)
 public isolated function civilToEmailString(Civil civil, HeaderZoneHandling zoneHandling) returns string|Error {
-    if civil?.utcOffset is () {
-        return error FormatError("civil.utcOffset must not be null");
+    int utcOffsetHours = 0;
+    int utcOffsetMinutes = 0;
+    decimal utcOffsetSeconds = 0.0;
+
+    ZoneOffset? utcOffset = civil?.utcOffset;
+    if utcOffset is ZoneOffset {
+        utcOffsetHours = utcOffset.hours;
+        utcOffsetMinutes = utcOffset.minutes;
+        decimal? utcOffsetSecField = utcOffset?.seconds;
+        utcOffsetSeconds = (utcOffsetSecField is decimal) ? utcOffsetSecField : 0.0;
+    } else {
+        if zoneHandling is PREFER_ZONE_OFFSET || zoneHandling is ZONE_OFFSET_WITH_TIME_ABBREV_COMMENT {
+            return error FormatError(string `civilTime.utcOffset must not be null with time:${zoneHandling.toString()}`);
+        }
     }
-    ZoneOffset utcOffset = <ZoneOffset>civil?.utcOffset;
+
     decimal? civilTimeSecField = civil?.second;
-    decimal? utcOffsetSecField = utcOffset?.seconds;
     string? timeAbbrevField = civil?.timeAbbrev;
     decimal civilTimeSeconds = (civilTimeSecField is Seconds) ? civilTimeSecField : 0.0;
-    decimal utcOffsetSeconds = (utcOffsetSecField is decimal) ? utcOffsetSecField : 0.0;
     string timeAbbrev = (timeAbbrevField is string) ? timeAbbrevField : "";
 
-    return externCivilToEmailString(civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds, 
-    utcOffset.hours, utcOffset.minutes, utcOffsetSeconds, timeAbbrev, zoneHandling);
+    return externCivilToEmailString(civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds,
+    utcOffsetHours, utcOffsetMinutes, utcOffsetSeconds, timeAbbrev, zoneHandling);
 }
 
 isolated function externUtcNow(int precision) returns Utc = @java:Method {
@@ -265,8 +275,8 @@ isolated function externUtcToCivil(Utc utc) returns Civil = @java:Method {
     'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
-isolated function externUtcFromCivil(int year, int month, int day, int hour, int minute, decimal second, int zoneHour, 
-                                     int zoneMinute, decimal zoneSecond) returns Utc|Error = @java:Method {
+isolated function externUtcFromCivil(int year, int month, int day, int hour, int minute, decimal second, int zoneHour,
+                                    int zoneMinute, decimal zoneSecond) returns Utc|Error = @java:Method {
     name: "externUtcFromCivil",
     'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -276,8 +286,8 @@ isolated function externCivilFromString(string dateTimeString) returns Civil|Err
     'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
-isolated function externCivilToString(int year, int month, int day, int hour, int minute, decimal second, int zoneHour, 
-                                      int zoneMinute, decimal zoneSecond) returns string|Error = @java:Method {
+isolated function externCivilToString(int year, int month, int day, int hour, int minute, decimal second, int zoneHour,
+                                    int zoneMinute, decimal zoneSecond) returns string|Error = @java:Method {
     name: "externCivilToString",
     'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -292,9 +302,9 @@ isolated function externCivilFromEmailString(string dateTimeString) returns Civi
     'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
-isolated function externCivilToEmailString(int year, int month, int day, int hour, int minute, decimal second, 
-                                           int zoneHour, int zoneMinute, decimal zoneSecond, string timeAbber, 
-                                           HeaderZoneHandling zoneHandling) returns string|Error = @java:Method {
+isolated function externCivilToEmailString(int year, int month, int day, int hour, int minute, decimal second,
+                                            int zoneHour, int zoneMinute, decimal zoneSecond, string timeAbber,
+                                            HeaderZoneHandling zoneHandling) returns string|Error = @java:Method {
     name: "externCivilToEmailString",
     'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
