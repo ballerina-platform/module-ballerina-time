@@ -244,14 +244,19 @@ public readonly class TimeZone {
 }
 
 # Load the default time zone of the system.
+# ```ballerina
+# time:Zone|time:Error zone = time:loadSystemZone();
+# ```
 # + return - Zone value or error when the zone ID of the system is in invalid format. 
 public isolated function loadSystemZone() returns Zone|Error {
     return check new TimeZone();
 }
 
 # Return the time zone object of a given zone ID.
-#
-# + id - Time zone ID (e.g., "Continent/City")
+# ```ballerina
+# time:Zone? zone = time:getZone("Asia/Colombo");
+# ```
+# + id - Time zone ID in the format of ("Continent/City")
 # + return - Corresponding ime zone object or null 
 public isolated function getZone(string id) returns Zone? {
     TimeZone|Error timeZone = new TimeZone(id);
