@@ -7,9 +7,7 @@ Ballerina Time Library
   [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/time.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Ftime)
   [![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-time/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-time)
 
-## Overview
-
-This module provides a set of APIs that have the capabilities to generate and manipulate UTC and localized time.
+This library provides a set of APIs that have the capabilities to generate and manipulate UTC and localized time.
 
 In cloud computing, the most essential type of time is UTC. Coordinated Universal Time (UTC) is the primary time standard on which the world agreed.
 UTC is independent of daylight saving time and provides a unique time value for the entire world.
@@ -18,7 +16,7 @@ However, the Earth rotation does not adhere to this time duration as the Earth i
 As a result, a solar day in 2012 is longer than 86400 SI seconds.
 To correct this incompatibility, additional seconds have been added to the UTC scale, which is known as leap-seconds.
 
-The focus of this module is to give the most precise UTC with nanoseconds precision and also handle some complex use cases such as leap seconds and daylight time-saving.
+The focus of this library is to give the most precise UTC with nanoseconds precision and also handle some complex use cases such as leap seconds and daylight time-saving.
 
 ### UTC Time
 The `time:Utc` is the tuple representation of the UTC. The UTC represents the number of seconds from a
@@ -55,7 +53,7 @@ time:Zone zone = check time:loadSystemZone();
 ```
 
 ### APIs
-Parallel to the aforementioned time representations, this module includes a set of APIs to facilitate time conversions
+Parallel to the aforementioned time representations, this library includes a set of APIs to facilitate time conversions
 and manipulations using a set of high-level APIs. Those conversion APIs can be listed as follows.
 
 #### The String Representations of UTC

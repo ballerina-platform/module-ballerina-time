@@ -1,8 +1,6 @@
 ## Package Overview
 
-## Overview
-
-This module provides a set of APIs that have the capabilities to generate and manipulate UTC and localized time.
+This package provides a set of APIs that have the capabilities to generate and manipulate UTC and localized time.
 
 In cloud computing, the most essential type of time is UTC. Coordinated Universal Time (UTC) is the primary time standard on which the world agreed.
 UTC is independent of daylight saving time and provides a unique time value for the entire world.
@@ -11,7 +9,7 @@ However, the Earth rotation does not adhere to this time duration as the Earth i
 As a result, a solar day in 2012 is longer than 86400 SI seconds.
 To correct this incompatibility, additional seconds have been added to the UTC scale, which is known as leap-seconds.
 
-The focus of this module is to give the most precise UTC with nanoseconds precision and also handle some complex use cases such as leap seconds and daylight time-saving.
+The focus of this package is to give the most precise UTC with nanoseconds precision and also handle some complex use cases such as leap seconds and daylight time-saving.
 
 ### UTC Time
 The `time:Utc` is the tuple representation of the UTC. The UTC represents the number of seconds from a
@@ -48,7 +46,7 @@ time:Zone zone = check time:loadSystemZone();
 ```
 
 ### APIs
-Parallel to the aforementioned time representations, this module includes a set of APIs to facilitate time conversions
+Parallel to the aforementioned time representations, this package includes a set of APIs to facilitate time conversions
 and manipulations using a set of high-level APIs. Those conversion APIs can be listed as follows.
 
 #### The String Representations of UTC
@@ -89,7 +87,7 @@ time:Civil civil = time:utcToCivil(utc);
 time:Utc utc = time:utcFromCivil(civil);
 ```
 
-### Report Issues
+## Report Issues
 
 To report bugs, request new features, start new discussions, view project boards, etc., go to the <a target="_blank" href="https://github.com/ballerina-platform/ballerina-standard-library">Ballerina standard library parent repository</a>.
 
