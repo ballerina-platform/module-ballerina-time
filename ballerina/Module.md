@@ -35,11 +35,21 @@ The localized time represents using the `time:Civil` record. It includes the fol
 - timezone information
 - daylight time-saving information
 
+### Time Zone
+The time zone can be obtained using a given zone ID or load the system time zone.
+```ballerina
+// Obtain the time zone corresponding to a given time zone ID.
+time:Zone? zone = time:getZone("Asia/Colombo");
+
+// Obtain the system time zone.
+time:Zone zone = check time:loadSystemZone();
+```
+
 ### APIs
 Parallel to the aforementioned time representations, this module includes a set of APIs to facilitate time conversions
 and manipulations using a set of high-level APIs. Those conversion APIs can be listed as follows.
 
-### The String Representations of UTC
+#### The String Representations of UTC
 ```ballerina
 // Converts from RFC 3339 timestamp to UTC.
 time:Utc utc = check time:utcFromString("2007-12-03T10:15:30.00Z");
@@ -48,7 +58,7 @@ time:Utc utc = check time:utcFromString("2007-12-03T10:15:30.00Z");
 string utcString = time:utcToString(utc);
 ```
 
-### The String Representations of Civil
+#### The String Representations of Civil
 ```ballerina
 // Converts from RFC 3339 timestamp to a civil record.
 time:Civil civil2 = check time:civilFromString("2007-12-03T10:15:30.00Z");
@@ -57,7 +67,7 @@ time:Civil civil2 = check time:civilFromString("2007-12-03T10:15:30.00Z");
 string civilString = check time:civilToString(civil);
 ```
 
-### UTC Value Manipulation
+#### UTC Value Manipulation
 ```ballerina
 // Returns the UTC time that occurs seconds after the given UTC.
 time:Utc utc = time:utcAddSeconds(time:utcNow(), 20.900);
@@ -68,7 +78,7 @@ time:Utc utc2 = check time:utcFromString("2021-04-12T23:20:50.520Z");
 time:Seconds seconds = time:utcDiffSeconds(utc1, utc2);
 ```
 
-### UTC vs Civil
+#### UTC vs Civil
 ```ballerina
 // Converts a given UTC to a Civil.
 time:Civil civil = time:utcToCivil(utc);
