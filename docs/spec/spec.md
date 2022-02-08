@@ -10,9 +10,9 @@ _Issue_: [#2263](https://github.com/ballerina-platform/ballerina-standard-librar
 # Introduction
 This is the specification for the Time standard library of [Ballerina language](https://ballerina.io/), which provides time generation and conversion APIs.
 
-The Time library specification has evolved and may continue to evolve in the future. Released versions of the specification can be found under the relevant Github tag.
+The Time library specification has evolved and may continue to evolve in the future. Released versions of the specification can be found under the relevant GitHub tag.
 
-If you have any feedback or suggestions about the library, start a discussion via a Github issue or in the [Slack channel](https://ballerina.io/community/). Based on the outcome of the discussion, specification and implementation can be updated. Community feedback is always welcome. Any accepted proposal which affects the specification is stored under `/docs/proposals`. Proposals under discussion can be found with the label `type/proposal` in Github.
+If you have any feedback or suggestions about the library, start a discussion via a GitHub issue or in the [Slack channel](https://ballerina.io/community/). Based on the outcome of the discussion, specification and implementation can be updated. Community feedback is always welcome. Any accepted proposal which affects the specification is stored under `/docs/proposals`. Proposals under discussion can be found with the label `type/proposal` in GitHub.
 
 Conforming implementation of the specification is released and included in the distribution. Any deviation from the specification is considered a bug.
 
