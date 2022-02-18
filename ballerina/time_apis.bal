@@ -38,7 +38,7 @@ public isolated function monotonicNow() returns decimal {
 
 # Converts from RFC 3339 timestamp (e.g., `2007-12-03T10:15:30.00Z`) to Utc.
 # ```ballerina
-# time:Utc|time:Error utc = time:utcFromString("2007-12-0310:15:30.00Z");
+# time:Utc|time:Error utc = time:utcFromString("2007-12-03T10:15:30.00Z");
 # ```
 # + timestamp - RFC 3339 timestamp (e.g., `2007-12-03T10:15:30.00Z`) value as a string
 # + return - The corresponding `time:Utc` or a `time:Error` when the specified timestamp
