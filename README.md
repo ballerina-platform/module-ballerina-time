@@ -18,7 +18,7 @@ To correct this incompatibility, additional seconds have been added to the UTC s
 
 The focus of this library is to give the most precise UTC with nanoseconds precision and also handle some complex use cases such as leap seconds and daylight time-saving.
 
-### UTC Time
+### UTC time
 The `time:Utc` is the tuple representation of the UTC. The UTC represents the number of seconds from a
 specified epoch. Here, the epoch is the UNIX epoch of 1970-01-01T00:00:00Z.
 
@@ -27,7 +27,7 @@ Use the following API to get the current epoch time:
 time:Utc utc = time:utcNow();
 ```
 
-### Monotonic Time
+### Monotonic time
 The monotonic time represents the number of seconds from an unspecified epoch.
 
 Use the following API to get the monotonic time from an unspecified topic:
@@ -35,14 +35,14 @@ Use the following API to get the monotonic time from an unspecified topic:
 decimal seconds = time:monotonicNow();
 ```
 
-### Civil Time
+### Civil time
 The localized time represents using the `time:Civil` record. It includes the following details:
 - date
 - time
 - timezone information
 - daylight time-saving information
 
-### Time Zone
+### Time zone
 The time zone can be obtained using a given zone ID or load the system time zone.
 ```ballerina
 // Obtain the time zone corresponding to a given time zone ID.
@@ -56,7 +56,7 @@ time:Zone zone = check time:loadSystemZone();
 Parallel to the aforementioned time representations, this library includes a set of APIs to facilitate time conversions
 and manipulations using a set of high-level APIs. Those conversion APIs can be listed as follows.
 
-#### The String Representations of UTC
+#### The string representations of UTC
 ```ballerina
 // Converts from RFC 3339 timestamp to UTC.
 time:Utc utc = check time:utcFromString("2007-12-03T10:15:30.00Z");
@@ -65,7 +65,7 @@ time:Utc utc = check time:utcFromString("2007-12-03T10:15:30.00Z");
 string utcString = time:utcToString(utc);
 ```
 
-#### The String Representations of Civil
+#### The string representations of civil
 ```ballerina
 // Converts from RFC 3339 timestamp to a civil record.
 time:Civil civil2 = check time:civilFromString("2007-12-03T10:15:30.00Z");
@@ -74,7 +74,7 @@ time:Civil civil2 = check time:civilFromString("2007-12-03T10:15:30.00Z");
 string civilString = check time:civilToString(civil);
 ```
 
-#### UTC Value Manipulation
+#### UTC value manipulation
 ```ballerina
 // Returns the UTC time that occurs seconds after the given UTC.
 time:Utc utc = time:utcAddSeconds(time:utcNow(), 20.900);
@@ -85,7 +85,7 @@ time:Utc utc2 = check time:utcFromString("2021-04-12T23:20:50.520Z");
 time:Seconds seconds = time:utcDiffSeconds(utc1, utc2);
 ```
 
-#### UTC vs Civil
+#### UTC vs civil
 ```ballerina
 // Converts a given UTC to a Civil.
 time:Civil civil = time:utcToCivil(utc);
@@ -94,15 +94,15 @@ time:Civil civil = time:utcToCivil(utc);
 time:Utc utc = time:utcFromCivil(civil);
 ```
 
-## Issues and Projects 
+## Issues and projects 
 
 Issues and Project tabs are disabled for this repository as this is part of the Ballerina Standard Library. To report bugs, request new features, start new discussions, view project boards, etc. please visit Ballerina Standard Library [parent repository](https://github.com/ballerina-platform/ballerina-standard-library). 
 
 This repository only contains the source code for the package.
 
-## Building from the Source
+## Build from the source
 
-### Setting Up the Prerequisites
+### Set up the prerequisites
 
 1. Download and install Java SE Development Kit (JDK) version 11 (from one of the following locations).
    * [Oracle](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html)
@@ -111,7 +111,7 @@ This repository only contains the source code for the package.
 
         > **Note:** Set the JAVA_HOME environment variable to the path name of the directory into which you installed JDK.
      
-### Building the Source
+### Build the source
 
 Execute the commands below to build from source.
 
@@ -151,17 +151,17 @@ Execute the commands below to build from source.
    ./gradlew clean build -PpublishToCentral=true
    ```      
 
-## Contributing to Ballerina
+## Contribute to Ballerina
 
 As an open source project, Ballerina welcomes contributions from the community.
 
 For more information, go to the [contribution guidelines](https://github.com/ballerina-platform/ballerina-lang/blob/master/CONTRIBUTING.md).
 
-## Code of Conduct
+## Code of conduct
 
 All contributors are encouraged to read the [Ballerina Code of Conduct](https://ballerina.io/code-of-conduct).
 
-## Useful Links
+## Useful links
 
 * Chat live with us via our [Slack channel](https://ballerina.io/community/slack/).
 * Post all technical questions on Stack Overflow with the [#ballerina](https://stackoverflow.com/questions/tagged/ballerina) tag.

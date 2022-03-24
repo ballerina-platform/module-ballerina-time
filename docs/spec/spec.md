@@ -34,7 +34,7 @@ Ballerina time standard library has five primary aspects in handling time values
 4. Time conversions
 5. Time zone handling
 
-# 2. Time Representations
+# 2. Time representations
 
 ## 2.1. UTC
 Coordinated Universal Time (UTC) is the time standard that defines time unambiguously. Ballerina represents UTC using a tuple of length 2.
@@ -56,7 +56,7 @@ The `Civil` record represents time within some region relative to a time scale s
 5. Time zone abbreviation
 6. Flag to indicate daylight savings time
 
-# 3. Time Generation
+# 3. Time generation
 
 The time library contains two APIs to get the systematic time values.
 
@@ -72,7 +72,7 @@ The following API can be used to return number of seconds from an unspecified ep
 public isolated function monotonicNow() returns decimal;
 ```
 
-# 4. Time Related Operations
+# 4. Time related operations
 
 Time standard library supports time-related operations such as addition, subtraction, and date validations.
 
@@ -100,7 +100,7 @@ The following API returns the day of week value (e.g. Sunday, Monday etc.) of a 
 public isolated function dayOfWeek(Date date) returns DayOfWeek;
 ```
 
-# 5. Time Conversions
+# 5. Time conversions
 
 The time library contains several conversion APIs to convert UTC to civil. The time library also has APIs to generate several string representations using UTC and Civil.
 
@@ -129,7 +129,7 @@ The time library contains several conversion APIs to convert UTC to civil. The t
     public isolated function civilFromEmailString(string dateTimeString) returns Civil|Error;
     ```
 
-# 6. Time Zone Handling
+# 6. Time zone handling
 
 The `Zone` object in the time library handles the time zone functionalities.
 
