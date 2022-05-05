@@ -150,10 +150,17 @@ public type ZERO_OR_ONE 0|1;
 # Time within some region relative to a
 # time scale stipulated by civilian authorities.
 # + utcOffset - An optional zone offset
-# + timeAbbrev - The string representation of the time zone
-# + which - If present, abbreviation for the local time (e.g., EDT, EST) in effect at the time represented by this record;
+# + timeAbbrev - If present, abbreviation for the local time (e.g., EDT, EST) in effect at the time represented by this record;
 # this is quite the same as the name of a time zone one time zone can have two abbreviations: one for
 # standard time and one for daylight savings time
+# + which - when the clocks are put back at the end of DST,
+# one hour's worth of times occur twice
+# i.e. the local time is ambiguous
+# this says which of those two times is meant
+# same as fold field in Python
+# see https://www.python.org/dev/peps/pep-0495/
+# is_dst has similar role in struct tm,
+# but with confusing semantics
 # + dayOfWeek - Day of the week (e.g., SUNDAY, MONDAY, TUESDAY, ... SATURDAY)
 public type Civil record {
     // the date time in that region
