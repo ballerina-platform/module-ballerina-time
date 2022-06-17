@@ -36,7 +36,7 @@ Ballerina time standard library has five primary aspects in handling time values
 
 ## 2. Time representations
 
-## 2.1. UTC
+### 2.1. UTC
 Coordinated Universal Time (UTC) is the time standard that defines time unambiguously. Ballerina represents UTC using a tuple of length 2.
 
 ```ballerina
@@ -44,7 +44,7 @@ public type Utc readonly & [int, decimal];
 ```
 The tuple is an ordered type, so the values can be compared using the Ballerina <, <=, >, >= operators. The first member of the tuple is int representing an integral number of seconds from the epoch. Epoch is the traditional UNIX epoch of 1970-01-01T00:00:00Z. The second member of the tuple is a decimal giving the fraction of a second. For times before the epoch, n is negative, and f is non-negative. In other words, the UTC represented is on or after the second specified by n. Leap seconds handles as follows. The first member of the tuple ignores leap seconds: it assumes that every day has 86400 seconds. The second member of the tuple is >= 0 and is < 1 except during positive leaps seconds in which it is >= 1 and < 2. So given a tuple [n,f] after the epoch, n / 86400 gives the day number, and (n % 86400) + f gives the time in seconds since midnight UTC (for which the limit is 86401 on a day with a positive leap second).
 
-## 2.2. Civil
+### 2.2. Civil
 
 Ballerina represents a date using mandatory year, month, and day fields. Additionally, the `Date` record can have optional time-related fields (such as hour, minute, and second) and a time zone offset. Similarly, the Ballerina time record has mandatory hour and minute fields with an optional second field, date fields, and a zone offset. The time zone offset has hours, minutes, and optional seconds fields.
 
