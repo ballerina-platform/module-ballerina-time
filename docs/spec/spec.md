@@ -4,10 +4,9 @@ _Owners_: @daneshk @BuddhiWathsala
 _Reviewers_: @daneshk  
 _Created_: 2021/12/04   
 _Updated_: 2022/02/17  
-_Edition_: Swan Lake  
-_Issue_: [#2263](https://github.com/ballerina-platform/ballerina-standard-library/issues/2263)
+_Edition_: Swan Lake 
 
-# Introduction
+## Introduction
 This is the specification for the Time standard library of [Ballerina language](https://ballerina.io/), which provides time generation and conversion APIs.
 
 The Time library specification has evolved and may continue to evolve in the future. The released versions of the specification can be found under the relevant GitHub tag.
@@ -16,7 +15,7 @@ If you have any feedback or suggestions about the library, start a discussion vi
 
 The conforming implementation of the specification is released and included in the distribution. Any deviation from the specification is considered a bug.
 
-# Contents
+## Contents
 1. [Overview](#1-overview)
 2. [Time Representations](#2-time-epresentations)
     * 2.1. [UTC](#21-utc)
@@ -26,7 +25,7 @@ The conforming implementation of the specification is released and included in t
 5. [Time Conversions](#5-time-conversions)
 6. [Time Zone Handling](#time-zone-handling)
 
-# 1. Overview
+## 1. Overview
 Ballerina time standard library has five primary aspects in handling time values.
 1. Time representations
 2. Time generation
@@ -34,9 +33,9 @@ Ballerina time standard library has five primary aspects in handling time values
 4. Time conversions
 5. Time zone handling
 
-# 2. Time representations
+## 2. Time representations
 
-## 2.1. UTC
+### 2.1. UTC
 Coordinated Universal Time (UTC) is the time standard that defines time unambiguously. Ballerina represents UTC using a tuple of length 2.
 
 ```ballerina
@@ -44,7 +43,7 @@ public type Utc readonly & [int, decimal];
 ```
 The tuple is an ordered type, so the values can be compared using the Ballerina <, <=, >, >= operators. The first member of the tuple is int representing an integral number of seconds from the epoch. Epoch is the traditional UNIX epoch of 1970-01-01T00:00:00Z. The second member of the tuple is a decimal giving the fraction of a second. For times before the epoch, n is negative, and f is non-negative. In other words, the UTC represented is on or after the second specified by n. Leap seconds handles as follows. The first member of the tuple ignores leap seconds: it assumes that every day has 86400 seconds. The second member of the tuple is >= 0 and is < 1 except during positive leaps seconds in which it is >= 1 and < 2. So given a tuple [n,f] after the epoch, n / 86400 gives the day number, and (n % 86400) + f gives the time in seconds since midnight UTC (for which the limit is 86401 on a day with a positive leap second).
 
-## 2.2. Civil
+### 2.2. Civil
 
 Ballerina represents a date using mandatory year, month, and day fields. Additionally, the `Date` record can have optional time-related fields (such as hour, minute, and second) and a time zone offset. Similarly, the Ballerina time record has mandatory hour and minute fields with an optional second field, date fields, and a zone offset. The time zone offset has hours, minutes, and optional seconds fields.
 
@@ -56,7 +55,7 @@ The `Civil` record represents time within some region relative to a time scale s
 5. Time zone abbreviation
 6. Flag to indicate daylight savings time
 
-# 3. Time generation
+## 3. Time generation
 
 The time library contains two APIs to get the systematic time values.
 
@@ -72,7 +71,7 @@ The following API can be used to return number of seconds from an unspecified ep
 public isolated function monotonicNow() returns decimal;
 ```
 
-# 4. Time related operations
+## 4. Time related operations
 
 Time standard library supports time-related operations such as addition, subtraction, and date validations.
 
@@ -100,7 +99,7 @@ The following API returns the day of week value (e.g. Sunday, Monday etc.) of a 
 public isolated function dayOfWeek(Date date) returns DayOfWeek;
 ```
 
-# 5. Time conversions
+## 5. Time conversions
 
 The time library contains several conversion APIs to convert UTC to civil. The time library also has APIs to generate several string representations using UTC and Civil.
 
@@ -129,7 +128,7 @@ The time library contains several conversion APIs to convert UTC to civil. The t
     public isolated function civilFromEmailString(string dateTimeString) returns Civil|Error;
     ```
 
-# 6. Time zone handling
+## 6. Time zone handling
 
 The `Zone` object in the time library handles the time zone functionalities.
 
