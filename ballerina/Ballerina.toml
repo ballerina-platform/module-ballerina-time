@@ -1,14 +1,14 @@
 [package]
 org = "ballerina"
 name = "time"
-version = "2.2.2"
+version = "2.3.0"
 authors = ["Ballerina"]
 keywords = ["time", "utc", "epoch", "civil"]
 repository = "https://github.com/ballerina-platform/module-ballerina-time"
 icon = "icon.png"
 license = ["Apache-2.0"]
-distribution = "2201.0.4"
+distribution = "2201.2.0"
 
 [[platform.java11.dependency]]
-path = "../native/build/libs/time-native-2.2.2.jar"
-version = "2.2.2"
+path = "../native/build/libs/time-native-2.3.0-SNAPSHOT.jar"
+version = "2.3.0-SNAPSHOT"
