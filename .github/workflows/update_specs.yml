@@ -46,3 +46,4 @@ jobs:
               \"release_date\": \"${{ steps.date.outputs.date }}\"
             }
           }"
+          
