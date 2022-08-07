@@ -13,6 +13,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+import ballerina/regex;
 import ballerina/jballerina.java;
 
 # Returns the UTC representing the current time (current instant of the system clock in seconds from the epoch of `1970-01-01T00:00:00`).
@@ -186,6 +187,12 @@ public isolated function civilToString(Civil civil) returns string|Error {
 # + zh - Type of the zone value to be added
 # + return - The corresponding formatted string
 public isolated function utcToEmailString(Utc utc, UtcZoneHandling zh = "0") returns string {
+    string timeString =  externUtcToEmailString(utc, zh);
+    string[] sValues = regex:split(timeString.trim(), " ");
+    if sValues[5] == "0" && zh == "0" {
+        sValues[5] = "+0000";
+        return sValues[0] + " " + sValues[1] + " " + sValues[2] + " " +sValues[3] + " " + sValues[4] + " " + sValues[5] ;
+    }
     return externUtcToEmailString(utc, zh);
 }
 
@@ -230,9 +237,19 @@ public isolated function civilToEmailString(Civil civil, HeaderZoneHandling zone
     string? timeAbbrevField = civil?.timeAbbrev;
     decimal civilTimeSeconds = (civilTimeSecField is Seconds) ? civilTimeSecField : 0.0;
     string timeAbbrev = (timeAbbrevField is string) ? timeAbbrevField : "";
+    string|Error timeString = externCivilToEmailString(civil.year, civil.month, civil.day, civil.hour, civil.minute, 
+            civilTimeSeconds, utcOffsetHours, utcOffsetMinutes, utcOffsetSeconds, timeAbbrev, zoneHandling); 
 
-    return externCivilToEmailString(civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds,
-    utcOffsetHours, utcOffsetMinutes, utcOffsetSeconds, timeAbbrev, zoneHandling);
+    if timeString !is error {
+        string[] sValues = regex:split(timeString.trim(), " ");
+        if sValues[5] == "0" {
+            sValues[5] = "+0000";
+            return sValues[0] + " " + sValues[1] + " " + sValues[2] + " " +sValues[3] + " " + sValues[4] + " " + sValues[5] + " " + sValues[6];
+        }
+        return timeString;
+    }
+
+    return timeString;
 }
 
 isolated function externUtcNow(int precision) returns Utc = @java:Method {
