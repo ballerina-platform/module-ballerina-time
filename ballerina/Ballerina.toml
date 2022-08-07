@@ -7,7 +7,7 @@ keywords = ["time", "utc", "epoch", "civil"]
 repository = "https://github.com/ballerina-platform/module-ballerina-time"
 icon = "icon.png"
 license = ["Apache-2.0"]
-distribution = "2201.0.4"
+distribution = "2201.2.0"
 
 [[platform.java11.dependency]]
 groupId = "io.ballerina.stdlib"
