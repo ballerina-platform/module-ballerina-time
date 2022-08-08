@@ -175,10 +175,9 @@ public class ExternMethods {
         if (zhString.equals("0")) {
             zhString = "+0000";
         }
-        String timeString = ZonedDateTime.ofInstant(time,
+        return StringUtils.fromString(ZonedDateTime.ofInstant(time,
                         ZoneId.of(Constants.GMT_STRING_VALUE)).format(DateTimeFormatter.RFC_1123_DATE_TIME)
-                .replace(Constants.GMT_STRING_VALUE, zhString);
-        return StringUtils.fromString(timeString);
+                .replace(Constants.GMT_STRING_VALUE, zhString));
     }
 
     public static Object externCivilToEmailString(long year, long month, long day, long hour, long minute,
@@ -189,17 +188,14 @@ public class ExternMethods {
             ZonedDateTime dateTime = TimeValueHandler.createZoneDateTimeFromCivilValues(year, month, day, hour,
                     minute, second, zoneHour, zoneMinute, zoneSecond, zoneAbbr, zoneHandling.getValue());
             if (Constants.HeaderZoneHandling.PREFER_ZONE_OFFSET.toString().equals(zoneHandling.getValue())) {
-                String timeString = dateTime.format(DateTimeFormatter.ofPattern(
-                        Constants.EMAIL_DATE_TIME_FORMAT_WITHOUT_COMMENT));
-                return StringUtils.fromString(timeString);
+                return StringUtils.fromString(dateTime.format(DateTimeFormatter.ofPattern(
+                        Constants.EMAIL_DATE_TIME_FORMAT_WITHOUT_COMMENT)));
             }
-            String timeString = dateTime.format(DateTimeFormatter.ofPattern(
-                    Constants.EMAIL_DATE_TIME_FORMAT));
-
-            return StringUtils.fromString(timeString);
+            return StringUtils.fromString(dateTime.format(DateTimeFormatter.ofPattern(
+                    Constants.EMAIL_DATE_TIME_FORMAT)));
         } catch (DateTimeException e) {
             return Utils.createError(Errors.FormatError, e.getMessage());
         }
     }
-    
+
 }
