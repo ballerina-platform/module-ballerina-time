@@ -171,9 +171,14 @@ public class ExternMethods {
     public static BString externUtcToEmailString(BArray utc, BString zh) {
 
         Instant time = new Utc(utc).generateInstant();
-        return StringUtils.fromString(ZonedDateTime.ofInstant(time,
-                ZoneId.of(Constants.GMT_STRING_VALUE)).format(DateTimeFormatter.RFC_1123_DATE_TIME)
-                .replace(Constants.GMT_STRING_VALUE, zh.getValue()));
+        String zhString = zh.getValue();
+        if (zhString.equals("0")) {
+            zhString = "+0000";
+        }
+        String timeString = ZonedDateTime.ofInstant(time,
+                        ZoneId.of(Constants.GMT_STRING_VALUE)).format(DateTimeFormatter.RFC_1123_DATE_TIME)
+                .replace(Constants.GMT_STRING_VALUE, zhString);
+        return StringUtils.fromString(timeString);
     }
 
     public static Object externCivilToEmailString(long year, long month, long day, long hour, long minute,
@@ -184,14 +189,17 @@ public class ExternMethods {
             ZonedDateTime dateTime = TimeValueHandler.createZoneDateTimeFromCivilValues(year, month, day, hour,
                     minute, second, zoneHour, zoneMinute, zoneSecond, zoneAbbr, zoneHandling.getValue());
             if (Constants.HeaderZoneHandling.PREFER_ZONE_OFFSET.toString().equals(zoneHandling.getValue())) {
-                return StringUtils.fromString(dateTime.format(DateTimeFormatter.ofPattern(
-                        Constants.EMAIL_DATE_TIME_FORMAT_WITHOUT_COMMENT)));
+                String timeString = dateTime.format(DateTimeFormatter.ofPattern(
+                        Constants.EMAIL_DATE_TIME_FORMAT_WITHOUT_COMMENT));
+                return StringUtils.fromString(timeString);
             }
-            return StringUtils.fromString(dateTime.format(DateTimeFormatter.ofPattern(
-                    Constants.EMAIL_DATE_TIME_FORMAT)));
+            String timeString = dateTime.format(DateTimeFormatter.ofPattern(
+                    Constants.EMAIL_DATE_TIME_FORMAT));
+
+            return StringUtils.fromString(timeString);
         } catch (DateTimeException e) {
             return Utils.createError(Errors.FormatError, e.getMessage());
         }
     }
-
+    
 }
