@@ -171,9 +171,13 @@ public class ExternMethods {
     public static BString externUtcToEmailString(BArray utc, BString zh) {
 
         Instant time = new Utc(utc).generateInstant();
+        String zhString = zh.getValue();
+        if (zhString.equals("0")) {
+            zhString = "+0000";
+        }
         return StringUtils.fromString(ZonedDateTime.ofInstant(time,
-                ZoneId.of(Constants.GMT_STRING_VALUE)).format(DateTimeFormatter.RFC_1123_DATE_TIME)
-                .replace(Constants.GMT_STRING_VALUE, zh.getValue()));
+                        ZoneId.of(Constants.GMT_STRING_VALUE)).format(DateTimeFormatter.RFC_1123_DATE_TIME)
+                .replace(Constants.GMT_STRING_VALUE, zhString));
     }
 
     public static Object externCivilToEmailString(long year, long month, long day, long hour, long minute,
