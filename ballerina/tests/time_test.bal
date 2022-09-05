@@ -423,13 +423,13 @@ isolated function testCivilToStringWithInvalidInput() {
 @test:Config {}
 isolated function testUtcToEmailString() returns Error? {
     Utc utc = check utcFromString("2007-12-03T10:15:30.00Z");
-    test:assertEquals(utcToEmailString(utc, "GMT"), "Mon, 03 Dec 2007 10:15:30 GMT");
+    test:assertEquals(utcToEmailString(utc, "GMT"), "Mon, 3 Dec 2007 10:15:30 GMT");
 }
 
 @test:Config {}
 isolated function testUtcToEmailStringWithZ() returns Error? {
     Utc utc = check utcFromString("2007-12-03T10:15:30.00Z");
-    test:assertEquals(utcToEmailString(utc, "Z"), "Mon, 03 Dec 2007 10:15:30 Z");
+    test:assertEquals(utcToEmailString(utc, "Z"), "Mon, 3 Dec 2007 10:15:30 Z");
 }
 
 @test:Config {}
@@ -645,7 +645,7 @@ isolated function testZoneToEmailStringConversion() returns Error? {
     Zone? systemZone = getZone("Asia/Colombo");
     test:assertTrue(systemZone is Zone);
     Civil civil = (<Zone>systemZone).utcToCivil(check utcFromString("2007-12-03T10:15:30.00Z"));
-    test:assertEquals(civilToEmailString(civil, PREFER_TIME_ABBREV), "Mon, 03 Dec 2007 15:45:30 +0530 (IST)");
+    test:assertEquals(civilToEmailString(civil, PREFER_TIME_ABBREV), "Mon, 3 Dec 2007 15:45:30 +0530 (IST)");
 }
 
 @test:Config {}
@@ -669,9 +669,9 @@ isolated function testGmtToEmailStringConversion() returns Error? {
     Utc utc2 = check utcFromString("2007-12-03T10:15:30.00+05:30");
     Civil civil = check civilFromString("2007-12-03T10:15:30.00+00:00");
     
-    test:assertEquals(utcToEmailString(utc, "Z"), "Mon, 03 Dec 2007 10:15:30 Z");
-    test:assertEquals(utcToEmailString(utc2, "0"), "Mon, 03 Dec 2007 04:45:30 +0000");
-    test:assertEquals(utcToEmailString(utc), "Mon, 03 Dec 2007 10:15:30 +0000");
-    test:assertEquals(civilToEmailString(civil, PREFER_TIME_ABBREV), "Mon, 03 Dec 2007 10:15:30 +0000 (Z)");
-    test:assertEquals(civilToEmailString(utcToCivil(utc), PREFER_TIME_ABBREV), "Mon, 03 Dec 2007 10:15:30 +0000 (Z)");
+    test:assertEquals(utcToEmailString(utc, "Z"), "Mon, 3 Dec 2007 10:15:30 Z");
+    test:assertEquals(utcToEmailString(utc2, "0"), "Mon, 3 Dec 2007 04:45:30 +0000");
+    test:assertEquals(utcToEmailString(utc), "Mon, 3 Dec 2007 10:15:30 +0000");
+    test:assertEquals(civilToEmailString(civil, PREFER_TIME_ABBREV), "Mon, 3 Dec 2007 10:15:30 +0000 (Z)");
+    test:assertEquals(civilToEmailString(utcToCivil(utc), PREFER_TIME_ABBREV), "Mon, 3 Dec 2007 10:15:30 +0000 (Z)");
 }
