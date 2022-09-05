@@ -32,6 +32,7 @@ public class Constants {
     private Constants() {}
     public static final String RECORD_UTC = "Utc";
     public static final String GMT_STRING_VALUE = "GMT";
+    public static final String ZERO_ZONE_STRING_VALUE = "+0000";
     public static final String EMAIL_DATE_TIME_FORMAT = "EEE, dd MMM yyyy HH:mm:ss Z[ ][(z)]";
     public static final String EMAIL_DATE_TIME_FORMAT_WITHOUT_COMMENT = "EEE, dd MMM yyyy HH:mm:ss Z";
     public static final int UTC_MAX_PRECISION = 9;

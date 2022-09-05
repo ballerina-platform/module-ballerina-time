@@ -29,6 +29,7 @@ import io.ballerina.stdlib.time.util.Errors;
 import io.ballerina.stdlib.time.util.TimeValueHandler;
 import io.ballerina.stdlib.time.util.Utils;
 
+import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.time.DateTimeException;
 import java.time.Instant;
@@ -176,8 +177,9 @@ public class ExternMethods {
             zhString = "+0000";
         }
         return StringUtils.fromString(ZonedDateTime.ofInstant(time,
-                        ZoneId.of(Constants.GMT_STRING_VALUE)).format(DateTimeFormatter.RFC_1123_DATE_TIME)
-                .replace(Constants.GMT_STRING_VALUE, zhString));
+                        ZoneId.of(Constants.GMT_STRING_VALUE)).format(DateTimeFormatter.ofPattern(
+                        Constants.EMAIL_DATE_TIME_FORMAT_WITHOUT_COMMENT))
+                .replace(Constants.GMT_STRING_VALUE, zhString).replace(Constants.ZERO_ZONE_STRING_VALUE, zhString));
     }
 
     public static Object externCivilToEmailString(long year, long month, long day, long hour, long minute,
