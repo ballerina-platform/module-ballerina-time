@@ -2,10 +2,11 @@ Ballerina Time Library
 ===================
 
   [![Build](https://github.com/ballerina-platform/module-ballerina-time/actions/workflows/build-timestamped-master.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-time/actions/workflows/build-timestamped-master.yml)
+  [![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-time/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-time)
   [![Trivy](https://github.com/ballerina-platform/module-ballerina-time/actions/workflows/trivy-scan.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-time/actions/workflows/trivy-scan.yml)
+  [![GraalVM Check](https://github.com/ballerina-platform/module-ballerina-time/actions/workflows/build-with-bal-test-native.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-time/actions/workflows/build-with-bal-test-native.yml)
   [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-time.svg)](https://github.com/ballerina-platform/module-ballerina-time/commits/master)
   [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/time.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Ftime)
-  [![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-time/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-time)
 
 This library provides a set of APIs that have the capabilities to generate and manipulate UTC and localized time.
 
