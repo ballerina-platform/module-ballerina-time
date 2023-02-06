@@ -56,7 +56,7 @@ isolated function testUtcFromStringWithInvalidFormat() {
     Utc|Error err = utcFromString("2007-12-0310:15:30.00Z");
     test:assertTrue(err is Error);
     test:assertEquals((<Error>err).message(),
-        "Provided '2007-12-0310:15:30.00Z' is not adhere to the expected RFC 3339 format '2007-12-03T10:15:30.00Z'");
+        "Provided '2007-12-0310:15:30.00Z' is not adhere to the expected RFC 3339 format '2007-12-03T10:15:30.00Z' ");
 }
 
 @test:Config {}
