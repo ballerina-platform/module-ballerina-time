@@ -71,8 +71,8 @@ public class ExternMethods {
             return new Utc(utcTimeInstant).build();
         } catch (DateTimeException e) {
             return Utils.createError(Errors.FormatError,
-                    "Provided '" + str.getValue() + "' is not adhere to the expected RFC 3339 format " +
-                            "'2007-12-03T10:15:30.00Z' ");
+                    "The provided string '" + str.getValue() + "' does not adhere to the expected RFC 3339 format " +
+                            "'YYYY-MM-DDTHH:MM:SS.SSZ'. ");
         }
     }
 
