@@ -676,7 +676,6 @@ isolated function testGmtToEmailStringConversion() returns Error? {
     test:assertEquals(civilToEmailString(utcToCivil(utc), PREFER_TIME_ABBREV), "Mon, 3 Dec 2007 10:15:30 +0000 (Z)");
 }
 
-
 @test:Config {enable: true}
 isolated function testUtcFromCivilWithEmptyTimeOffset() returns Error? {
     Utc expectedUtc = check utcFromString("2021-04-12T23:20:50.520Z");
