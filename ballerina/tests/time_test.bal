@@ -675,3 +675,110 @@ isolated function testGmtToEmailStringConversion() returns Error? {
     test:assertEquals(civilToEmailString(civil, PREFER_TIME_ABBREV), "Mon, 3 Dec 2007 10:15:30 +0000 (Z)");
     test:assertEquals(civilToEmailString(utcToCivil(utc), PREFER_TIME_ABBREV), "Mon, 3 Dec 2007 10:15:30 +0000 (Z)");
 }
+
+
+@test:Config {enable: true}
+isolated function testUtcFromCivilWithEmptyTimeOffset() returns Error? {
+    Utc expectedUtc = check utcFromString("2021-04-12T23:20:50.520Z");
+    Civil civil = {
+        year: 2021,
+        month: 4,
+        day: 12,
+        hour: 23,
+        minute: 20,
+        second: 50.52,
+        timeAbbrev: "Z"
+    };
+    Utc utc = check utcFromCivil(civil);
+    test:assertEquals(utc, expectedUtc);
+}
+
+@test:Config {enable: true}
+isolated function testCivilToStringWithEmptyTimeOffset() returns Error? {
+    Civil civil = {
+        year: 2021,
+        month: 4,
+        day: 12,
+        hour: 23,
+        minute: 20,
+        second: 50.52,
+        timeAbbrev: "Z"
+    };
+    string civilString = check civilToString(civil);
+    test:assertEquals(civilString, "2021-04-12T23:20:50.520Z");
+}
+
+@test:Config {enable: true}
+isolated function testUtcFromCivilWithEmptyTimeOffsetNegative() returns Error? {
+    Utc expectedUtc = check utcFromString("2021-04-12T23:20:50.520Z");
+    Civil civil = {
+        year: 2021,
+        month: 4,
+        day: 12,
+        hour: 23,
+        minute: 20,
+        second: 50.52,
+        timeAbbrev: "Asia/Colombo"
+    };
+    Utc|error utc = utcFromCivil(civil);
+    if utc is error {
+        test:assertEquals(utc.message(), "civilTime.utcOffset must not be null");
+    } else {
+        test:assertFail("utc should be error");
+    }
+}
+
+@test:Config {enable: true}
+isolated function testCivilToStringWithEmptyTimeOffsetNegative() returns Error? {
+    Civil civil = {
+        year: 2021,
+        month: 4,
+        day: 12,
+        hour: 23,
+        minute: 20,
+        second: 50.52,
+        timeAbbrev: "Asia/Colombo"
+    };
+    string|error civilString = civilToString(civil);
+    if civilString is error {
+        test:assertEquals(civilString.message(), "civil.utcOffset must not be null");
+    } else {
+        test:assertFail("civilString should be error");
+    } 
+}
+
+isolated function testUtcFromCivilWithEmptyTimeOffsetAndAbbreviation() returns Error? {
+    Utc expectedUtc = check utcFromString("2021-04-12T23:20:50.520Z");
+    Civil civil = {
+        year: 2021,
+        month: 4,
+        day: 12,
+        hour: 23,
+        minute: 20,
+        second: 50.52
+    };
+    Utc|error utc = utcFromCivil(civil);
+    if utc is error {
+        test:assertEquals(utc.message(), "civilTime.utcOffset must not be null");
+    } else {
+        test:assertFail("utc should be error");
+    }
+}
+
+@test:Config {enable: true}
+isolated function testCivilToStringWithEmptyTimeOffsetAndAbbreviation() returns Error? {
+    Civil civil = {
+        year: 2021,
+        month: 4,
+        day: 12,
+        hour: 23,
+        minute: 20,
+        second: 50.52
+    };
+    string|error civilString = civilToString(civil);
+    if civilString is error {
+        test:assertEquals(civilString.message(), "civil.utcOffset must not be null");
+    } else {
+        test:assertFail("civilString should be error");
+    } 
+}
