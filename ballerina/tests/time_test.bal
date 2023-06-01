@@ -782,3 +782,11 @@ isolated function testCivilToStringWithEmptyTimeOffsetAndAbbreviation() returns 
         test:assertFail("civilString should be error");
     } 
 }
+
+@test:Config {enable: true}
+isolated function testRepeatedUtcToCivilConversion() returns Error? {
+    Utc utc = utcNow();
+    Civil civil = utcToCivil(utc);
+    Utc utc2 = check utcFromCivil(civil);
+    test:assertEquals(utc, utc2);
+}   
