@@ -1,16 +1,19 @@
 [package]
 org = "ballerina"
 name = "time"
-version = "2.2.5"
+version = "2.3.0"
 authors = ["Ballerina"]
 keywords = ["time", "utc", "epoch", "civil"]
 repository = "https://github.com/ballerina-platform/module-ballerina-time"
 icon = "icon.png"
 license = ["Apache-2.0"]
-distribution = "2201.0.4"
+distribution = "2201.7.0"
+
+[platform.java11]
+graalvmCompatible = true
 
 [[platform.java11.dependency]]
 groupId = "io.ballerina.stdlib"
 artifactId = "time-native"
-version = "2.2.5"
-path = "../native/build/libs/time-native-2.2.5.jar"
+version = "2.3.0"
+path = "../native/build/libs/time-native-2.3.0-SNAPSHOT.jar"
