@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 ### changed
+- [Mark Standard Libraries as GraalVM Compatible](https://github.com/ballerina-platform/ballerina-standard-library/issues/4568)
+- [Added support for inferring utc offset for zulu time(Z) in utcFromCivil and civilToString APIs](https://github.com/ballerina-platform/module-ballerina-time/pull/459) 
+
+## [2.2.4]
+### changed
 - [Update error message for unsupported input strings in UtcFromString](https://github.com/ballerina-platform/ballerina-standard-library/issues/3808) 
 
 ## [2.2.3]
