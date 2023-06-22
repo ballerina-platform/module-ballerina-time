@@ -78,7 +78,7 @@ public class Civil {
         second = second.add(new BigDecimal(zonedDateTime.getNano()).divide(ANALOG_GIGA, MathContext.DECIMAL128));
         civilMap.put(Constants.TIME_OF_DAY_RECORD_SECOND_BSTRING, ValueCreator.createDecimalValue(second));
 
-        return ValueCreator.createRecordValue(ModuleUtils.getModule(), Constants.CIVIL_RECORD, civilMap);
+        return civilMap;
     }
 
     public BMap<BString, Object> buildWithZone() {
@@ -95,7 +95,7 @@ public class Civil {
                     createZoneOffsetFromZonedDateTime(zonedDateTime));
         }
 
-        return ValueCreator.createRecordValue(ModuleUtils.getModule(), Constants.CIVIL_RECORD, civilMap);
+        return civilMap;
     }
 
     private void setCommonCivilFields() {
