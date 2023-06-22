@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - java_17_migration
     paths-ignore:
       - '*.md'
       - 'docs/**'

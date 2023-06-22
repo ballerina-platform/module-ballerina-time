@@ -20,7 +20,6 @@ on:
   pull_request:
     branches:
       - master
-      - java_17_migration
     types: [opened, synchronize, reopened, labeled, unlabeled]
 
 concurrency:
