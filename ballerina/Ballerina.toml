@@ -16,4 +16,4 @@ graalvmCompatible = true
 groupId = "io.ballerina.stdlib"
 artifactId = "time-native"
 version = "2.3.0"
-path = "../native/build/libs/time-native-2.3.0-SNAPSHOT.jar"
+path = "../native/build/libs/time-native-2.3.0.jar"
