@@ -79,7 +79,6 @@ public class Civil {
         civilMap.put(Constants.TIME_OF_DAY_RECORD_SECOND_BSTRING, ValueCreator.createDecimalValue(second));
 
         return civilMap;
-
     }
 
     public BMap<BString, Object> buildWithZone() {
@@ -97,7 +96,6 @@ public class Civil {
         }
 
         return civilMap;
-
     }
 
     private void setCommonCivilFields() {

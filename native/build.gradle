@@ -31,7 +31,7 @@ dependencies {
 }
 
 checkstyle {
-    toolVersion '7.8.2'
+    toolVersion '10.12.0'
     configFile rootProject.file("build-config/checkstyle/build/checkstyle.xml")
     configProperties = ["suppressionFile" : file("${rootDir}/build-config/checkstyle/build/suppressions.xml")]
 }
@@ -43,8 +43,8 @@ spotbugsMain {
     reportLevel "low"
     reportsDir = file("$project.buildDir/reports/spotbugs")
     reports {
-        html.enabled true
-        text.enabled = true
+        html.required = true
+        text.required = true
     }
     def excludeFile = file("${rootDir}/spotbugs-exclude.xml")
     if(excludeFile.exists()) {
