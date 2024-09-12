@@ -163,7 +163,7 @@ public class ExternMethods {
         try {
             ZonedDateTime dateTime = TimeValueHandler.createZoneDateTimeFromCivilValues(year, month, day, hour,
                     minute, second, zoneHour, zoneMinute, zoneSecond, zoneAbbr, zoneHandling.getValue());
-            return StringUtils.fromString(dateTime.toInstant().toString());
+            return StringUtils.fromString(dateTime.toString());
         } catch (DateTimeException e) {
             return Utils.createError(Errors.FormatError, e.getMessage());
         }
