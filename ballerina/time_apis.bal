@@ -170,23 +170,28 @@ public isolated function civilFromString(string dateTimeString) returns Civil|Er
 # + civil - `time:Civil` that needs to be converted
 # + return - The corresponding string value or an error if the specified `time:Civil` contains invalid parameters (e.g., `month` > 12)
 public isolated function civilToString(Civil civil) returns string|Error {
-    ZoneOffset utcOffset;
-    if civil?.utcOffset is () {
-        if civil?.timeAbbrev !is () && string:toLowerAscii(<string>civil?.timeAbbrev) == "z" {
-            utcOffset = <ZoneOffset>{hours: 0, minutes: 0, seconds: 0};
-        } else {
-            return error FormatError("civil.utcOffset must not be null");
-        }
-    } else {
+    ZoneOffset utcOffset = {
+        hours: 0,
+        minutes: 0,
+        seconds: 0
+    };
+    HeaderZoneHandling zoneHandling = PREFER_ZONE_OFFSET;
+    if civil?.utcOffset is () && civil?.timeAbbrev is () {
+        return error FormatError("civil.utcOffset and civil.timeAbbrev both must not be null");
+    } else if civil?.utcOffset is ZoneOffset {
         utcOffset = <ZoneOffset>civil?.utcOffset;
+    } else if civil?.timeAbbrev is string {
+        zoneHandling = PREFER_TIME_ABBREV;
     }
+
+    string timeAbbrev = civil?.timeAbbrev ?: "";
     decimal? civilTimeSecField = civil?.second;
     decimal? utcOffsetSecField = utcOffset?.seconds;
     decimal civilTimeSeconds = (civilTimeSecField is Seconds) ? civilTimeSecField : 0.0;
     decimal utcOffsetSeconds = (utcOffsetSecField is decimal) ? utcOffsetSecField : 0.0;
 
     return externCivilToString(civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds, utcOffset.
-    hours, utcOffset.minutes, utcOffsetSeconds);
+    hours, utcOffset.minutes, utcOffsetSeconds, timeAbbrev, zoneHandling);
 }
 
 # Converts a given UTC to an email formatted string (e.g `Mon, 3 Dec 2007 10:15:30 GMT`).
@@ -298,8 +303,9 @@ isolated function externCivilFromString(string dateTimeString) returns Civil|Err
     'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
-isolated function externCivilToString(int year, int month, int day, int hour, int minute, decimal second, int zoneHour,
-                                    int zoneMinute, decimal zoneSecond) returns string|Error = @java:Method {
+isolated function externCivilToString(int year, int month, int day, int hour, int minute, decimal second, 
+                                      int zoneHour, int zoneMinute, decimal zoneSecond, 
+                                      string timeAbber, HeaderZoneHandling zoneHandling) returns string|Error = @java:Method {
     name: "externCivilToString",
     'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;

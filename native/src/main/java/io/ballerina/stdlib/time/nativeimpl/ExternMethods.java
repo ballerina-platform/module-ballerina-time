@@ -157,12 +157,12 @@ public class ExternMethods {
     }
 
     public static Object externCivilToString(long year, long month, long day, long hour, long minute, BDecimal second,
-                                             long zoneHour, long zoneMinute, BDecimal zoneSecond) {
+                                             long zoneHour, long zoneMinute, BDecimal zoneSecond, BString zoneAbbr,
+                                             BString zoneHandling) {
 
         try {
             ZonedDateTime dateTime = TimeValueHandler.createZoneDateTimeFromCivilValues(year, month, day, hour,
-                    minute, second, zoneHour, zoneMinute, zoneSecond, null,
-                    Constants.HeaderZoneHandling.PREFER_ZONE_OFFSET.toString());
+                    minute, second, zoneHour, zoneMinute, zoneSecond, zoneAbbr, zoneHandling.getValue());
             return StringUtils.fromString(dateTime.toInstant().toString());
         } catch (DateTimeException e) {
             return Utils.createError(Errors.FormatError, e.getMessage());
