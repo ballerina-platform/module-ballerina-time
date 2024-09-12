@@ -356,7 +356,7 @@ isolated function testCivilToString() returns Error? {
         utcOffset: zoneOffset
     };
     string civilStr = check civilToString(civil);
-    string expectedStr = "2021-03-04T19:03:28.839564Z";
+    string expectedStr = "2021-03-05T00:33:28.839564+05:30";
     test:assertEquals(civilStr, expectedStr);
 }
 
@@ -383,14 +383,12 @@ isolated function testCivilToStringWithTimeOfDay() returns Error? {
         utcOffset: zoneOffset
     };
     string civilStr = check civilToString(civil);
-    string expectedStr = "2021-03-04T19:03:28.839564Z";
+    string expectedStr = "2021-03-05T00:33:28.839564+05:30";
     test:assertEquals(civilStr, expectedStr);
 }
 
-@test:Config {
-    enable: false
-}
-isolated function testCivilToStringWithoutOffset() {
+@test:Config {}
+isolated function testCivilToStringWithTimeAbbreviation() returns Error? {
     Civil civil = {
         year: 2021,
         month: 4,
@@ -399,9 +397,9 @@ isolated function testCivilToStringWithoutOffset() {
         minute: 33,
         timeAbbrev: "Asia/Colombo"
     };
-    string|Error err = civilToString(civil);
-    test:assertTrue(err is Error);
-    test:assertEquals((<Error>err).message(), "civil.utcOffset must not be null");
+    string civilStr = check civilToString(civil);
+    string expectedStr = "2021-04-13T04:33+05:30[Asia/Colombo]";
+    test:assertEquals(civilStr, expectedStr);
 }
 
 @test:Config {}
