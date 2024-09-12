@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [unreleased]
+
+### Fixed
+- [When converting a `time:Civil` with time-zone information to a string using `time:civilToString` API error is thrown](https://github.com/ballerina-platform/ballerina-library/issues/6986)
+
+## [2.3.0] - 2023-06-30
 ### changed
 - [Mark Standard Libraries as GraalVM Compatible](https://github.com/ballerina-platform/ballerina-standard-library/issues/4568)
 - [Add support for inferring utc offset for zulu time(Z) in utcFromCivil and civilToString APIs](https://github.com/ballerina-platform/module-ballerina-time/pull/459) 
