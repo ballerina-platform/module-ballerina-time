@@ -162,7 +162,7 @@ public isolated function civilFromString(string dateTimeString) returns Civil|Er
     return check externCivilFromString(dateTimeString);
 }
 
-# Obtain a RFC 3339 timestamp (e.g., `2007-12-03T10:15:30.00Z`) from a given `time:Civil`.
+# Obtain a RFC 3339 timestamp (e.g., `2021-03-05T00:33:28.839564+05:30`) from a given `time:Civil`.
 # ```ballerina
 # time:Civil civil = check time:civilFromString("2007-12-03T10:15:30.00Z");
 # string|time:Error civilString = time:civilToString(civil);
