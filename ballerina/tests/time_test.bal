@@ -727,25 +727,6 @@ isolated function testUtcFromCivilWithEmptyTimeOffsetNegative() returns Error? {
     }
 }
 
-@test:Config {enable: false}
-isolated function testCivilToStringWithEmptyTimeOffsetNegative() returns Error? {
-    Civil civil = {
-        year: 2021,
-        month: 4,
-        day: 12,
-        hour: 23,
-        minute: 20,
-        second: 50.52,
-        timeAbbrev: "Asia/Colombo"
-    };
-    string|error civilString = civilToString(civil);
-    if civilString is error {
-        test:assertEquals(civilString.message(), "civil.utcOffset must not be null");
-    } else {
-        test:assertFail("civilString should be error");
-    } 
-}
-
 isolated function testUtcFromCivilWithEmptyTimeOffsetAndAbbreviation() returns Error? {
     Utc expectedUtc = check utcFromString("2021-04-12T23:20:50.520Z");
     Civil civil = {
