@@ -757,7 +757,7 @@ isolated function testCivilToStringWithEmptyTimeOffsetAndAbbreviation() returns 
     };
     string|error civilString = civilToString(civil);
     if civilString is error {
-        test:assertEquals(civilString.message(), "civil.utcOffset and civil.timeAbbrev both must not be null");
+        test:assertEquals(civilString.message(), "the civil value should have either `utcOffset` or `timeAbbrev`");
     } else {
         test:assertFail("civilString should be error");
     } 
