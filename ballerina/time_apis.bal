@@ -170,28 +170,25 @@ public isolated function civilFromString(string dateTimeString) returns Civil|Er
 # + civil - `time:Civil` that needs to be converted
 # + return - The corresponding string value or an error if the specified `time:Civil` contains invalid parameters (e.g., `month` > 12)
 public isolated function civilToString(Civil civil) returns string|Error {
-    ZoneOffset utcOffset = {
-        hours: 0,
-        minutes: 0,
-        seconds: 0
-    };
+    ZoneOffset? utcOffset = civil?.utcOffset;
+    string? timeAbbrev = civil?.timeAbbrev;
+
     HeaderZoneHandling zoneHandling = PREFER_ZONE_OFFSET;
-    if civil?.utcOffset is () && civil?.timeAbbrev is () {
+    if utcOffset is () && timeAbbrev is () {
         return error FormatError("civil.utcOffset and civil.timeAbbrev both must not be null");
     } else if civil?.utcOffset is ZoneOffset {
         utcOffset = <ZoneOffset>civil?.utcOffset;
-    } else if civil?.timeAbbrev is string {
+    } else if timeAbbrev is string {
         zoneHandling = PREFER_TIME_ABBREV;
     }
 
-    string timeAbbrev = civil?.timeAbbrev ?: "";
-    decimal? civilTimeSecField = civil?.second;
-    decimal? utcOffsetSecField = utcOffset?.seconds;
-    decimal civilTimeSeconds = (civilTimeSecField is Seconds) ? civilTimeSecField : 0.0;
-    decimal utcOffsetSeconds = (utcOffsetSecField is decimal) ? utcOffsetSecField : 0.0;
+    int utcOffsetHours = utcOffset?.hours ?: 0;
+    int utcOffsetMinutes = utcOffset?.minutes ?: 0;
+    decimal utcOffsetSeconds = utcOffset?.seconds ?: 0.0;
+    decimal civilTimeSeconds = civil?.second ?: 0.0;
 
-    return externCivilToString(civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds, utcOffset.
-    hours, utcOffset.minutes, utcOffsetSeconds, timeAbbrev, zoneHandling);
+    return externCivilToString(civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds, 
+        utcOffsetHours, utcOffsetMinutes, utcOffsetSeconds, timeAbbrev ?: "", zoneHandling);
 }
 
 # Converts a given UTC to an email formatted string (e.g `Mon, 3 Dec 2007 10:15:30 GMT`).
