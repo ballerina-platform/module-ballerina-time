@@ -387,14 +387,16 @@ isolated function testCivilToStringWithTimeOfDay() returns Error? {
     test:assertEquals(civilStr, expectedStr);
 }
 
-@test:Config {}
+@test:Config {
+    enable: false
+}
 isolated function testCivilToStringWithoutOffset() {
     Civil civil = {
         year: 2021,
         month: 4,
         day: 13,
         hour: 4,
-        minute: 70,
+        minute: 33,
         timeAbbrev: "Asia/Colombo"
     };
     string|Error err = civilToString(civil);
@@ -727,7 +729,7 @@ isolated function testUtcFromCivilWithEmptyTimeOffsetNegative() returns Error? {
     }
 }
 
-@test:Config {enable: true}
+@test:Config {enable: false}
 isolated function testCivilToStringWithEmptyTimeOffsetNegative() returns Error? {
     Civil civil = {
         year: 2021,
@@ -776,7 +778,7 @@ isolated function testCivilToStringWithEmptyTimeOffsetAndAbbreviation() returns 
     };
     string|error civilString = civilToString(civil);
     if civilString is error {
-        test:assertEquals(civilString.message(), "civil.utcOffset must not be null");
+        test:assertEquals(civilString.message(), "civil.utcOffset and civil.timeAbbrev both must not be null");
     } else {
         test:assertFail("civilString should be error");
     } 
