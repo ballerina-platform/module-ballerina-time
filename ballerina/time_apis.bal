@@ -176,8 +176,8 @@ public isolated function civilToString(Civil civil) returns string|Error {
     HeaderZoneHandling zoneHandling = PREFER_ZONE_OFFSET;
     if utcOffset is () && timeAbbrev is () {
         return error FormatError("civil.utcOffset and civil.timeAbbrev both must not be null");
-    } else if civil?.utcOffset is ZoneOffset {
-        utcOffset = <ZoneOffset>civil?.utcOffset;
+    } else if utcOffset is ZoneOffset {
+        utcOffset = <ZoneOffset>utcOffset;
     } else if timeAbbrev is string {
         zoneHandling = PREFER_TIME_ABBREV;
     }
