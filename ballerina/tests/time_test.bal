@@ -356,7 +356,7 @@ isolated function testCivilToString() returns Error? {
         utcOffset: zoneOffset
     };
     string civilStr = check civilToString(civil);
-    string expectedStr = "2021-03-04T19:03:28.839564Z";
+    string expectedStr = "2021-03-05T00:33:28.839564+05:30";
     test:assertEquals(civilStr, expectedStr);
 }
 
@@ -383,23 +383,23 @@ isolated function testCivilToStringWithTimeOfDay() returns Error? {
         utcOffset: zoneOffset
     };
     string civilStr = check civilToString(civil);
-    string expectedStr = "2021-03-04T19:03:28.839564Z";
+    string expectedStr = "2021-03-05T00:33:28.839564+05:30";
     test:assertEquals(civilStr, expectedStr);
 }
 
 @test:Config {}
-isolated function testCivilToStringWithoutOffset() {
+isolated function testCivilToStringWithTimeAbbreviation() returns Error? {
     Civil civil = {
         year: 2021,
         month: 4,
         day: 13,
         hour: 4,
-        minute: 70,
+        minute: 33,
         timeAbbrev: "Asia/Colombo"
     };
-    string|Error err = civilToString(civil);
-    test:assertTrue(err is Error);
-    test:assertEquals((<Error>err).message(), "civil.utcOffset must not be null");
+    string civilStr = check civilToString(civil);
+    string expectedStr = "2021-04-13T04:33+05:30[Asia/Colombo]";
+    test:assertEquals(civilStr, expectedStr);
 }
 
 @test:Config {}
@@ -727,25 +727,6 @@ isolated function testUtcFromCivilWithEmptyTimeOffsetNegative() returns Error? {
     }
 }
 
-@test:Config {enable: true}
-isolated function testCivilToStringWithEmptyTimeOffsetNegative() returns Error? {
-    Civil civil = {
-        year: 2021,
-        month: 4,
-        day: 12,
-        hour: 23,
-        minute: 20,
-        second: 50.52,
-        timeAbbrev: "Asia/Colombo"
-    };
-    string|error civilString = civilToString(civil);
-    if civilString is error {
-        test:assertEquals(civilString.message(), "civil.utcOffset must not be null");
-    } else {
-        test:assertFail("civilString should be error");
-    } 
-}
-
 isolated function testUtcFromCivilWithEmptyTimeOffsetAndAbbreviation() returns Error? {
     Utc expectedUtc = check utcFromString("2021-04-12T23:20:50.520Z");
     Civil civil = {
@@ -776,7 +757,7 @@ isolated function testCivilToStringWithEmptyTimeOffsetAndAbbreviation() returns 
     };
     string|error civilString = civilToString(civil);
     if civilString is error {
-        test:assertEquals(civilString.message(), "civil.utcOffset must not be null");
+        test:assertEquals(civilString.message(), "the civil value should have either `utcOffset` or `timeAbbrev`");
     } else {
         test:assertFail("civilString should be error");
     } 
