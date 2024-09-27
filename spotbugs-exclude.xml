@@ -18,6 +18,6 @@
 <FindBugsFilter>
     <Match>
         <Class name="io.ballerina.stdlib.time.nativeimpl.Civil"/>
-        <Bug pattern="EI_EXPOSE_REP"/>
+        <Bug pattern="CT_CONSTRUCTOR_THROW,EI_EXPOSE_REP"/>
     </Match>
 </FindBugsFilter>
