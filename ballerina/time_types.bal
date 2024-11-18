@@ -135,7 +135,6 @@ public type ZoneOffset readonly & record {|
     decimal seconds?;
 |};
 
-@java:ExternalDependency
 type ReadWriteZoneOffset record {|
     int hours;
     int minutes = 0;
