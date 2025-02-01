@@ -6,6 +6,28 @@
  * Detailed information about configuring a multi-project build in Gradle can be found
  * in the user manual at https://docs.gradle.org/6.4/userguide/multi_project_builds.html
  */
+
+pluginManagement {
+    plugins {
+        id "com.github.spotbugs" version "${spotbugsPluginVersion}"
+        id "com.github.johnrengelman.shadow" version "${shadowJarPluginVersion}"
+        id "de.undercouch.download" version "${downloadPluginVersion}"
+        id "net.researchgate.release" version "${releasePluginVersion}"
+        id "io.ballerina.plugin" version "${ballerinaGradlePluginVersion}"
+    }
+
+    repositories {
+        gradlePluginPortal()
+        maven {
+            url = 'https://maven.pkg.github.com/ballerina-platform/*'
+            credentials {
+                username System.getenv("packageUser")
+                password System.getenv("packagePAT")
+            }
+        }
+    }
+}
+
 plugins {
     id "com.gradle.enterprise" version "3.2"
 }
