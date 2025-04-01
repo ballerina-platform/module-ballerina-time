@@ -210,7 +210,7 @@ public readonly class TimeZone {
     # Initialize a TimeZone class using a zone ID.
     #
     # + zoneId - Zone ID as a string or nil to initialize a TimeZone object with the system default time zone
-    # + return - An error or nil
+    # + return - An `time:Error` if the zone ID is invalid, otherwise nil
     public isolated function init(string? zoneId = ()) returns Error? {
         if zoneId is string {
             externTimeZoneInitWithId(self, zoneId);
