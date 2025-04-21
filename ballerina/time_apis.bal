@@ -76,7 +76,7 @@ public isolated function utcAddSeconds(Utc utc, Seconds seconds) returns Utc {
     return [secondsFromEpoch, lastSecondFraction];
 }
 
-# Returns difference in seconds between `utc1` and `utc2`.
+# Returns difference in seconds between two UTC times.
 # This will be positive if `utc1` occurs after `utc2`
 # ```ballerina
 # time:Utc utc1 = time:utcNow();
@@ -85,7 +85,7 @@ public isolated function utcAddSeconds(Utc utc, Seconds seconds) returns Utc {
 # ```
 # + utc1 - 1st Utc time as a tuple `[int, decimal]`
 # + utc2 - 2nd Utc time as a tuple `[int, decimal]`
-# + return - The difference between `utc1` and `utc2` as `Seconds`
+# + return - The difference between `utc1` and `utc2` in seconds
 public isolated function utcDiffSeconds(Utc utc1, Utc utc2) returns Seconds {
     return externUtcDiffSeconds(utc1, utc2);
 }
@@ -106,8 +106,8 @@ public isolated function dateValidate(Date date) returns Error? {
 # time:Date date = {year: 1994, month: 11, day: 7};
 # time:DayOfWeek day = time:dayOfWeek(date);
 # ```
-# + date - Date value
-# + return - `time:DayOfWeek` if the `date` is valid or else panic
+# + date - The date for which the day of the week is to be calculated
+# + return - The `time:DayOfWeek` if the `date` is valid or else panic
 public isolated function dayOfWeek(Date date) returns DayOfWeek {
     DayOfWeek[] daysOfWeek = [SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY];
     return daysOfWeek[checkpanic externDayOfWeek(date)];
@@ -118,18 +118,18 @@ public isolated function dayOfWeek(Date date) returns DayOfWeek {
 # time:Utc utc = time:utcNow();
 # time:Civil civil = time:utcToCivil(utc);
 # ```
-# + utc - `time:Utc` timestamp
+# + utc - The `time:Utc` timestamp value to be converted
 # + return - The corresponding `time:Civil` value
 public isolated function utcToCivil(Utc utc) returns Civil {
     return externUtcToCivil(utc);
 }
 
-# Converts a given `Civil` value to an `Utc` timestamp.
+# Converts a given `time:Civil` value to an `time:Utc` timestamp.
 # ```ballerina
 # time:Civil civil = time:utcToCivil(time:utcNow());
 # time:Utc utc = time:utcFromCivil(civil);
 # ```
-# + civilTime - `time:Civil` time
+# + civilTime - The `time:Civil` value to be converted
 # + return - The corresponding `time:Utc` value or an error if `civilTime.utcOffset` is missing
 public isolated function utcFromCivil(Civil civilTime) returns Utc|Error {
     ZoneOffset utcOffset;
@@ -156,7 +156,7 @@ public isolated function utcFromCivil(Civil civilTime) returns Utc|Error {
 # time:Civil|time:Error civil1 = time:civilFromString("2021-04-12T23:20:50.520+05:30[Asia/Colombo]");
 # time:Civil|time:Error civil2 = time:civilFromString("2007-12-03T10:15:30.00Z");
 # ```
-# + dateTimeString - RFC 3339 timestamp (e.g., `2007-12-03T10:15:30.00Z`) as a string
+# + dateTimeString - RFC 3339 timestamp (e.g., `2007-12-03T10:15:30.00Z`) as a string.
 # + return - The corresponding `time:Civil` value or an error if the given `dateTimeString` is invalid
 public isolated function civilFromString(string dateTimeString) returns Civil|Error {
     return check externCivilFromString(dateTimeString);
@@ -167,7 +167,7 @@ public isolated function civilFromString(string dateTimeString) returns Civil|Er
 # time:Civil civil = check time:civilFromString("2007-12-03T10:15:30.00Z");
 # string|time:Error civilString = time:civilToString(civil);
 # ```
-# + civil - `time:Civil` that needs to be converted
+# + civil - The `time:Civil` value to be converted
 # + return - The corresponding string value or an error if the specified `time:Civil` contains invalid parameters (e.g., `month` > 12)
 public isolated function civilToString(Civil civil) returns string|Error {
     ZoneOffset? utcOffset = civil?.utcOffset;
@@ -194,9 +194,9 @@ public isolated function civilToString(Civil civil) returns string|Error {
 # time:Utc utc = time:utcNow();
 # string emailFormattedString = time:utcToEmailString(utc);
 # ```
-# + utc - The UTC value to be formatted
+# + utc - The `time:UTC` value to be formatted
 # + zh - Type of the zone value to be added
-# + return - The corresponding formatted string
+# + return - The corresponding formatted string value
 public isolated function utcToEmailString(Utc utc, UtcZoneHandling zh = "0") returns string {
     return externUtcToEmailString(utc, zh);
 }
@@ -206,20 +206,20 @@ public isolated function utcToEmailString(Utc utc, UtcZoneHandling zh = "0") ret
 # time:Civil|time:Error emailDateTime = time:civilFromEmailString("Wed, 10 Mar 2021 19:51:55 -0820");
 # ```
 # + dateTimeString - RFC 5322 formatted (e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`) string to be converted
-# + return - The corresponding civil record or an error if the given string is incorrectly formatted.
+# + return - The corresponding `time:Civil` record or an error if the given string is incorrectly formatted.
 public isolated function civilFromEmailString(string dateTimeString) returns Civil|Error {
     return check externCivilFromEmailString(dateTimeString);
 }
 
-# Converts a given Civil record to RFC 5322 format (e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`).
+# Converts a given `time:Civil` record to RFC 5322 format (e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`).
 # ```ballerina
 # time:Civil civil = check time:civilFromString("2021-04-12T23:20:50.520+05:30[Asia/Colombo]");
 # string|time:Error emailDateTime = time:civilToEmailString(civil, time:PREFER_ZONE_OFFSET);
 # ```
-# + civil - The civil record to be converted
+# + civil - The `time:Civil` record to be converted
 # + zoneHandling - Indicate how to handle the zone by specifying the preference whether to give preference to zone
 # offset or time abbreviation. Also, this can configure to use zone offset to the execution and use time abbreviation as a comment.
-# + return - RFC 5322 formatted (e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`) string or
+# + return - The RFC 5322 formatted (e.g `Wed, 10 Mar 2021 19:51:55 -0800 (PST)`) string or
 # an error if the specified `time:Civil` contains invalid parameters (e.g., `month` > 12)
 public isolated function civilToEmailString(Civil civil, HeaderZoneHandling zoneHandling) returns string|Error {
     int utcOffsetHours = 0;

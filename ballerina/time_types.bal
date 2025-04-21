@@ -190,16 +190,16 @@ public type Zone readonly & object {
     # + return - The fixed zone offset or nil
     public isolated function fixedOffset() returns ZoneOffset?;
 
-    # Converts a given `Civil` value to an `Utc` timestamp based on the time zone value.
+    # Converts a given `time:Civil` value to an `time:Utc` timestamp based on the time zone value.
     #
-    # + civil - `Civil` time
-    # + return - The corresponding `Utc` value or an error if `civil.timeAbbrev` is missing
+    # + civil - The `time:Civil` value to be converted
+    # + return - The corresponding `time:Utc` value or an error if `civil.timeAbbrev` is missing
     public isolated function utcFromCivil(Civil civil) returns Utc|Error;
 
-    # Converts a given `Utc` timestamp to a `Civil` value based on the time zone value.
+    # Converts a given `time:Utc` timestamp to a `time:Civil` value based on the time zone value.
     #
-    # + utc - `Utc` timestamp
-    # + return - The corresponding `Civil` value
+    # + utc - The `time:Utc` timestamp value to be converted
+    # + return - The corresponding `time:Civil` value
     public isolated function utcToCivil(Utc utc) returns Civil;
 };
 
@@ -210,7 +210,7 @@ public readonly class TimeZone {
     # Initialize a TimeZone class using a zone ID.
     #
     # + zoneId - Zone ID as a string or nil to initialize a TimeZone object with the system default time zone
-    # + return - An error or nil
+    # + return - An `time:Error` if the zone ID is invalid, otherwise nil
     public isolated function init(string? zoneId = ()) returns Error? {
         if zoneId is string {
             externTimeZoneInitWithId(self, zoneId);
@@ -228,7 +228,7 @@ public readonly class TimeZone {
 
     # Converts a given `time:Civil` value to an `time:Utc` timestamp based on the time zone value.
     #
-    # + civil - `time:Civil` time
+    # + civil - The `time:Civil` value to be converted
     # + return - The corresponding `time:Utc` value or an error if `civil.timeAbbrev` is missing
     public isolated function utcFromCivil(Civil civil) returns Utc|Error {
         string? timeAbbrev = civil?.timeAbbrev;
@@ -243,7 +243,7 @@ public readonly class TimeZone {
 
     # Converts a given `time:Utc` timestamp to a `time:Civil` value based on the time zone value.
     #
-    # + utc - `time:Utc` timestamp
+    # + utc - The `time:Utc` timestamp value to be converted
     # + return - The corresponding `time:Civil` value
     public isolated function utcToCivil(Utc utc) returns Civil {
         return externTimeZoneUtcToCivil(self, utc);
@@ -264,7 +264,7 @@ public isolated function loadSystemZone() returns Zone|Error {
 # time:Zone? zone = time:getZone("Asia/Colombo");
 # ```
 # + id - Time zone ID in the format of ("Continent/City")
-# + return - Corresponding ime zone object or null 
+# + return - Corresponding time zone object or null
 public isolated function getZone(string id) returns Zone? {
     TimeZone|Error timeZone = new TimeZone(id);
     if timeZone is TimeZone {
