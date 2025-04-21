@@ -172,8 +172,28 @@ public type Civil record {
     DayOfWeek dayOfWeek?;
 };
 
-# Defualt zone value represation in different formats.
+# Default zone value representation in different formats.
 public type UtcZoneHandling "0"|"GMT"|"UT"|"Z";
+
+# Represents the time duration used to adjust a civil date-time value by a specified amount.
+# The duration can be added to or subtracted from the civil time.
+# Fields in the record can be negative, in which case the duration is subtracted.
+public type Duration record {|
+    # The duration in years.
+    int years = 0;
+    # The duration in months.
+    int months = 0;
+    # The duration in weeks.
+    int weeks = 0;
+    # The duration in days.
+    int days = 0;
+    # The duration in hours.
+    int hours = 0;
+    # The duration in minutes.
+    int minutes = 0;
+    # The duration in seconds.
+    Seconds seconds = 0.0;
+|};
 
 # Indicate how to handle both `zoneOffset` and `timeAbbrev`.
 public enum HeaderZoneHandling {
@@ -201,6 +221,15 @@ public type Zone readonly & object {
     # + utc - The `time:Utc` timestamp value to be converted
     # + return - The corresponding `time:Civil` value
     public isolated function utcToCivil(Utc utc) returns Civil;
+
+    # Adds the given time duration to the specified civil date-time based on the time zone.
+    # The operation assumes that all days have exactly 86,400 seconds.
+    #
+    # + civil - The civil time to which the duration should be added
+    # + duration - The date-time duration to be added
+    # + return - The civil time after adding the duration
+    public isolated function civilAddDuration(Civil civil, Duration duration) returns Civil|Error;
+
 };
 
 # Localized time zone implementation to handle time zones.  
@@ -248,6 +277,31 @@ public readonly class TimeZone {
     public isolated function utcToCivil(Utc utc) returns Civil {
         return externTimeZoneUtcToCivil(self, utc);
     }
+
+    # Adds the given time duration to the specified civil date-time based on the time zone.
+    # The operation assumes that all days have exactly 86,400 seconds.
+    #
+    # + civil - The civil time to which the duration should be added
+    # + duration - The date-time duration to be added
+    # + return - The civil time after adding the duration
+    public isolated function civilAddDuration(Civil civil, Duration duration) returns Civil|Error {
+        ZoneOffset? utcOffset = civil?.utcOffset;
+        string? timeAbbrev = civil?.timeAbbrev;
+        HeaderZoneHandling zoneHandling = PREFER_ZONE_OFFSET;
+        if utcOffset is () && timeAbbrev is () {
+            return error FormatError("The civil value should have either `utcOffset` or `timeAbbrev`");
+        } else if utcOffset is () && timeAbbrev is string {
+            zoneHandling = PREFER_TIME_ABBREV;
+        }
+        int utcOffsetHours = utcOffset?.hours ?: 0;
+        int utcOffsetMinutes = utcOffset?.minutes ?: 0;
+        decimal utcOffsetSeconds = utcOffset?.seconds ?: 0.0;
+        decimal civilTimeSeconds = civil?.second ?: 0.0;
+
+        return externTimeZoneCivilAddDuration(self, civil.year, civil.month, civil.day, civil.hour, civil.minute,
+                civilTimeSeconds, utcOffsetHours, utcOffsetMinutes, utcOffsetSeconds, timeAbbrev ?: "", zoneHandling,
+                duration.years, duration.months, duration.days, duration.hours, duration.minutes, duration.seconds);
+    }
 }
 
 # Load the default time zone of the system.
@@ -290,7 +344,14 @@ isolated function externTimeZoneUtcToCivil(TimeZone timeZone, Utc utc) returns C
 } external;
 
 isolated function externTimeZoneUtcFromCivil(TimeZone timeZone, int year, int month, int day,
-int hour, int minute, decimal second, string timeAbber, HeaderZoneHandling zoneHandling)
+        int hour, int minute, decimal second, string timeAbber, HeaderZoneHandling zoneHandling)
 returns Utc|Error = @java:Method {
+    'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternUtils"
+} external;
+
+isolated function externTimeZoneCivilAddDuration(TimeZone timeZone, int year, int month, int day, int hour, int minute,
+        decimal second, int zoneHour, int zoneMinute, decimal zoneSecond, string timeAbbrev,
+        HeaderZoneHandling zoneHandling, int duYear, int duMonth, int duDay, int duHour, int duMinute,
+        decimal duSecond) returns Civil|Error = @java:Method {
     'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternUtils"
 } external;

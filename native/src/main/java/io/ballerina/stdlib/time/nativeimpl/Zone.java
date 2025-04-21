@@ -17,6 +17,8 @@
  */
 package io.ballerina.stdlib.time.nativeimpl;
 
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BString;
 import io.ballerina.stdlib.time.util.Utils;
 
 import java.time.DateTimeException;
@@ -61,5 +63,9 @@ public class Zone {
     public Civil utcToCivil(Utc utc) {
 
         return new Civil(utc.generateInstant().atZone(zoneId));
+    }
+
+    public BMap<BString, Object> civilAddDuration(Civil civil, CustomDuration customDuration) {
+        return civil.addDuration(this.zoneId, customDuration).build();
     }
 }
