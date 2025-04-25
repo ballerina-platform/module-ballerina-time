@@ -148,7 +148,7 @@ public isolated function utcFromCivil(Civil civilTime) returns Utc|Error {
     decimal utcOffsetSeconds = (utcOffsetSecField is decimal) ? utcOffsetSecField : 0.0;
 
     return externUtcFromCivil(civilTime.year, civilTime.month, civilTime.day, civilTime.hour, civilTime.minute,
-    civilTimeSeconds, utcOffset.hours, utcOffset.minutes, utcOffsetSeconds);
+            civilTimeSeconds, utcOffset.hours, utcOffset.minutes, utcOffsetSeconds);
 }
 
 # Converts a given RFC 3339 timestamp(e.g., `2007-12-03T10:15:30.00Z`) to `time:Civil`.
@@ -185,8 +185,8 @@ public isolated function civilToString(Civil civil) returns string|Error {
     decimal utcOffsetSeconds = utcOffset?.seconds ?: 0.0;
     decimal civilTimeSeconds = civil?.second ?: 0.0;
 
-    return externCivilToString(civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds, 
-        utcOffsetHours, utcOffsetMinutes, utcOffsetSeconds, timeAbbrev ?: "", zoneHandling);
+    return externCivilToString(civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds,
+            utcOffsetHours, utcOffsetMinutes, utcOffsetSeconds, timeAbbrev ?: "", zoneHandling);
 }
 
 # Converts a given UTC to an email formatted string (e.g `Mon, 3 Dec 2007 10:15:30 GMT`).
@@ -244,8 +244,36 @@ public isolated function civilToEmailString(Civil civil, HeaderZoneHandling zone
     string timeAbbrev = (timeAbbrevField is string) ? timeAbbrevField : "";
 
     return externCivilToEmailString(civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds,
-    utcOffsetHours, utcOffsetMinutes, utcOffsetSeconds, timeAbbrev, zoneHandling);
+            utcOffsetHours, utcOffsetMinutes, utcOffsetSeconds, timeAbbrev, zoneHandling);
 }
+
+# Adds the given time duration to the specified civil date-time. This is a time zone-agnostic operation and assumes that
+# all days have exactly 86,400 seconds.
+# ```ballerina
+# time:Civil civil = check time:civilFromString("2025-04-25T10:15:30.00Z");
+# time:Civil|time:Error updatedCivil = time:civilAddDuration(civil, {years: 1, days: 3, hours: 4, seconds: 6});
+# ```
+# + civil - The civil time to which the duration should be added
+# + duration - The time duration to be added
+# + return - The civil time after adding the duration
+public isolated function civilAddDuration(Civil civil, Duration duration) returns Civil|Error {
+    ZoneOffset? utcOffset = civil?.utcOffset;
+    string? timeAbbrev = civil?.timeAbbrev;
+    HeaderZoneHandling zoneHandling = PREFER_ZONE_OFFSET;
+    if utcOffset is () && timeAbbrev is () {
+        return error FormatError("The civil value should have either `utcOffset` or `timeAbbrev`");
+    } else if utcOffset is () && timeAbbrev is string {
+        zoneHandling = PREFER_TIME_ABBREV;
+    }
+    int utcOffsetHours = utcOffset?.hours ?: 0;
+    int utcOffsetMinutes = utcOffset?.minutes ?: 0;
+    decimal utcOffsetSeconds = utcOffset?.seconds ?: 0.0;
+    decimal civilTimeSeconds = civil?.second ?: 0.0;
+
+    return externCivilAddDuration(civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds,
+            utcOffsetHours, utcOffsetMinutes, utcOffsetSeconds, timeAbbrev ?: "", zoneHandling, duration.years,
+            duration.months, duration.days, duration.hours, duration.minutes, duration.seconds);
+};
 
 isolated function externUtcNow(int precision) returns Utc = @java:Method {
     name: "externUtcNow",
@@ -288,7 +316,7 @@ isolated function externUtcToCivil(Utc utc) returns Civil = @java:Method {
 } external;
 
 isolated function externUtcFromCivil(int year, int month, int day, int hour, int minute, decimal second, int zoneHour,
-                                    int zoneMinute, decimal zoneSecond) returns Utc|Error = @java:Method {
+        int zoneMinute, decimal zoneSecond) returns Utc|Error = @java:Method {
     name: "externUtcFromCivil",
     'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -298,9 +326,9 @@ isolated function externCivilFromString(string dateTimeString) returns Civil|Err
     'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
 
-isolated function externCivilToString(int year, int month, int day, int hour, int minute, decimal second, 
-                                      int zoneHour, int zoneMinute, decimal zoneSecond, 
-                                      string timeAbber, HeaderZoneHandling zoneHandling) returns string|Error = @java:Method {
+isolated function externCivilToString(int year, int month, int day, int hour, int minute, decimal second,
+        int zoneHour, int zoneMinute, decimal zoneSecond,
+        string timeAbber, HeaderZoneHandling zoneHandling) returns string|Error = @java:Method {
     name: "externCivilToString",
     'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;
@@ -316,8 +344,14 @@ isolated function externCivilFromEmailString(string dateTimeString) returns Civi
 } external;
 
 isolated function externCivilToEmailString(int year, int month, int day, int hour, int minute, decimal second,
-                                            int zoneHour, int zoneMinute, decimal zoneSecond, string timeAbber,
-                                            HeaderZoneHandling zoneHandling) returns string|Error = @java:Method {
+        int zoneHour, int zoneMinute, decimal zoneSecond, string timeAbber, HeaderZoneHandling zoneHandling)
+        returns string|Error = @java:Method {
     name: "externCivilToEmailString",
+    'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
+} external;
+
+isolated function externCivilAddDuration(int year, int month, int day, int hour, int minute, decimal second,
+        int zoneHour, int zoneMinute, decimal zoneSecond, string timeAbbrev, HeaderZoneHandling zoneHandling,
+        int duYear, int duMonth, int duDay, int duHour, int duMinute, decimal duSecond) returns Civil|Error = @java:Method {
     'class: "io.ballerina.stdlib.time.nativeimpl.ExternMethods"
 } external;

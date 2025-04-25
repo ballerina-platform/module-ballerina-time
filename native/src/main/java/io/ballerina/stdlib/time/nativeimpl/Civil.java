@@ -27,6 +27,8 @@ import io.ballerina.stdlib.time.util.Utils;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.time.Period;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -126,6 +128,15 @@ public class Civil {
 
         Map<String, Integer> zoneInfo = Utils.zoneOffsetMapFromString(zonedDateTime.getOffset().toString());
         return Utils.createZoneOffsetFromZoneInfoMap(zoneInfo);
+    }
+
+    public Civil addDuration(ZoneId zoneId, CustomDuration duration) {
+        ZonedDateTime zoneDateTime = this.zonedDateTime.withZoneSameInstant(zoneId);
+        Period period = Period.of(duration.years(), duration.months(), duration.days());
+        zoneDateTime = zoneDateTime.plus(period);
+        zoneDateTime = zoneDateTime.plus(Utils.createTimeDuration(duration.hours(), duration.minutes(),
+                duration.seconds(), duration.nanoSeconds()));
+        return new Civil(zoneDateTime);
     }
 
 }
