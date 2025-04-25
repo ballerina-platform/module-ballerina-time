@@ -249,7 +249,10 @@ public isolated function civilToEmailString(Civil civil, HeaderZoneHandling zone
 
 # Adds the given time duration to the specified civil date-time. This is a time zone-agnostic operation and assumes that
 # all days have exactly 86,400 seconds.
-#
+# ```ballerina
+# time:Civil civil = check time:civilFromString("2025-04-25T10:15:30.00Z");
+# time:Civil|time:Error updatedCivil = time:civilAddDuration(civil, {years: 1, days: 3, hours: 4, seconds: 6});
+# ```
 # + civil - The civil time to which the duration should be added
 # + duration - The time duration to be added
 # + return - The civil time after adding the duration

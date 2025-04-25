@@ -280,7 +280,11 @@ public readonly class TimeZone {
 
     # Adds the given time duration to the specified civil date-time based on the time zone.
     # The operation assumes that all days have exactly 86,400 seconds.
-    #
+    # ```ballerina
+    # time:TimeZone timeZone = check new("Asia/Colombo");
+    # time:Civil civil = check time:civilFromString("2025-04-25T10:15:30.00Z");
+    # time:Civil|time:Error updatedCivil = timeZone.civilAddDuration(civil, {years: 1, days: 3, hours: 4});
+    # ```
     # + civil - The civil time to which the duration should be added
     # + duration - The date-time duration to be added
     # + return - The civil time after adding the duration
