@@ -56,7 +56,7 @@ isolated function testUtcFromStringWithInvalidFormat() {
     Utc|Error err = utcFromString("2007-12-0310:15:30.00Z");
     test:assertTrue(err is Error);
     test:assertEquals((<Error>err).message(),
-        "The provided string '2007-12-0310:15:30.00Z' does not adhere to the expected RFC 3339 format 'YYYY-MM-DDTHH:MM:SS.SSZ'. ");
+            "The provided string '2007-12-0310:15:30.00Z' does not adhere to the expected RFC 3339 format 'YYYY-MM-DDTHH:MM:SS.SSZ'. ");
 }
 
 @test:Config {}
@@ -668,7 +668,7 @@ isolated function testGmtToEmailStringConversion() returns Error? {
     Utc utc = check utcFromString("2007-12-03T10:15:30.00Z");
     Utc utc2 = check utcFromString("2007-12-03T10:15:30.00+05:30");
     Civil civil = check civilFromString("2007-12-03T10:15:30.00+00:00");
-    
+
     test:assertEquals(utcToEmailString(utc, "Z"), "Mon, 3 Dec 2007 10:15:30 Z");
     test:assertEquals(utcToEmailString(utc2, "0"), "Mon, 3 Dec 2007 04:45:30 +0000");
     test:assertEquals(utcToEmailString(utc), "Mon, 3 Dec 2007 10:15:30 +0000");
@@ -709,7 +709,6 @@ isolated function testCivilToStringWithEmptyTimeOffset() returns Error? {
 
 @test:Config {enable: true}
 isolated function testUtcFromCivilWithEmptyTimeOffsetNegative() returns Error? {
-    Utc expectedUtc = check utcFromString("2021-04-12T23:20:50.520Z");
     Civil civil = {
         year: 2021,
         month: 4,
@@ -728,7 +727,6 @@ isolated function testUtcFromCivilWithEmptyTimeOffsetNegative() returns Error? {
 }
 
 isolated function testUtcFromCivilWithEmptyTimeOffsetAndAbbreviation() returns Error? {
-    Utc expectedUtc = check utcFromString("2021-04-12T23:20:50.520Z");
     Civil civil = {
         year: 2021,
         month: 4,
@@ -760,7 +758,7 @@ isolated function testCivilToStringWithEmptyTimeOffsetAndAbbreviation() returns 
         test:assertEquals(civilString.message(), "the civil value should have either `utcOffset` or `timeAbbrev`");
     } else {
         test:assertFail("civilString should be error");
-    } 
+    }
 }
 
 @test:Config {enable: true}
@@ -769,4 +767,120 @@ isolated function testRepeatedUtcToCivilConversion() returns Error? {
     Civil civil = utcToCivil(utc);
     Utc utc2 = check utcFromCivil(civil);
     test:assertEquals(utc, utc2);
-}   
+}
+
+@test:Config {
+    groups: ["duration"],
+    dataProvider: dataProviderCivilAddDuration
+}
+isolated function testCivilAddDuration(string civilString, Duration duration, string expectedResult) returns Error? {
+    Civil actualResult = check civilAddDuration(check civilFromString(civilString), duration);
+    test:assertEquals(civilToString(actualResult), expectedResult);
+}
+
+isolated function dataProviderCivilAddDuration() returns [string, Duration, string][] {
+    return [
+        ["2025-06-02T10:30:00Z", {years: -1, months: -8, days: -5, hours: -3, minutes: -5, seconds: -6}, "2023-09-27T07:24:54Z"],
+        ["2024-02-27T22:30:30.00+02:00", {years: 0, months: 0, days: 3, hours: 1, minutes: 29, seconds: 30}, "2024-03-02T00:00+02:00"],
+        ["1972-12-31T23:59:59+05:30", {years: 0, months: 15, days: 30, hours: 0, minutes: 0, seconds: 1}, "1974-05-01T00:00+05:30"],
+        ["2025-05-22T08:30:04.67Z", {years: -1, months: 4, days: 0, hours: -23, minutes: 5, seconds: -1}, "2024-09-21T09:35:03.670Z"]
+    ];
+}
+
+@test:Config {
+    groups: ["duration", "zone"],
+    dataProvider: dataProviderZoneDateTimeCivilAddDuration
+}
+isolated function testZoneDataTimeCivilAddDuration(string zone, string civilString, Duration duration, string expectedResult) returns Error? {
+    Zone? systemZone = getZone(zone);
+    test:assertTrue(systemZone is Zone);
+    Civil civil = check (<Zone>systemZone).civilAddDuration(check civilFromString(civilString), duration);
+    test:assertEquals(civilToString(civil), expectedResult);
+}
+
+isolated function dataProviderZoneDateTimeCivilAddDuration() returns [string, string, Duration, string][] {
+    return [
+        ["Asia/Colombo", "2025-06-02T10:30:00+05:30", {years: -1, months: -8, days: -5, hours: -3, minutes: -5, seconds: -6}, "2023-09-27T07:24:54+05:30[Asia/Colombo]"],
+        ["Greenwich", "2025-06-02T10:30:00+05:30", {years: -1, months: -8, days: -5, hours: -3, minutes: -5, seconds: -6}, "2023-09-27T01:54:54Z[Greenwich]"],
+        ["Etc/GMT-9", "2025-06-02T10:30:00+05:30", {years: -1, months: -8, days: -5, hours: -3, minutes: -5, seconds: -6}, "2023-09-27T10:54:54+09:00[Etc/GMT-9]"],
+        ["Asia/Colombo", "2024-02-27T22:30:30.00+02:00", {years: 0, months: 0, days: 3, hours: 1, minutes: 29, seconds: 30}, "2024-03-02T03:30+05:30[Asia/Colombo]"],
+        ["Asia/Tokyo", "2025-05-22T08:30:04.67Z", {years: 1, months: -4, days: 3, hours: 25, minutes: -5, seconds: 111}, "2026-01-26T18:26:55.670+09:00[Asia/Tokyo]"],
+        ["Asia/Colombo", "2025-05-22T08:30:04.67Z", {years: 1, months: -12, days: 1, hours: -24, minutes: 1, seconds: -60}, "2025-05-22T14:00:04.670+05:30[Asia/Colombo]"]
+    ];
+}
+
+@test:Config {
+    groups: ["duration"],
+    dataProvider: dataProviderCivilRecordAddDuration
+}
+isolated function testCivilRecordAddDuration(Civil civilString, Duration duration, string expectedResult) returns Error? {
+    Civil actualResult = check civilAddDuration(civilString, duration);
+    test:assertEquals(civilToString(actualResult), expectedResult);
+}
+
+isolated function dataProviderCivilRecordAddDuration() returns [Civil, Duration, string][] {
+    return [
+        [{year: 2021, month: 4, day: 12, hour: 23, minute: 20, second: 50.52, timeAbbrev: "Z"}, {years: -100, months: -8, days: -5, hours: 22, minutes: 5, seconds: -6}, "1920-08-08T21:25:44.520Z"],
+        [{year: 2025, month: 4, day: 23, hour: 0, minute: 20, second: 1.2, timeAbbrev: "Asia/Colombo"}, {years: 5, months: 0, days: 0, hours: 3, minutes: 8, seconds: 34}, "2030-04-23T03:28:35.200+05:30[Asia/Colombo]"],
+        [{year: 2025, month: 4, day: 23, hour: 0, minute: 20, second: 1.2, utcOffset: {hours: 8, minutes: 0}}, {years: 0, months: 10, days: 5, hours: 0, minutes: 0, seconds: 0}, "2026-02-28T00:20:01.200+08:00"],
+        [{year: 2025, month: 4, day: 23, hour: 0, minute: 20, second: 1.2, timeAbbrev: "America/Los_Angeles", utcOffset: {hours: 8, minutes: 0}}, {years: 0, months: 10, days: 5, hours: 0, minutes: 0, seconds: 0}, "2026-02-28T00:20:01.200+08:00"]
+    ];
+}
+
+@test:Config {
+    groups: ["duration", "zone"],
+    dataProvider: dataProviderZoneDateTimeCivilRecordAddDuration
+}
+isolated function testZoneDataTimeCivilRecordAddDuration(string zone, Civil civil, Duration duration, string expectedResult) returns Error? {
+    Zone? systemZone = getZone(zone);
+    test:assertTrue(systemZone is Zone);
+    Civil result = check (<Zone>systemZone).civilAddDuration(civil, duration);
+    test:assertEquals(civilToString(result), expectedResult);
+}
+
+isolated function dataProviderZoneDateTimeCivilRecordAddDuration() returns [string, Civil, Duration, string][] {
+    return [
+        ["Asia/Colombo", {year: 2021, month: 4, day: 12, hour: 23, minute: 20, second: 50.52, timeAbbrev: "Z"}, {years: -11, months: -8, days: -30, hours: 22, minutes: 5, seconds: -6}, "2009-07-15T02:55:44.520+05:30[Asia/Colombo]"],
+        ["Z", {year: 2025, month: 4, day: 23, hour: 0, minute: 20, second: 1.2, timeAbbrev: "Asia/Colombo"}, {years: 4, months: 7, days: 9, hours: 3, minutes: 8, seconds: 34}, "2029-12-01T21:58:35.200Z"],
+        ["America/Los_Angeles", {year: 2030, month: 4, day: 23, hour: 0, minute: 20, second: 1.2, utcOffset: {hours: 8, minutes: 0}}, {years: 3, months: 10, days: 5, hours: 0, minutes: 0, seconds: 55.5}, "2034-02-27T09:20:56.700-08:00[America/Los_Angeles]"],
+        ["America/Los_Angeles", {year: 2011, month: 4, day: 23, hour: 0, minute: 20, second: 1.2, timeAbbrev: "America/Los_Angeles", utcOffset: {hours: 8, minutes: 0}}, {years: 0, months: 10, days: 6, hours: 0, minutes: 0, seconds: 9.34}, "2012-02-28T09:20:10.540-08:00[America/Los_Angeles]"]
+    ];
+}
+
+@test:Config {
+    groups: ["duration"],
+    dataProvider: dataProviderInvalidCivilAddDuration
+}
+isolated function testInvalidCivilAddDuration(Civil civil, Duration duration, string errorMsg) returns Error? {
+    Civil|Error actualResult = civilAddDuration(civil, duration);
+    test:assertTrue(actualResult is Error);
+    test:assertEquals((<Error>actualResult).message(), errorMsg);
+}
+
+isolated function dataProviderInvalidCivilAddDuration() returns [Civil, Duration, string][] {
+    return [
+        [{year: 2021, month: 4, day: 12, hour: 23, minute: 20, second: 50.52}, {years: -25, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0}, "The civil value should have either `utcOffset` or `timeAbbrev`"],
+        [{year: 2021, month: 4, day: 12, hour: 23, minute: 20, second: 50.52, timeAbbrev: "Colombo"}, {years: -25, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0}, "Unknown time-zone ID: Colombo"],
+        [{year: 2025, month: 13, day: 23, hour: 0, minute: 20, second: 1.2, timeAbbrev: "America/Los_Angeles", utcOffset: {hours: 8, minutes: 0}}, {years: 0, months: 10, days: 5, hours: 0, minutes: 0, seconds: 0}, "Invalid value for MonthOfYear (valid values 1 - 12): 13"]
+    ];
+}
+
+@test:Config {
+    groups: ["duration", "zone"],
+    dataProvider: dataProviderInvalidZoneDateTimeCivilAddDuration
+}
+isolated function testInvalidZoneDataTimeCivilAddDuration(string zone, Civil civil, Duration duration, string errorMsg) returns Error? {
+    Zone? systemZone = getZone(zone);
+    test:assertTrue(systemZone is Zone);
+    Civil|Error result = (<Zone>systemZone).civilAddDuration(civil, duration);
+    test:assertTrue(result is Error);
+    test:assertEquals((<Error>result).message(), errorMsg);
+}
+
+isolated function dataProviderInvalidZoneDateTimeCivilAddDuration() returns [string, Civil, Duration, string][] {
+    return [
+        ["Asia/Colombo", {year: 2021, month: 4, day: 12, hour: 23, minute: 20, second: 50.52, timeAbbrev: "Colombo"}, {years: -1, months: -8, days: -5, hours: -3, minutes: -5, seconds: -6}, "Unknown time-zone ID: Colombo"],
+        ["Asia/Colombo", {year: 2021, month: 4, day: 12, hour: 23, minute: 20, second: 50.52}, {years: -25, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0}, "The civil value should have either `utcOffset` or `timeAbbrev`"],
+        ["Asia/Colombo", {year: 2025, month: 13, day: 23, hour: 0, minute: 20, second: 1.2, timeAbbrev: "America/Los_Angeles", utcOffset: {hours: 8, minutes: 0}}, {years: 0, months: 10, days: 5, hours: 0, minutes: 0, seconds: 0}, "Invalid value for MonthOfYear (valid values 1 - 12): 13"]
+    ];
+}

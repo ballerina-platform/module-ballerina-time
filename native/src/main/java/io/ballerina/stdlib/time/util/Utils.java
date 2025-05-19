@@ -27,6 +27,7 @@ import io.ballerina.runtime.api.values.BString;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -127,4 +128,9 @@ public class Utils {
         return ErrorCreator.createError(ModuleUtils.getModule(), errorType.name(),
                 StringUtils.fromString(errorMsg), null, null);
     }
+
+    public static Duration createTimeDuration(int hours, int minutes, int seconds, int nanoSeconds) {
+        return Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds).plusNanos(nanoSeconds);
+    }
+
 }
