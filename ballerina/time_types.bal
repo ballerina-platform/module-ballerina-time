@@ -43,26 +43,26 @@ public type Utc readonly & [int, decimal];
 
 # Represents Sunday from integer 0.
 public const int SUNDAY = 0;
-# Monday represents from integer 1.
+# Represents Monday from integer 1.
 public const int MONDAY = 1;
-# Tuesday represents from integer 2.
+# Represents Tuesday from integer 2.
 public const int TUESDAY = 2;
-# Wednesday represents from integer 3.
+# Represents Wednesday from integer 3.
 public const int WEDNESDAY = 3;
-# Thursday represents from integer 4.
+# Represents Thursday from integer 4.
 public const int THURSDAY = 4;
-# Friday represents from integer 5.
+# Represents Friday from integer 5.
 public const int FRIDAY = 5;
-# Saturday represents from integer 6.
+# Represents Saturday from integer 6.
 public const int SATURDAY = 6;
 
-# The day of week according to the US convention.
+# Represents the day of week according to the US convention, where the week starts on Sunday.
 public type DayOfWeek SUNDAY|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY;
 
-# Fields of the Date record.
+# Represents fields of the Date record.
 #
-# + month - Month as an integer (1 <= month <= 12)
 # + year - Year as an integer
+# + month - Month as an integer (1 <= month <= 12)
 # + day - Day as an integer (1 <= day <= 31)
 type DateFields record {
     int year;
@@ -70,7 +70,7 @@ type DateFields record {
     int day;
 };
 
-# Fields of the TimeOfDay record.
+# Represents fields of the TimeOfDay record.
 # + hour - Hour as an integer(0 <= hour <= 23)
 # + minute - Minute as an integer(0 <= minute <= 59)
 # + second - Second as decimal value with nanoseconds precision
@@ -80,10 +80,10 @@ type TimeOfDayFields record {
     Seconds second?;
 };
 
-# Date in proleptic Gregorian calendar with all the fields beign optional.
+# Represents a date in the proleptic Gregorian calendar with all fields being optional.
 #
-# + month - Month as an integer(1 <= month <= 12)
 # + year - Year as an integer
+# + month - Month as an integer (1 <= month <= 12)
 # + day - Day as an integer (1 <= day <= 31)
 type OptionalDateFields record {
     int year?;
@@ -91,18 +91,18 @@ type OptionalDateFields record {
     int day?;
 };
 
-# TimeOfDay with all the fields beign optional.
+# Represents a time of day with all fields being optional.
 #
-# + hour - Hour as an integer(0 <= hour <= 23)
-# + minute - Minute as an integer(0 <= minute <= 59)
-# + second - Second as decimal value with nanoseconds precision
+# + hour - Hour as an integer (0 <= hour <= 23)
+# + minute - Minute as an integer (0 <= minute <= 59)
+# + second - Second as a decimal value with nanoseconds precision
 type OptionalTimeOfDayFields record {
     int hour?;
     int minute?;
     Seconds second?;
 };
 
-# Date in proleptic Gregorian calendar.
+# Represents a date in the proleptic Gregorian calendar.
 #
 # + utcOffset - Optional zone offset
 public type Date record {
@@ -111,8 +111,8 @@ public type Date record {
     ZoneOffset utcOffset?;
 };
 
-# Time within a day
-# Not always duration from midnight.
+# Represents time within a day.
+# Not always as a duration from midnight.
 #
 # + utcOffset - Optional zone offset
 public type TimeOfDay record {
@@ -121,13 +121,15 @@ public type TimeOfDay record {
     ZoneOffset utcOffset?;
 };
 
-# This is closed so it is a subtype of Delta
-# Fields can negative
-# if any of the three fields are > 0, then all must be >= 0
-# if any of the three fields are < 0, then all must be <= 0
-# Semantic is that durations should be left out
+# Represents a time zone offset.
+#
+# Constraints:
+# - If any of the fields (`hours`, `minutes`, `seconds`) are > 0, then all must be >= 0.
+# - If any of the fields are < 0, then all must be <= 0.
 public type ZoneOffset readonly & record {|
+    # The hour offset as an integer
     int hours;
+    # The minute offset as an integer (default is 0)
     int minutes = 0;
     # IETF zone files have historical zones that are offset by
     # integer seconds; we use Seconds type so that this is a subtype
@@ -147,8 +149,8 @@ public final ZoneOffset Z = {hours: 0};
 # Represents the type that can be either zero or one.
 public type ZERO_OR_ONE 0|1;
 
-# Time within some region relative to a
-# time scale stipulated by civilian authorities.
+# Represents time within some region relative to a time scale stipulated by civilian authorities.
+#
 # + utcOffset - An optional zone offset
 # + timeAbbrev - If present, abbreviation for the local time (e.g., EDT, EST) in effect at the time represented by this record;
 # this is quite the same as the name of a time zone one time zone can have two abbreviations: one for
@@ -172,7 +174,7 @@ public type Civil record {
     DayOfWeek dayOfWeek?;
 };
 
-# Default zone value representation in different formats.
+# Represents default zone value in different formats.
 public type UtcZoneHandling "0"|"GMT"|"UT"|"Z";
 
 # Represents the time duration used to adjust a civil date-time value by a specified amount.
@@ -195,7 +197,11 @@ public type Duration record {|
     Seconds seconds = 0.0;
 |};
 
-# Indicate how to handle both `zoneOffset` and `timeAbbrev`.
+# Indicates how to handle both `zoneOffset` and `timeAbbrev`.
+#
+# + PREFER_TIME_ABBREV - Prefer the time abbreviation when both `zoneOffset` and `timeAbbrev` are present
+# + PREFER_ZONE_OFFSET - Prefer the zone offset when both `zoneOffset` and `timeAbbrev` are present
+# + ZONE_OFFSET_WITH_TIME_ABBREV_COMMENT - Use the zone offset but include a comment with the time abbreviation
 public enum HeaderZoneHandling {
     PREFER_TIME_ABBREV,
     PREFER_ZONE_OFFSET,
@@ -205,21 +211,22 @@ public enum HeaderZoneHandling {
 # Abstract object representation to handle time zones.  
 public type Zone readonly & object {
 
-    # If always at a fixed offset from Utc, then this function returns it; otherwise nil.
+    # Returns the fixed zone offset if the time zone is always at a fixed offset from UTC; otherwise, returns nil.
     #
     # + return - The fixed zone offset or nil
     public isolated function fixedOffset() returns ZoneOffset?;
 
-    # Converts a given `time:Civil` value to an `time:Utc` timestamp based on the time zone value.
+    # Converts a given civil record to a UTC timestamp based on the time zone value.
     #
-    # + civil - The `time:Civil` value to be converted
-    # + return - The corresponding `time:Utc` value or an error if `civil.timeAbbrev` is missing
+    # + civil - The civil record to be converted
+    # + return - The corresponding UTC value or an error if `timeAbbrev` is missing
     public isolated function utcFromCivil(Civil civil) returns Utc|Error;
 
-    # Converts a given `time:Utc` timestamp to a `time:Civil` value based on the time zone value.
+    # Converts a given UTC timestamp to a civil record based on the time zone value.
     #
-    # + utc - The `time:Utc` timestamp value to be converted
-    # + return - The corresponding `time:Civil` value
+    # + utc - The UTC time as a tuple `[int, decimal]`, where the first element is the seconds from the epoch
+    #         and the second element is the fractional part of the last second.
+    # + return - The corresponding civil record
     public isolated function utcToCivil(Utc utc) returns Civil;
 
     # Adds the given time duration to the specified civil date-time based on the time zone.
@@ -236,7 +243,7 @@ public type Zone readonly & object {
 public readonly class TimeZone {
     *Zone;
 
-    # Initialize a TimeZone class using a zone ID.
+    # Initializes a `TimeZone` object using a zone ID or the system default time zone.
     #
     # + zoneId - Zone ID as a string or nil to initialize a TimeZone object with the system default time zone
     # + return - An `time:Error` if the zone ID is invalid, otherwise nil
@@ -248,17 +255,17 @@ public readonly class TimeZone {
         }
     }
 
-    # If always at a fixed offset from Utc, then this function returns it; otherwise nil.
+    # Returns the fixed zone offset if the time zone is always at a fixed offset from UTC; otherwise, returns nil.
     #
     # + return - The fixed zone offset or nil
     public isolated function fixedOffset() returns ZoneOffset? {
         return externTimeZoneFixedOffset(self);
     }
 
-    # Converts a given `time:Civil` value to an `time:Utc` timestamp based on the time zone value.
+    # Converts a given civil record to a UTC timestamp based on the time zone value.
     #
-    # + civil - The `time:Civil` value to be converted
-    # + return - The corresponding `time:Utc` value or an error if `civil.timeAbbrev` is missing
+    # + civil - The civil record to be converted
+    # + return - The corresponding UTC value or an error if `timeAbbrev` is missing
     public isolated function utcFromCivil(Civil civil) returns Utc|Error {
         string? timeAbbrev = civil?.timeAbbrev;
         if timeAbbrev is () {
@@ -270,10 +277,10 @@ public readonly class TimeZone {
         return externTimeZoneUtcFromCivil(self, civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds, timeAbbrev, PREFER_TIME_ABBREV);
     }
 
-    # Converts a given `time:Utc` timestamp to a `time:Civil` value based on the time zone value.
+    # Converts a given UTC timestamp to a civil record based on the time zone value.
     #
-    # + utc - The `time:Utc` timestamp value to be converted
-    # + return - The corresponding `time:Civil` value
+    # + utc - The UTC timestamp value to be converted
+    # + return - The corresponding civil record
     public isolated function utcToCivil(Utc utc) returns Civil {
         return externTimeZoneUtcToCivil(self, utc);
     }
@@ -308,21 +315,21 @@ public readonly class TimeZone {
     }
 }
 
-# Load the default time zone of the system.
+# Loads the default time zone of the system.
 # ```ballerina
 # time:Zone|time:Error zone = time:loadSystemZone();
 # ```
-# + return - Zone value or error when the zone ID of the system is in invalid format. 
+# + return - The system's default zone value or error when the zone ID of the system is in invalid format.
 public isolated function loadSystemZone() returns Zone|Error {
     return check new TimeZone();
 }
 
-# Return the time zone object of a given zone ID.
+# Returns the time zone object for a given zone ID.
 # ```ballerina
 # time:Zone? zone = time:getZone("Asia/Colombo");
 # ```
 # + id - Time zone ID in the format of ("Continent/City")
-# + return - Corresponding time zone object or null
+# + return - Corresponding time zone object or `nil` if the zone ID is invalid or not found.
 public isolated function getZone(string id) returns Zone? {
     TimeZone|Error timeZone = new TimeZone(id);
     if timeZone is TimeZone {
