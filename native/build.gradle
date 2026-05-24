@@ -45,7 +45,7 @@ spotbugsMain {
     ignoreFailures = true
     effort = SpotBugsEffort.MAX
     reportLevel = SpotBugsConfidence.LOW
-    reportsDir = file("$project.buildDir/reports/spotbugs")
+    reportsDir = layout.buildDirectory.dir("reports/spotbugs").get().asFile
     reports {
         html.required = true
         text.required = true
