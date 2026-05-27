@@ -119,6 +119,7 @@ task patchBallerinaScripts(type: PatchBallerinaScriptsTask) {
 }
 
 build.dependsOn patchBallerinaScripts
+test.dependsOn patchBallerinaScripts
 
 publishing {
     publications {
