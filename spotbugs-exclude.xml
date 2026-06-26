@@ -22,15 +22,19 @@
     </Match>
     <!-- Pre-existing issues surfaced by SpotBugs 4.9.x (bundled in plugin >= 6.2.0) -->
     <Match>
+        <Package name="~io\.ballerina\.stdlib\.time.*"/>
         <BugCode name="THROWS"/>
     </Match>
     <Match>
+        <Package name="~io\.ballerina\.stdlib\.time.*"/>
         <BugCode name="AT"/>
     </Match>
     <Match>
+        <Package name="~io\.ballerina\.stdlib\.time.*"/>
         <BugCode name="USELESS_STRING"/>
     </Match>
     <Match>
+        <Package name="~io\.ballerina\.stdlib\.time.*"/>
         <BugCode name="DM"/>
     </Match>
 </FindBugsFilter>
