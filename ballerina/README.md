@@ -1,5 +1,3 @@
-# Ballerina Time Library
-
 ## Overview
 
 This module provides APIs to generate and manipulate UTC and localized
