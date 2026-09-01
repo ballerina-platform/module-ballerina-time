@@ -1,15 +1,24 @@
-## Overview
+Ballerina Time Library
+===================
 
-This module provides a set of APIs that have the capabilities to generate and manipulate UTC and localized time.
+Overview
+--------
 
-In cloud computing, the most essential type of time is UTC. Coordinated Universal Time (UTC) is the primary time standard on which the world agreed. 
-UTC is independent of daylight saving time and provides a unique time value for the entire world. 
-The definition of UTC started from the epoc `1970-01-01T00:00:00Z`. Initially, humans divided a day into 86400 seconds.
-However, the Earth rotation does not adhere to this time duration as the Earth is slowing down and the day is getting longer.
-As a result, a solar day in 2012 is longer than 86400 SI seconds.
-To correct this incompatibility, additional seconds have been added to the UTC scale, which is known as leap-seconds.
+This module provides APIs to generate and manipulate UTC and localized
+time, with nanosecond precision and support for complex cases such as
+leap seconds and daylight saving time.
 
-The focus of this module is to give the most precise UTC with nanoseconds precision and also handle some complex use cases such as leap seconds and daylight time-saving.
+Key Features
+------------
+
+- UTC time generation and manipulation with nanosecond precision
+- Monotonic time for measuring elapsed durations from an unspecified epoch
+- Civil (localized) time with date, time, timezone, and daylight saving information
+- Time zone lookup by zone ID or system default
+- Conversions between UTC, Civil, and RFC 3339 string representations
+
+Module Details
+--------------
 
 ### UTC time
 The `time:Utc` is the tuple representation of the UTC. The UTC represents the number of seconds from a
@@ -86,4 +95,3 @@ time:Civil civil = time:utcToCivil(utc);
 // Converts a given Civil to a UTC.
 time:Utc utc = time:utcFromCivil(civil);
 ```
-
