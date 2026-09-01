@@ -1,5 +1,4 @@
-Ballerina Time Library
-===================
+# Ballerina Time Library
 
   [![Build](https://github.com/ballerina-platform/module-ballerina-time/actions/workflows/build-timestamped-master.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-time/actions/workflows/build-timestamped-master.yml)
   [![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-time/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-time)
@@ -8,15 +7,13 @@ Ballerina Time Library
   [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-time.svg)](https://github.com/ballerina-platform/module-ballerina-time/commits/master)
   [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/time.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Ftime)
 
-Overview
---------
+## Overview
 
 This module provides APIs to generate and manipulate UTC and localized
 time, with nanosecond precision and support for complex cases such as
 leap seconds and daylight saving time.
 
-Key Features
-------------
+## Key Features
 
 - UTC time generation and manipulation with nanosecond precision
 - Monotonic time for measuring elapsed durations from an unspecified epoch
@@ -24,8 +21,7 @@ Key Features
 - Time zone lookup by zone ID or system default
 - Conversions between UTC, Civil, and RFC 3339 string representations
 
-Module Details
---------------
+## Module Details
 
 ### UTC time
 The `time:Utc` is the tuple representation of the UTC. The UTC represents the number of seconds from a
