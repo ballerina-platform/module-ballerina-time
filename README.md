@@ -13,16 +13,6 @@ This module provides APIs to generate and manipulate UTC and localized
 time, with nanosecond precision and support for complex cases such as
 leap seconds and daylight saving time.
 
-## Key Features
-
-- UTC time generation and manipulation with nanosecond precision
-- Monotonic time for measuring elapsed durations from an unspecified epoch
-- Civil (localized) time with date, time, timezone, and daylight saving information
-- Time zone lookup by zone ID or system default
-- Conversions between UTC, Civil, and RFC 3339 string representations
-
-## Module Details
-
 ### UTC time
 The `time:Utc` is the tuple representation of the UTC. The UTC represents the number of seconds from a
 specified epoch. Here, the epoch is the UNIX epoch of 1970-01-01T00:00:00Z.

@@ -12,8 +12,6 @@ leap seconds and daylight saving time.
 - Time zone lookup by zone ID or system default
 - Conversions between UTC, Civil, and RFC 3339 string representations
 
-## Module Details
-
 ### UTC time
 The `time:Utc` is the tuple representation of the UTC. The UTC represents the number of seconds from a
 specified epoch. Here, the epoch is the UNIX epoch of 1970-01-01T00:00:00Z.
