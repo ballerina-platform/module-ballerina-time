@@ -1,8 +1,6 @@
 ## Overview
 
-This module provides APIs to generate and manipulate UTC and localized
-time, with nanosecond precision and support for complex cases such as
-leap seconds and daylight saving time.
+This module provides APIs to generate and manipulate UTC and localized time, with nanosecond precision and support for complex cases such as leap seconds and daylight saving time.
 
 ## Key Features
 
@@ -13,8 +11,7 @@ leap seconds and daylight saving time.
 - Conversions between UTC, Civil, and RFC 3339 string representations
 
 ### UTC time
-The `time:Utc` is the tuple representation of the UTC. The UTC represents the number of seconds from a
-specified epoch. Here, the epoch is the UNIX epoch of 1970-01-01T00:00:00Z.
+The `time:Utc` is the tuple representation of the UTC. The UTC represents the number of seconds from a specified epoch. Here, the epoch is the UNIX epoch of 1970-01-01T00:00:00Z.
 
 Use the following API to get the current epoch time:
 ```ballerina
@@ -87,3 +84,4 @@ time:Civil civil = time:utcToCivil(utc);
 // Converts a given Civil to a UTC.
 time:Utc utc = time:utcFromCivil(civil);
 ```
+

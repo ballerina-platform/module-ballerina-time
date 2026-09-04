@@ -9,9 +9,7 @@
 
 ## Overview
 
-This module provides APIs to generate and manipulate UTC and localized
-time, with nanosecond precision and support for complex cases such as
-leap seconds and daylight saving time.
+This module provides APIs to generate and manipulate UTC and localized time, with nanosecond precision and support for complex cases such as leap seconds and daylight saving time.
 
 ### UTC time
 The `time:Utc` is the tuple representation of the UTC. The UTC represents the number of seconds from a
