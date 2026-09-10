@@ -1,5 +1,4 @@
-Ballerina Time Library
-===================
+# Ballerina Time Library
 
   [![Build](https://github.com/ballerina-platform/module-ballerina-time/actions/workflows/build-timestamped-master.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-time/actions/workflows/build-timestamped-master.yml)
   [![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-time/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-time)
@@ -8,16 +7,9 @@ Ballerina Time Library
   [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-time.svg)](https://github.com/ballerina-platform/module-ballerina-time/commits/master)
   [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/time.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Ftime)
 
-This library provides a set of APIs that have the capabilities to generate and manipulate UTC and localized time.
+## Overview
 
-In cloud computing, the most essential type of time is UTC. Coordinated Universal Time (UTC) is the primary time standard on which the world agreed.
-UTC is independent of daylight saving time and provides a unique time value for the entire world.
-The definition of UTC started from the epoc `1970-01-01T00:00:00Z`. Initially, humans divided a day into 86400 seconds.
-However, the Earth rotation does not adhere to this time duration as the Earth is slowing down and the day is getting longer.
-As a result, a solar day in 2012 is longer than 86400 SI seconds.
-To correct this incompatibility, additional seconds have been added to the UTC scale, which is known as leap-seconds.
-
-The focus of this library is to give the most precise UTC with nanoseconds precision and also handle some complex use cases such as leap seconds and daylight time-saving.
+This module provides APIs to generate and manipulate UTC and localized time, with nanosecond precision and support for complex cases such as leap seconds and daylight saving time.
 
 ### UTC time
 The `time:Utc` is the tuple representation of the UTC. The UTC represents the number of seconds from a
@@ -117,44 +109,44 @@ This repository only contains the source code for the package.
 Execute the commands below to build from source.
 
 1. To build the library:
-   ```    
+   ```shell
    ./gradlew clean build
    ```
 
 1. To run the integration tests:
-   ```
+   ```shell
    ./gradlew clean test
    ```
 1. To build the module without the tests:
-   ```
+   ```shell
    ./gradlew clean build -x test
    ```
 1. To debug module implementation:
-   ```
+   ```shell
    ./gradlew clean build -Pdebug=<port>
    ./gradlew clean test -Pdebug=<port>
    ```
 1. To debug the module with Ballerina language:
-   ```
+   ```shell
    ./gradlew clean build -PbalJavaDebug=<port>
    ./gradlew clean test -PbalJavaDebug=<port>
    ```
 1. Publish ZIP artifact to the local `.m2` repository:
-   ```
+   ```shell
    ./gradlew clean build publishToMavenLocal
    ```
 1. Publish the generated artifacts to the local Ballerina central repository:
-   ```
+   ```shell
    ./gradlew clean build -PpublishToLocalCentral=true
    ```
 1. Publish the generated artifacts to the Ballerina central repository:
-   ```
+   ```shell
    ./gradlew clean build -PpublishToCentral=true
    ```      
 
 ## Contribute to Ballerina
 
-As an open source project, Ballerina welcomes contributions from the community.
+As an open-source project, Ballerina welcomes contributions from the community.
 
 For more information, go to the [contribution guidelines](https://github.com/ballerina-platform/ballerina-lang/blob/master/CONTRIBUTING.md).
 
