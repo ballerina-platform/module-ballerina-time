@@ -2,7 +2,7 @@
 
 This module provides APIs to generate and manipulate UTC and localized time, with nanosecond precision and support for complex cases such as leap seconds and daylight saving time.
 
-## Key Features
+### Key Features
 
 - UTC time generation and manipulation with nanosecond precision
 - Monotonic time for measuring elapsed durations from an unspecified epoch
