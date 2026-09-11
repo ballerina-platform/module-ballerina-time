@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### Changed
+
+[[#9111] Updated Keywords and Reformat README for Connector Store Discoverability](https://github.com/ballerina-platform/ballerina-library/issues/9111)
+
 ### Added
 
 - [Add support for custom time duration calculations](https://github.com/ballerina-platform/ballerina-library/issues/6840)
