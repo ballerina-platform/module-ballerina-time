@@ -94,6 +94,14 @@ release {
     }
 }
 
-tasks.named('build') {
-    dependsOn('time-ballerina:build')
+if (tasks.names.contains('build')) {
+    tasks.named('build') {
+        dependsOn('time-ballerina:build')
+
+    }
+} else {
+    tasks.register('build') {
+        dependsOn('time-ballerina:build')
+
+    }
 }
