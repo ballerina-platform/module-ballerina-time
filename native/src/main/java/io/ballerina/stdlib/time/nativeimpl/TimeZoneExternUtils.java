@@ -68,10 +68,14 @@ public class TimeZoneExternUtils {
                                                     long minute, BDecimal second, BString zoneAbbr,
                                                     BString zoneHandling) {
 
-        Zone zone = (Zone) timeZoneObj.getNativeData(ZONE_ID_ENTRY);
-        ZonedDateTime zonedDateTime = Utils.createZoneDateTimeFromCivilValues(year, month, day, hour, minute,
-                second, 0, 0, BDecimal.valueOf(0), zoneAbbr, zoneHandling.getValue());
-        return zone.utcFromCivil(new Civil(zonedDateTime)).build();
+        try {
+            Zone zone = (Zone) timeZoneObj.getNativeData(ZONE_ID_ENTRY);
+            ZonedDateTime zonedDateTime = Utils.createZoneDateTimeFromCivilValues(year, month, day, hour, minute,
+                    second, 0, 0, BDecimal.valueOf(0), zoneAbbr, zoneHandling.getValue());
+            return zone.utcFromCivil(new Civil(zonedDateTime)).build();
+        } catch (DateTimeException e) {
+            return Utils.createError(Errors.FormatError, e.getMessage());
+        }
     }
 
     public static BMap externTimeZoneUtcToCivil(BObject timeZoneObj, BArray utc) {

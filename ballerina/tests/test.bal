@@ -884,3 +884,26 @@ isolated function dataProviderInvalidZoneDateTimeCivilAddDuration() returns [str
         ["Asia/Colombo", {year: 2025, month: 13, day: 23, hour: 0, minute: 20, second: 1.2, timeAbbrev: "America/Los_Angeles", utcOffset: {hours: 8, minutes: 0}}, {years: 0, months: 10, days: 5, hours: 0, minutes: 0, seconds: 0}, "Invalid value for MonthOfYear (valid values 1 - 12): 13"]
     ];
 }
+
+@test:Config {
+    groups: ["zone"],
+    dataProvider: dataProviderInvalidCivilForZoneUtcFromCivil
+}
+isolated function testZoneUtcFromCivilWithInvalidCivil(Civil civil) returns Error? {
+    TimeZone zone = check new ("Asia/Colombo");
+    Utc|Error result = zone.utcFromCivil(civil);
+    if result is Utc {
+        test:assertFail(string `Expected an error for civil ${civil.toString()}`);
+    }
+    test:assertTrue(result is FormatError);
+    test:assertNotEquals(result.message(), "");
+}
+
+isolated function dataProviderInvalidCivilForZoneUtcFromCivil() returns [Civil][] {
+    return [
+        [{year: 2025, month: 4, day: 25, hour: 1, minute: 0, timeAbbrev: "Asia/Colmbo"}],
+        [{year: 2025, month: 2, day: 30, hour: 1, minute: 0, timeAbbrev: "Asia/Colombo"}],
+        [{year: 2025, month: 13, day: 1, hour: 1, minute: 0, timeAbbrev: "Asia/Colombo"}],
+        [{year: 2025, month: 2, day: 3, hour: 1, minute: 0, timeAbbrev: ""}]
+    ];
+}
