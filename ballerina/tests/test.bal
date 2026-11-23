@@ -884,3 +884,35 @@ isolated function dataProviderInvalidZoneDateTimeCivilAddDuration() returns [str
         ["Asia/Colombo", {year: 2025, month: 13, day: 23, hour: 0, minute: 20, second: 1.2, timeAbbrev: "America/Los_Angeles", utcOffset: {hours: 8, minutes: 0}}, {years: 0, months: 10, days: 5, hours: 0, minutes: 0, seconds: 0}, "Invalid value for MonthOfYear (valid values 1 - 12): 13"]
     ];
 }
+
+@test:Config {
+    groups: ["duration"],
+    dataProvider: dataProviderDurationsWithWeeks
+}
+isolated function testCivilAddDurationWithWeeks(Duration duration, string expected) returns Error? {
+    Civil civil = check civilFromString("2025-04-25T10:15:30Z");
+    test:assertEquals(check civilToString(check civilAddDuration(civil, duration)), expected);
+    TimeZone zone = check new ("Asia/Colombo");
+    Civil zoneResult = check zone.civilAddDuration(civil, duration);
+    test:assertEquals(utcToString(check zone.utcFromCivil(zoneResult)), expected);
+}
+
+isolated function dataProviderDurationsWithWeeks() returns [Duration, string][] {
+    return [
+        [{weeks: 2}, "2025-05-09T10:15:30Z"],
+        [{weeks: 1, days: 1}, "2025-05-03T10:15:30Z"],
+        [{weeks: -1}, "2025-04-18T10:15:30Z"]
+    ];
+}
+
+@test:Config {
+    groups: ["duration"]
+}
+isolated function testCivilAddDurationWithOverflowingWeeks() returns Error? {
+    Civil civil = check civilFromString("2025-04-25T10:15:30Z");
+    Civil|Error result = civilAddDuration(civil, {weeks: int:MAX_VALUE});
+    if result is Civil {
+        test:assertFail(string `Expected an error, found ${result.toString()}`);
+    }
+    test:assertEquals(result.message(), "Duration is out of range");
+}
