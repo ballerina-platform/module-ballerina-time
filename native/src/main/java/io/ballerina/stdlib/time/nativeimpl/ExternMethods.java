@@ -37,6 +37,7 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 
 /**
  * Extern methods used in Ballerina Time library.
@@ -96,11 +97,11 @@ public class ExternMethods {
 
     public static Object externDateValidate(BMap date) {
 
-        int year = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_YEAR_BSTRING));
-        int month = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_MONTH_BSTRING));
-        int day = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_DAY_BSTRING));
         try {
-            LocalDate.of(year, month, day);
+            LocalDate.of(ChronoField.YEAR.checkValidIntValue(date.getIntValue(Constants.DATE_RECORD_YEAR_BSTRING)),
+                    ChronoField.MONTH_OF_YEAR.checkValidIntValue(
+                            date.getIntValue(Constants.DATE_RECORD_MONTH_BSTRING)),
+                    ChronoField.DAY_OF_MONTH.checkValidIntValue(date.getIntValue(Constants.DATE_RECORD_DAY_BSTRING)));
             return null;
         } catch (DateTimeException e) {
             return Utils.createError(Errors.FormatError, e.getMessage());
