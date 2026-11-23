@@ -932,3 +932,26 @@ isolated function testWhichFieldAtDstOverlap() returns Error? {
     Civil withoutWhich = {year: 2025, month: 10, day: 26, hour: 2, minute: 30, timeAbbrev: "Europe/Berlin"};
     test:assertEquals(check zone.utcFromCivil(withoutWhich), check utcFromString("2025-10-26T00:30:00Z"));
 }
+
+@test:Config {
+    groups: ["zone", "dst"],
+    dataProvider: dataProviderOverlapCivilWithOffsetAndAbbrev
+}
+isolated function testExplicitUtcOffsetSelectsOccurrenceAtDstOverlap(ZoneOffset utcOffset, ZERO_OR_ONE? which,
+        string expectedUtc, string expectedEmail) returns Error? {
+    TimeZone zone = check new ("Europe/Berlin");
+    Civil civil = {year: 2025, month: 10, day: 26, hour: 2, minute: 30, timeAbbrev: "Europe/Berlin",
+        utcOffset, which};
+    test:assertEquals(utcToString(check zone.utcFromCivil(civil)), expectedUtc);
+    test:assertEquals(check civilToEmailString(civil, ZONE_OFFSET_WITH_TIME_ABBREV_COMMENT), expectedEmail);
+    test:assertEquals(check civilToEmailString(civil, PREFER_TIME_ABBREV), expectedEmail);
+}
+
+isolated function dataProviderOverlapCivilWithOffsetAndAbbrev() returns [ZoneOffset, ZERO_OR_ONE?, string, string][] {
+    return [
+        [{hours: 1}, (), "2025-10-26T01:30:00Z", "Sun, 26 Oct 2025 02:30:00 +0100 (CET)"],
+        [{hours: 2}, 1, "2025-10-26T00:30:00Z", "Sun, 26 Oct 2025 02:30:00 +0200 (CEST)"],
+        [{hours: 5, minutes: 30}, (), "2025-10-26T00:30:00Z", "Sun, 26 Oct 2025 02:30:00 +0200 (CEST)"],
+        [{hours: 5, minutes: 30}, 1, "2025-10-26T01:30:00Z", "Sun, 26 Oct 2025 02:30:00 +0100 (CET)"]
+    ];
+}

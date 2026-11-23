@@ -65,12 +65,14 @@ public class TimeZoneExternUtils {
     }
 
     public static Object externTimeZoneUtcFromCivil(BObject timeZoneObj, long year, long month, long day, long hour,
-                                                    long minute, BDecimal second, BString zoneAbbr,
-                                                    BString zoneHandling, boolean laterOffsetAtOverlap) {
+                                                    long minute, BDecimal second, long zoneHour, long zoneMinute,
+                                                    BDecimal zoneSecond, BString zoneAbbr, BString zoneHandling,
+                                                    boolean hasZoneOffset, boolean laterOffsetAtOverlap) {
 
         Zone zone = (Zone) timeZoneObj.getNativeData(ZONE_ID_ENTRY);
         ZonedDateTime zonedDateTime = Utils.createZoneDateTimeFromCivilValues(year, month, day, hour, minute,
-                second, 0, 0, BDecimal.valueOf(0), zoneAbbr, zoneHandling.getValue(), laterOffsetAtOverlap);
+                second, zoneHour, zoneMinute, zoneSecond, zoneAbbr, zoneHandling.getValue(), hasZoneOffset,
+                laterOffsetAtOverlap);
         return zone.utcFromCivil(new Civil(zonedDateTime)).build();
     }
 
@@ -85,11 +87,12 @@ public class TimeZoneExternUtils {
                                                         int zoneHour, int zoneMinute, BDecimal zoneSecond,
                                                         BString zoneAbbrev, BString zoneHandling, int duYears,
                                                         int duMonths, int duDays, int duHours, int duMinutes,
-                                                        BDecimal duSeconds, boolean laterOffsetAtOverlap) {
+                                                        BDecimal duSeconds, boolean hasZoneOffset,
+                                                        boolean laterOffsetAtOverlap) {
         try {
             Zone zone = (Zone) timeZoneObj.getNativeData(ZONE_ID_ENTRY);
             ZonedDateTime zonedDateTime = Utils.createZoneDateTimeFromCivilValues(year, month, day, hour, minute,
-                    second, zoneHour, zoneMinute, zoneSecond, zoneAbbrev, zoneHandling.getValue(),
+                    second, zoneHour, zoneMinute, zoneSecond, zoneAbbrev, zoneHandling.getValue(), hasZoneOffset,
                     laterOffsetAtOverlap);
             CustomDuration customDuration = new CustomDuration(duYears, duMonths, duDays, duHours, duMinutes,
                     duSeconds);

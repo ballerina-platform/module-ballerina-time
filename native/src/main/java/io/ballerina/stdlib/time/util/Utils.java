@@ -108,13 +108,14 @@ public class Utils {
                                                                   BString zoneAbbr, String zoneHandling) {
 
         return createZoneDateTimeFromCivilValues(year, month, day, hour, minute, second, zoneHour, zoneMinute,
-                zoneSecond, zoneAbbr, zoneHandling, false);
+                zoneSecond, zoneAbbr, zoneHandling, false, false);
     }
 
     public static ZonedDateTime createZoneDateTimeFromCivilValues(long year, long month, long day, long hour,
                                                                   long minute, BDecimal second, long zoneHour,
                                                                   long zoneMinute, BDecimal zoneSecond,
                                                                   BString zoneAbbr, String zoneHandling,
+                                                                  boolean hasZoneOffset,
                                                                   boolean laterOffsetAtOverlap) {
 
         ZoneId zoneId;
@@ -131,6 +132,15 @@ public class Utils {
         ZonedDateTime zonedDateTime = ZonedDateTime.of(
                 Long.valueOf(year).intValue(), Long.valueOf(month).intValue(), Long.valueOf(day).intValue(),
                 Long.valueOf(hour).intValue(), Long.valueOf(minute).intValue(), intSecond, intNanoSecond, zoneId);
+        if (hasZoneOffset) {
+            // When a region zone has two valid offsets, an explicit matching offset picks the occurrence.
+            ZoneOffset zoneOffset = ZoneOffset.ofHoursMinutesSeconds(Long.valueOf(zoneHour).intValue(),
+                    Long.valueOf(zoneMinute).intValue(), intZoneSecond);
+            ZonedDateTime withZoneOffset = ZonedDateTime.ofLocal(zonedDateTime.toLocalDateTime(), zoneId, zoneOffset);
+            if (withZoneOffset.getOffset().equals(zoneOffset)) {
+                return withZoneOffset;
+            }
+        }
         return laterOffsetAtOverlap ? zonedDateTime.withLaterOffsetAtOverlap() : zonedDateTime;
     }
 
