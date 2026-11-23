@@ -27,6 +27,7 @@ import io.ballerina.runtime.api.values.BString;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -134,14 +135,23 @@ public class Utils {
                 Long.valueOf(hour).intValue(), Long.valueOf(minute).intValue(), intSecond, intNanoSecond, zoneId);
         if (hasZoneOffset) {
             // When a region zone has two valid offsets, an explicit matching offset picks the occurrence.
-            ZoneOffset zoneOffset = ZoneOffset.ofHoursMinutesSeconds(Long.valueOf(zoneHour).intValue(),
-                    Long.valueOf(zoneMinute).intValue(), intZoneSecond);
+            ZoneOffset zoneOffset = toZoneOffsetOrNull(zoneHour, zoneMinute, intZoneSecond);
             ZonedDateTime withZoneOffset = ZonedDateTime.ofLocal(zonedDateTime.toLocalDateTime(), zoneId, zoneOffset);
             if (withZoneOffset.getOffset().equals(zoneOffset)) {
                 return withZoneOffset;
             }
         }
         return laterOffsetAtOverlap ? zonedDateTime.withLaterOffsetAtOverlap() : zonedDateTime;
+    }
+
+    // An offset that is not a valid ZoneOffset cannot match, so the abbreviation-based resolution applies.
+    private static ZoneOffset toZoneOffsetOrNull(long zoneHour, long zoneMinute, int zoneSecond) {
+        try {
+            return ZoneOffset.ofHoursMinutesSeconds(Long.valueOf(zoneHour).intValue(),
+                    Long.valueOf(zoneMinute).intValue(), zoneSecond);
+        } catch (DateTimeException e) {
+            return null;
+        }
     }
 
     public static BError createError(Errors errorType, String errorMsg) {

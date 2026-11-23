@@ -952,6 +952,8 @@ isolated function dataProviderOverlapCivilWithOffsetAndAbbrev() returns [ZoneOff
         [{hours: 1}, (), "2025-10-26T01:30:00Z", "Sun, 26 Oct 2025 02:30:00 +0100 (CET)"],
         [{hours: 2}, 1, "2025-10-26T00:30:00Z", "Sun, 26 Oct 2025 02:30:00 +0200 (CEST)"],
         [{hours: 5, minutes: 30}, (), "2025-10-26T00:30:00Z", "Sun, 26 Oct 2025 02:30:00 +0200 (CEST)"],
-        [{hours: 5, minutes: 30}, 1, "2025-10-26T01:30:00Z", "Sun, 26 Oct 2025 02:30:00 +0100 (CET)"]
+        [{hours: 5, minutes: 30}, 1, "2025-10-26T01:30:00Z", "Sun, 26 Oct 2025 02:30:00 +0100 (CET)"],
+        [{hours: 19}, (), "2025-10-26T00:30:00Z", "Sun, 26 Oct 2025 02:30:00 +0200 (CEST)"],
+        [{hours: 19}, 1, "2025-10-26T01:30:00Z", "Sun, 26 Oct 2025 02:30:00 +0100 (CET)"]
     ];
 }
