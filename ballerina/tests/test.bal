@@ -910,9 +910,13 @@ isolated function dataProviderDurationsWithWeeks() returns [Duration, string][] 
 }
 isolated function testCivilAddDurationWithOverflowingWeeks() returns Error? {
     Civil civil = check civilFromString("2025-04-25T10:15:30Z");
-    Civil|Error result = civilAddDuration(civil, {weeks: int:MAX_VALUE});
-    if result is Civil {
-        test:assertFail(string `Expected an error, found ${result.toString()}`);
+    TimeZone zone = check new ("Asia/Colombo");
+    (Civil|Error)[] results = [civilAddDuration(civil, {weeks: int:MAX_VALUE}),
+        zone.civilAddDuration(civil, {weeks: int:MAX_VALUE})];
+    foreach Civil|Error result in results {
+        if result is Civil {
+            test:assertFail(string `Expected an error, found ${result.toString()}`);
+        }
+        test:assertEquals(result.message(), "Duration is out of range");
     }
-    test:assertEquals(result.message(), "Duration is out of range");
 }
