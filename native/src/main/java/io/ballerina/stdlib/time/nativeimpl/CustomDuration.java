@@ -21,7 +21,12 @@ import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.stdlib.time.util.Constants;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.time.DateTimeException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * This {@link CustomDuration} record represents a custom duration with various time components.
@@ -35,9 +40,14 @@ import java.math.RoundingMode;
  *
  * @since 2.8.0
  */
-public record CustomDuration(int years, int months, int days, int hours, int minutes, int seconds, int nanoSeconds) {
+public record CustomDuration(long years, long months, long days, long hours, long minutes, long seconds,
+                             long nanoSeconds) {
 
-    public CustomDuration(int years, int months, int days, int hours, int minutes, BDecimal seconds) {
+    private static final BigInteger MONTHS_PER_YEAR = BigInteger.valueOf(12);
+    private static final BigInteger SECONDS_PER_HOUR = BigInteger.valueOf(3600);
+    private static final BigInteger SECONDS_PER_MINUTE = BigInteger.valueOf(60);
+
+    public CustomDuration(long years, long months, long days, long hours, long minutes, BDecimal seconds) {
         this(
             years,
             months,
@@ -49,17 +59,41 @@ public record CustomDuration(int years, int months, int days, int hours, int min
         );
     }
 
-    private static int getSeconds(BDecimal seconds) {
-        BigDecimal decimal = seconds.decimalValue();
-        return decimal.setScale(0, RoundingMode.FLOOR).intValue();
+    /**
+     * Adds the years, months and days to the local date-time and resolves the zone once, exactly as
+     * {@code ZonedDateTime.plus(Period)} does, then adds the hours, minutes and seconds as elapsed time.
+     */
+    public ZonedDateTime addTo(ZonedDateTime zonedDateTime) {
+        try {
+            long totalMonths = BigInteger.valueOf(years).multiply(MONTHS_PER_YEAR).add(BigInteger.valueOf(months))
+                    .longValueExact();
+            LocalDateTime localDateTime = zonedDateTime.toLocalDateTime().plusMonths(totalMonths).plusDays(days);
+            ZonedDateTime dateShifted = ZonedDateTime.ofLocal(localDateTime, zonedDateTime.getZone(),
+                    zonedDateTime.getOffset());
+            long totalSeconds = BigInteger.valueOf(hours).multiply(SECONDS_PER_HOUR)
+                    .add(BigInteger.valueOf(minutes).multiply(SECONDS_PER_MINUTE))
+                    .add(BigInteger.valueOf(seconds)).longValueExact();
+            return dateShifted.plus(Duration.ofSeconds(totalSeconds, nanoSeconds));
+        } catch (ArithmeticException e) {
+            throw new DateTimeException("Duration is out of range", e);
+        }
     }
 
-    private static int getNanoSeconds(BDecimal seconds) {
+    private static long getSeconds(BDecimal seconds) {
+        try {
+            return seconds.decimalValue().setScale(0, RoundingMode.FLOOR).longValueExact();
+        } catch (ArithmeticException e) {
+            throw new DateTimeException("Duration seconds is out of range: " +
+                    seconds.decimalValue().toPlainString(), e);
+        }
+    }
+
+    private static long getNanoSeconds(BDecimal seconds) {
         BigDecimal decimal = seconds.decimalValue();
-        BigDecimal fractional = decimal.subtract(new BigDecimal(decimal.setScale(0, RoundingMode.FLOOR).intValue()));
+        BigDecimal fractional = decimal.subtract(decimal.setScale(0, RoundingMode.FLOOR));
         return fractional
                 .multiply(Constants.ANALOG_GIGA)
                 .setScale(0, RoundingMode.HALF_UP)
-                .intValue();
+                .longValue();
     }
 }

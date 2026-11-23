@@ -884,3 +884,117 @@ isolated function dataProviderInvalidZoneDateTimeCivilAddDuration() returns [str
         ["Asia/Colombo", {year: 2025, month: 13, day: 23, hour: 0, minute: 20, second: 1.2, timeAbbrev: "America/Los_Angeles", utcOffset: {hours: 8, minutes: 0}}, {years: 0, months: 10, days: 5, hours: 0, minutes: 0, seconds: 0}, "Invalid value for MonthOfYear (valid values 1 - 12): 13"]
     ];
 }
+
+@test:Config {
+    dataProvider: dataProviderCivilWithOutOfIntRangeFields
+}
+isolated function testCivilConversionsWithOutOfIntRangeFields(Civil civil, string errorMsg) {
+    string|Error civilString = civilToString(civil);
+    if civilString is string {
+        test:assertFail(string `Expected an error from civilToString, found '${civilString}'`);
+    }
+    test:assertEquals(civilString.message(), errorMsg);
+    Utc|Error utc = utcFromCivil(civil);
+    if utc is Utc {
+        test:assertFail(string `Expected an error from utcFromCivil, found '${utc.toString()}'`);
+    }
+    test:assertEquals(utc.message(), errorMsg);
+}
+
+isolated function dataProviderCivilWithOutOfIntRangeFields() returns [Civil, string][] {
+    return [
+        [{year: 4294969321, month: 1, day: 1, hour: 0, minute: 0, utcOffset: {hours: 0}}, "Invalid value for Year (valid values -999999999 - 999999999): 4294969321"],
+        [{year: 2025, month: 4294967297, day: 1, hour: 0, minute: 0, utcOffset: {hours: 0}}, "Invalid value for MonthOfYear (valid values 1 - 12): 4294967297"],
+        [{year: 2025, month: 1, day: 1, hour: 4294967296, minute: 0, utcOffset: {hours: 0}}, "Invalid value for HourOfDay (valid values 0 - 23): 4294967296"],
+        [{year: 2025, month: 1, day: 1, hour: 0, minute: 0, second: 4294967326.5, utcOffset: {hours: 0}}, "Invalid value for SecondOfMinute (valid values 0 - 59): 4294967326"],
+        [{year: 2025, month: 1, day: 1, hour: 0, minute: 0, second: 1e30, utcOffset: {hours: 0}}, "Invalid value for SecondOfMinute: 1000000000000000000000000000000"],
+        [{year: 2025, month: 1, day: 1, hour: 0, minute: 0, utcOffset: {hours: 4294967296}}, "Zone offset hours not in valid range: value 4294967296"],
+        [{year: 2025, month: 1, day: 1, hour: 0, minute: 0, utcOffset: {hours: 0, minutes: -4294967296}}, "Zone offset minutes not in valid range: value -4294967296"],
+        [{year: 2025, month: 1, day: 1, hour: 0, minute: 0, utcOffset: {hours: 0, minutes: 0, seconds: 1e30}}, "Zone offset seconds not in valid range: value 1000000000000000000000000000000"]
+    ];
+}
+
+@test:Config {
+    groups: ["duration"],
+    dataProvider: dataProviderOutOfRangeDurations
+}
+isolated function testCivilAddDurationWithOutOfRangeDuration(Duration duration, string errorMsg) returns Error? {
+    Civil civil = check civilFromString("2025-04-25T10:15:30.00Z");
+    Civil|Error result = civilAddDuration(civil, duration);
+    if result is Civil {
+        test:assertFail(string `Expected an error, found ${result.toString()}`);
+    }
+    test:assertEquals(result.message(), errorMsg);
+    TimeZone zone = check new ("Asia/Colombo");
+    Civil|Error zoneResult = zone.civilAddDuration(civil, duration);
+    if zoneResult is Civil {
+        test:assertFail(string `Expected an error, found ${zoneResult.toString()}`);
+    }
+    test:assertEquals(zoneResult.message(), errorMsg);
+}
+
+isolated function dataProviderOutOfRangeDurations() returns [Duration, string][] {
+    return [
+        [{years: 4294967296}, "Invalid value for Year (valid values -999999999 - 999999999): 4294969321"],
+        [{years: 9223372036854775807}, "Duration is out of range"],
+        [{hours: 9223372036854775807}, "Duration is out of range"],
+        [{seconds: 1e20}, "Duration seconds is out of range: 100000000000000000000"]
+    ];
+}
+
+@test:Config {
+    groups: ["duration"],
+    dataProvider: dataProviderDurationsBeyondIntRange
+}
+isolated function testCivilAddDurationBeyondIntRange(Duration duration, decimal expectedSeconds) returns Error? {
+    Civil civil = check civilFromString("2025-04-25T10:15:30Z");
+    Utc expected = utcAddSeconds(check utcFromCivil(civil), expectedSeconds);
+    test:assertEquals(check utcFromCivil(check civilAddDuration(civil, duration)), expected);
+}
+
+isolated function dataProviderDurationsBeyondIntRange() returns [Duration, decimal][] {
+    return [
+        [{seconds: 3000000000.5}, 3000000000.5],
+        [{minutes: 2147483648}, 128849018880],
+        [{days: 2147483648}, 185542587187200]
+    ];
+}
+
+@test:Config {
+    groups: ["duration", "zone", "dst"]
+}
+isolated function testZoneCivilAddDurationAcrossDstGapResolvesOnce() returns Error? {
+    TimeZone zone = check new ("America/New_York");
+    Civil civil = {year: 2025, month: 2, day: 9, hour: 2, minute: 30, timeAbbrev: "America/New_York"};
+    Civil result = check zone.civilAddDuration(civil, {months: 1, days: 1});
+    test:assertEquals(check civilToString(result), "2025-03-10T02:30-04:00[America/New_York]");
+}
+
+@test:Config {
+    groups: ["duration"],
+    dataProvider: dataProviderCancellingDurations
+}
+isolated function testCivilAddDurationWithCancellingParts(Duration duration) returns Error? {
+    Civil civil = check civilFromString("2025-04-25T10:15:30Z");
+    Civil result = check civilAddDuration(civil, duration);
+    test:assertEquals(check utcFromCivil(result), check utcFromCivil(civil));
+}
+
+isolated function dataProviderCancellingDurations() returns [Duration][] {
+    return [
+        [{hours: 3000000000000000, minutes: -180000000000000000}],
+        [{years: 768614336404564650, months: -9223372036854775800}]
+    ];
+}
+
+@test:Config {
+    groups: ["duration"]
+}
+isolated function testCivilAddDurationWithOutOfRangeTimeTotal() returns Error? {
+    Civil civil = check civilFromString("2025-04-25T10:15:30Z");
+    Civil|Error result = civilAddDuration(civil, {hours: 9223372036854775807, minutes: 9223372036854775807});
+    if result is Civil {
+        test:assertFail(string `Expected an error, found ${result.toString()}`);
+    }
+    test:assertEquals(result.message(), "Duration is out of range");
+}

@@ -27,10 +27,12 @@ import io.ballerina.runtime.api.values.BString;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -108,19 +110,45 @@ public class Utils {
                                                                   BString zoneAbbr, String zoneHandling) {
 
         ZoneId zoneId;
-        int intSecond = second.decimalValue().setScale(0, RoundingMode.FLOOR).intValue();
-        int intNanoSecond = second.decimalValue().subtract(new BigDecimal(intSecond)).multiply(Constants.ANALOG_GIGA)
+        BigDecimal wholeSecond = second.decimalValue().setScale(0, RoundingMode.FLOOR);
+        int intNanoSecond = second.decimalValue().subtract(wholeSecond).multiply(Constants.ANALOG_GIGA)
                 .setScale(0, RoundingMode.HALF_UP).intValue();
-        int intZoneSecond = zoneSecond.decimalValue().setScale(0, RoundingMode.HALF_UP).intValue();
         if (Constants.HeaderZoneHandling.PREFER_ZONE_OFFSET.toString().equals(zoneHandling)) {
-            zoneId = ZoneId.of(ZoneOffset.ofHoursMinutesSeconds(
-                    Long.valueOf(zoneHour).intValue(), Long.valueOf(zoneMinute).intValue(), intZoneSecond).toString());
+            BigDecimal wholeZoneSecond = zoneSecond.decimalValue().setScale(0, RoundingMode.HALF_UP);
+            zoneId = ZoneId.of(ZoneOffset.ofHoursMinutesSeconds(toZoneOffsetField(zoneHour, "hours"),
+                    toZoneOffsetField(zoneMinute, "minutes"), toZoneOffsetField(wholeZoneSecond, "seconds"))
+                    .toString());
         } else {
             zoneId = ZoneId.of(zoneAbbr.getValue());
         }
-        return ZonedDateTime.of(
-                Long.valueOf(year).intValue(), Long.valueOf(month).intValue(), Long.valueOf(day).intValue(),
-                Long.valueOf(hour).intValue(), Long.valueOf(minute).intValue(), intSecond, intNanoSecond, zoneId);
+        return ZonedDateTime.of(ChronoField.YEAR.checkValidIntValue(year),
+                ChronoField.MONTH_OF_YEAR.checkValidIntValue(month), ChronoField.DAY_OF_MONTH.checkValidIntValue(day),
+                ChronoField.HOUR_OF_DAY.checkValidIntValue(hour), ChronoField.MINUTE_OF_HOUR.checkValidIntValue(minute),
+                toCivilField(ChronoField.SECOND_OF_MINUTE, wholeSecond), intNanoSecond, zoneId);
+    }
+
+    private static int toCivilField(ChronoField field, BigDecimal value) {
+        try {
+            return field.checkValidIntValue(value.longValueExact());
+        } catch (ArithmeticException e) {
+            throw new DateTimeException("Invalid value for " + field + ": " + value.toPlainString(), e);
+        }
+    }
+
+    private static int toZoneOffsetField(long value, String field) {
+        if (value < Integer.MIN_VALUE || value > Integer.MAX_VALUE) {
+            throw new DateTimeException("Zone offset " + field + " not in valid range: value " + value);
+        }
+        return (int) value;
+    }
+
+    private static int toZoneOffsetField(BigDecimal value, String field) {
+        try {
+            return toZoneOffsetField(value.longValueExact(), field);
+        } catch (ArithmeticException e) {
+            throw new DateTimeException("Zone offset " + field + " not in valid range: value " +
+                    value.toPlainString(), e);
+        }
     }
 
     public static BError createError(Errors errorType, String errorMsg) {

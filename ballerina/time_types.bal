@@ -134,7 +134,7 @@ public type ZoneOffset readonly & record {|
     int minutes = 0;
     # IETF zone files have historical zones that are offset by
     # integer seconds; we use Seconds type so that this is a subtype
-    # of Delta
+    # of Delta. A fractional value is rounded to the nearest whole second (half up) when used in a conversion.
     decimal seconds?;
 |};
 
@@ -231,7 +231,8 @@ public type Zone readonly & object {
     public isolated function utcToCivil(Utc utc) returns Civil;
 
     # Adds the given time duration to the specified civil date-time based on the time zone.
-    # The operation assumes that all days have exactly 86,400 seconds.
+    # Years, months and days are added to the local date-time in this time zone, so across a daylight saving time
+    # change a day can be 23 or 25 hours long. Hours, minutes and seconds are added as elapsed time.
     #
     # + civil - The civil time to which the duration should be added
     # + duration - The date-time duration to be added
@@ -287,7 +288,8 @@ public readonly class TimeZone {
     }
 
     # Adds the given time duration to the specified civil date-time based on the time zone.
-    # The operation assumes that all days have exactly 86,400 seconds.
+    # Years, months and days are added to the local date-time in this time zone, so across a daylight saving time
+    # change a day can be 23 or 25 hours long. Hours, minutes and seconds are added as elapsed time.
     # ```ballerina
     # time:TimeZone timeZone = check new("Asia/Colombo");
     # time:Civil civil = check time:civilFromString("2025-04-25T10:15:30.00Z");
