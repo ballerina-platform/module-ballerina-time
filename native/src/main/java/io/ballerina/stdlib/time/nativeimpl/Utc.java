@@ -26,8 +26,10 @@ import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.stdlib.time.util.Constants;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -42,6 +44,8 @@ import static io.ballerina.stdlib.time.util.Constants.ANALOG_GIGA;
  * @since 2.0.2
  */
 public class Utc {
+
+    private static final BigInteger BIG_INTEGER_GIGA = ANALOG_GIGA.toBigInteger();
 
     private long secondsFromEpoc = 0;
     private BigDecimal lastSecondFraction = new BigDecimal(0);
@@ -61,8 +65,19 @@ public class Utc {
 
     public Utc (BArray utc) {
         if (utc.getLength() == 2) {
-            secondsFromEpoc = utc.getInt(0);
-            lastSecondFraction = new BigDecimal(utc.getValues()[1].toString()).multiply(Constants.ANALOG_GIGA);
+            // Same normalisation as Instant.ofEpochSecond(seconds, nanos), but without int overflow of the nanos.
+            BigInteger[] carryAndNanos = new BigDecimal(utc.getValues()[1].toString()).multiply(ANALOG_GIGA)
+                    .toBigInteger().divideAndRemainder(BIG_INTEGER_GIGA);
+            if (carryAndNanos[1].signum() < 0) {
+                carryAndNanos[0] = carryAndNanos[0].subtract(BigInteger.ONE);
+                carryAndNanos[1] = carryAndNanos[1].add(BIG_INTEGER_GIGA);
+            }
+            try {
+                secondsFromEpoc = Math.addExact(utc.getInt(0), carryAndNanos[0].longValueExact());
+            } catch (ArithmeticException e) {
+                throw new DateTimeException("Instant exceeds minimum or maximum instant", e);
+            }
+            lastSecondFraction = new BigDecimal(carryAndNanos[1]);
         } else if (utc.getLength() == 1) {
             secondsFromEpoc = utc.getInt(0);
         }
@@ -95,6 +110,20 @@ public class Utc {
         utcTuple.add(1, ValueCreator.createDecimalValue(lastSecondFraction));
         utcTuple.freezeDirect();
         return utcTuple;
+    }
+
+    /**
+     * Returns {@code utc1 - utc2} in seconds for two Ballerina {@code time:Utc} values. It works on epoch
+     * nanoseconds as a BigInteger, so it supports the full {@code int} range of seconds and any fraction, and it
+     * truncates sub-nanosecond digits as {@code Instant}-based conversions do.
+     */
+    public static BigDecimal secondsBetween(BArray utc1, BArray utc2) {
+        return new BigDecimal(epochNanos(utc1).subtract(epochNanos(utc2))).divide(ANALOG_GIGA);
+    }
+
+    private static BigInteger epochNanos(BArray utc) {
+        BigInteger nanos = new BigDecimal(utc.getValues()[1].toString()).multiply(ANALOG_GIGA).toBigInteger();
+        return BigInteger.valueOf(utc.getInt(0)).multiply(BIG_INTEGER_GIGA).add(nanos);
     }
 
     public Instant generateInstant() {

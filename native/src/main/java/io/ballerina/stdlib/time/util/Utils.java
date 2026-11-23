@@ -20,14 +20,18 @@ package io.ballerina.stdlib.time.util;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
+import io.ballerina.stdlib.time.nativeimpl.Utc;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.DateTimeException;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -121,6 +125,36 @@ public class Utils {
         return ZonedDateTime.of(
                 Long.valueOf(year).intValue(), Long.valueOf(month).intValue(), Long.valueOf(day).intValue(),
                 Long.valueOf(hour).intValue(), Long.valueOf(minute).intValue(), intSecond, intNanoSecond, zoneId);
+    }
+
+    public static final String INSTANT_YEARS = "from year -1000000000 to year 1000000000";
+    public static final String DATE_TIME_YEARS = "from year -999999999 to year 999999999";
+    public static final String EMAIL_YEARS = "from year 0 to year 9999";
+
+    /**
+     * Converts a Ballerina {@code time:Utc} to an Instant, panicking with a {@code time:Error} that states
+     * {@code supportedYears} when the value cannot be represented.
+     */
+    public static Instant toInstant(BArray utc, String supportedYears) {
+        try {
+            return new Utc(utc).generateInstant();
+        } catch (DateTimeException e) {
+            throw createUtcOutOfRangeError(utc, supportedYears);
+        }
+    }
+
+    public static ZonedDateTime toZonedDateTime(BArray utc, ZoneId zoneId, String supportedYears) {
+        Instant instant = toInstant(utc, supportedYears);
+        try {
+            return instant.atZone(zoneId);
+        } catch (DateTimeException e) {
+            throw createUtcOutOfRangeError(utc, supportedYears);
+        }
+    }
+
+    public static BError createUtcOutOfRangeError(BArray utc, String supportedYears) {
+        return createError(Errors.FormatError, "UTC value [" + utc.getInt(0) + ", " + utc.getValues()[1] +
+                "] is outside the supported range, " + supportedYears);
     }
 
     public static BError createError(Errors errorType, String errorMsg) {
