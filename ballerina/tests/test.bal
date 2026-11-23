@@ -884,3 +884,100 @@ isolated function dataProviderInvalidZoneDateTimeCivilAddDuration() returns [str
         ["Asia/Colombo", {year: 2025, month: 13, day: 23, hour: 0, minute: 20, second: 1.2, timeAbbrev: "America/Los_Angeles", utcOffset: {hours: 8, minutes: 0}}, {years: 0, months: 10, days: 5, hours: 0, minutes: 0, seconds: 0}, "Invalid value for MonthOfYear (valid values 1 - 12): 13"]
     ];
 }
+
+@test:Config {
+    dataProvider: dataProviderRfc5322DateTimes
+}
+isolated function testCivilFromEmailStringWithRfc5322Forms(string dateTimeString, string expectedUtc) returns Error? {
+    Civil civil = check civilFromEmailString(dateTimeString);
+    test:assertEquals(utcToString(check utcFromCivil(civil)), expectedUtc);
+}
+
+isolated function dataProviderRfc5322DateTimes() returns [string, string][] {
+    return [
+        ["Mon, 3 Dec 2007 10:15:30 GMT", "2007-12-03T10:15:30Z"],
+        ["Mon, 3 Dec 2007 10:15:30 UT", "2007-12-03T10:15:30Z"],
+        ["Mon, 3 Dec 2007 10:15:30 Z", "2007-12-03T10:15:30Z"],
+        ["Mon, 03 Dec 2007 10:15:30 -0000", "2007-12-03T10:15:30Z"],
+        ["Mon, 03 Dec 2007 10:15:30 EST", "2007-12-03T15:15:30Z"],
+        ["Mon, 03 Dec 2007 10:15:30 pdt", "2007-12-03T17:15:30Z"],
+        ["Mon, 03 Dec 2007 10:15:30 A", "2007-12-03T10:15:30Z"],
+        ["3 Dec 2007 10:15:30 +0000", "2007-12-03T10:15:30Z"],
+        ["Mon, 03 Dec 2007 10:15 +0530", "2007-12-03T04:45:00Z"],
+        ["mon, 3 dec 2007 10:15:30 +0000", "2007-12-03T10:15:30Z"],
+        ["Wed, 10 Mar 2021 19:51:55 -0800 (PST)", "2021-03-11T03:51:55Z"]
+    ];
+}
+
+@test:Config {}
+isolated function testCivilFromEmailStringRoundTripsUtcToEmailString() returns Error? {
+    Utc utc = check utcFromString("2007-12-03T10:15:30Z");
+    UtcZoneHandling[] zoneHandlings = ["0", "GMT", "UT", "Z"];
+    foreach UtcZoneHandling zh in zoneHandlings {
+        Civil civil = check civilFromEmailString(utcToEmailString(utc, zh));
+        test:assertEquals(check utcFromCivil(civil), utc, string `Round trip failed for zone handling '${zh}'`);
+    }
+}
+
+@test:Config {
+    dataProvider: dataProviderInvalidRfc5322DateTimes
+}
+isolated function testCivilFromEmailStringWithInvalidRfc5322Forms(string dateTimeString, int? errorIndex) {
+    Civil|Error result = civilFromEmailString(dateTimeString);
+    if result is Civil {
+        test:assertFail(string `Expected an error for '${dateTimeString}'`);
+    }
+    string quoted = dateTimeString.length() > 64 ? dateTimeString.substring(0, 64) + "..." : dateTimeString;
+    test:assertTrue(result.message().startsWith(string `Text '${quoted}' could not be parsed`), result.message());
+    if errorIndex is int {
+        test:assertTrue(result.message().endsWith(string ` index ${errorIndex}`), result.message());
+    }
+}
+
+isolated function dataProviderInvalidRfc5322DateTimes() returns [string, int?][] {
+    return [
+        ["Mon, 3 Dec 2007 10:15:30 J", 25],
+        ["Mon, 3 Dez 2007 10:15:30 GMT", 7],
+        ["Mon,  3 Dez 2007 10:15:30 GMT", 8],
+        ["Tue, 3 Dec 2007 10:15:30 GMT", ()],
+        ["Tue, 3 Dec 2007 10:15:30 GMT (some long comment exceeding sixty-four characters)", ()],
+        ["Wed, 10 2021 19:51:55 -0800 (PST)", 8]
+    ];
+}
+
+@test:Config {
+    dataProvider: dataProviderRfc5322FoldingAndObsoleteForms
+}
+isolated function testCivilFromEmailStringWithFoldingAndObsoleteForms(string dateTimeString, string expectedUtc)
+        returns Error? {
+    Civil civil = check civilFromEmailString(dateTimeString);
+    test:assertEquals(utcToString(check utcFromCivil(civil)), expectedUtc);
+}
+
+isolated function dataProviderRfc5322FoldingAndObsoleteForms() returns [string, string][] {
+    return [
+        ["Mon,  3 Dec 2007 10:15:30 +0000", "2007-12-03T10:15:30Z"],
+        ["Mon,3 Dec 2007 10:15:30 +0000", "2007-12-03T10:15:30Z"],
+        ["Mon, 3 Dec\r\n 2007 10:15:30 +0000", "2007-12-03T10:15:30Z"],
+        ["Mon, 3 Dec 2007 10:15:30 GMT\r\n", "2007-12-03T10:15:30Z"],
+        ["Mon, 3 Dec 2007 10:15:30 GMT  (UTC)", "2007-12-03T10:15:30Z"],
+        ["Mon, 3 Dec 2007 10:15:30 +0000 (added by relay)", "2007-12-03T10:15:30Z"],
+        ["Mon, 3 Dec 2007 10:15:30 UT (foo)", "2007-12-03T10:15:30Z"],
+        ["Mon, 3 Dec 07 10:15:30 +0000", "2007-12-03T10:15:30Z"],
+        ["Fri, 3 Dec 99 10:15:30 +0000", "1999-12-03T10:15:30Z"],
+        ["3 Dec 107 10:15:30 +0000", "2007-12-03T10:15:30Z"]
+    ];
+}
+
+@test:Config {}
+isolated function testCivilFromEmailStringRejectsLongCraftedInputQuickly() {
+    string padding = " ";
+    foreach int i in 0 ..< 17 {
+        padding = padding + padding;
+    }
+    foreach string crafted in ["1:00 A" + padding + "x", "Mon, 3 Dec 2007 10:15:30 A" + padding + "x"] {
+        decimal startTime = monotonicNow();
+        test:assertTrue(civilFromEmailString(crafted) is Error);
+        test:assertTrue(monotonicNow() - startTime < 5d, "Parsing a crafted input took too long");
+    }
+}

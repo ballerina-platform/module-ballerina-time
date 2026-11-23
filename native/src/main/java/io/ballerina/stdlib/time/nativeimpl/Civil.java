@@ -30,7 +30,6 @@ import java.math.MathContext;
 import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -57,8 +56,7 @@ public class Civil {
     public Civil(String zonedDateTimeString, Constants.CivilInputStringTypes inputStringTypes) {
 
         if (Constants.CivilInputStringTypes.EMAIL_STRING.toString().equals(inputStringTypes.toString())) {
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(Constants.EMAIL_DATE_TIME_FORMAT);
-            this.zonedDateTime = ZonedDateTime.parse(zonedDateTimeString, dateTimeFormatter);
+            this.zonedDateTime = EmailDateTimeParser.parse(zonedDateTimeString);
             this.isSecondExists = true;
             this.isLocalTimeZoneExists = true;
         } else {
