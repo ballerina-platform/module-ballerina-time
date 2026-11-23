@@ -895,18 +895,34 @@ isolated function testCivilFromStringWithEquivalentForms(string dateString, Civi
 }
 
 isolated function dataProviderEquivalentRfc3339Strings() returns [string, Civil][] {
-    Civil withSeconds = {year: 2025, month: 4, day: 25, hour: 10, minute: 15, second: 30, timeAbbrev: "Z",
-        utcOffset: {hours: 0, minutes: 0}, dayOfWeek: FRIDAY};
-    Civil withoutSeconds = {year: 2025, month: 4, day: 25, hour: 10, minute: 15, timeAbbrev: "Z",
+    Civil expected = {year: 2025, month: 4, day: 25, hour: 10, minute: 15, second: 30, timeAbbrev: "Z",
         utcOffset: {hours: 0, minutes: 0}, dayOfWeek: FRIDAY};
     return [
-        ["2025-04-25T10:15:30Z", withSeconds],
-        ["2025-04-25T10:15:30.00Z", withSeconds],
-        ["2025-04-25t10:15:30z", withSeconds],
-        ["2025-04-25t10:15:30.00z", withSeconds],
-        ["2025-04-25T10:15:30+00:00", withSeconds],
-        ["2025-04-25T10:15Z", withoutSeconds],
-        ["2025-04-25t10:15z", withoutSeconds]
+        ["2025-04-25T10:15:30Z", expected],
+        ["2025-04-25T10:15:30.00Z", expected],
+        ["2025-04-25t10:15:30z", expected],
+        ["2025-04-25t10:15:30.00z", expected],
+        ["2025-04-25T10:15:30+00:00", expected]
+    ];
+}
+
+@test:Config {
+    dataProvider: dataProviderIsoStringsWithoutSeconds
+}
+isolated function testCivilFromStringWithoutSecondsOmitsSecond(string dateString, Civil expectedCivil)
+        returns Error? {
+    test:assertEquals(check civilFromString(dateString), expectedCivil);
+}
+
+// RFC 3339 requires seconds; these ISO 8601 forms are accepted because the parser is lenient.
+isolated function dataProviderIsoStringsWithoutSeconds() returns [string, Civil][] {
+    return [
+        ["2025-04-25T10:15Z", {year: 2025, month: 4, day: 25, hour: 10, minute: 15, timeAbbrev: "Z",
+            utcOffset: {hours: 0, minutes: 0}, dayOfWeek: FRIDAY}],
+        ["2025-04-25t10:15z", {year: 2025, month: 4, day: 25, hour: 10, minute: 15, timeAbbrev: "Z",
+            utcOffset: {hours: 0, minutes: 0}, dayOfWeek: FRIDAY}],
+        ["2025-04-25t10:15+05:30[Asia/Colombo]", {year: 2025, month: 4, day: 25, hour: 10, minute: 15,
+            timeAbbrev: "Asia/Colombo", utcOffset: {hours: 5, minutes: 30}, dayOfWeek: FRIDAY}]
     ];
 }
 
@@ -914,6 +930,13 @@ isolated function dataProviderEquivalentRfc3339Strings() returns [string, Civil]
 isolated function testCivilFromStringLowercaseKeepsSeconds() returns Error? {
     Civil civil = check civilFromString("2025-04-25t10:15:30z");
     test:assertEquals(check civilToString(civil), "2025-04-25T10:15:30Z");
-    test:assertEquals(check civilToEmailString(check civilFromString("2025-04-25T10:15:30.00Z"), PREFER_ZONE_OFFSET),
-            "Fri, 25 Apr 2025 10:15:30 +0000");
+    Civil withOffset = check civilFromString("2025-04-25t10:15:30.5-08:00");
+    test:assertEquals(withOffset?.second, 30.5d);
+    test:assertEquals(withOffset?.utcOffset, {hours: -8, minutes: 0});
+}
+
+@test:Config {}
+isolated function testCivilFromStringFractionalZHasUtcOffset() returns Error? {
+    Civil civil = check civilFromString("2025-04-25T10:15:30.00Z");
+    test:assertEquals(check civilToEmailString(civil, PREFER_ZONE_OFFSET), "Fri, 25 Apr 2025 10:15:30 +0000");
 }
