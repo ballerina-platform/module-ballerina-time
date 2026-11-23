@@ -599,9 +599,8 @@ isolated function testZoneUtcFromCivilWithoutTimeAbbrev() returns Error? {
     };
     Zone? zone = getZone("Etc/GMT-9");
     test:assertTrue(zone is Zone);
-    Utc|Error err = (<Zone>zone).utcFromCivil(civil);
-    test:assertTrue(err is Error);
-    test:assertEquals((<Error>err).message(), "Abbreviation for the local time is required for the conversion");
+    Utc utc = check (<Zone>zone).utcFromCivil(civil);
+    test:assertEquals(utcToString(utc), "2021-03-10T10:51:55Z");
 }
 
 @test:Config {}
@@ -882,5 +881,50 @@ isolated function dataProviderInvalidZoneDateTimeCivilAddDuration() returns [str
         ["Asia/Colombo", {year: 2021, month: 4, day: 12, hour: 23, minute: 20, second: 50.52, timeAbbrev: "Colombo"}, {years: -1, months: -8, days: -5, hours: -3, minutes: -5, seconds: -6}, "Unknown time-zone ID: Colombo"],
         ["Asia/Colombo", {year: 2021, month: 4, day: 12, hour: 23, minute: 20, second: 50.52}, {years: -25, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0}, "The civil value should have either `utcOffset` or `timeAbbrev`"],
         ["Asia/Colombo", {year: 2025, month: 13, day: 23, hour: 0, minute: 20, second: 1.2, timeAbbrev: "America/Los_Angeles", utcOffset: {hours: 8, minutes: 0}}, {years: 0, months: 10, days: 5, hours: 0, minutes: 0, seconds: 0}, "Invalid value for MonthOfYear (valid values 1 - 12): 13"]
+    ];
+}
+
+@test:Config {
+    groups: ["zone"],
+    dataProvider: dataProviderLocalCivilInReceiverZone
+}
+isolated function testZoneUtcFromCivilUsesReceiverZoneWithoutTimeAbbrev(string zoneId, Civil civil, string expected)
+        returns Error? {
+    TimeZone zone = check new (zoneId);
+    test:assertEquals(utcToString(check zone.utcFromCivil(civil)), expected);
+}
+
+isolated function dataProviderLocalCivilInReceiverZone() returns [string, Civil, string][] {
+    return [
+        ["Asia/Colombo", {year: 2025, month: 4, day: 25, hour: 10, minute: 0}, "2025-04-25T04:30:00Z"],
+        ["Asia/Colombo", {year: 2025, month: 4, day: 25, hour: 10, minute: 0, second: 1.5, utcOffset: {hours: 5, minutes: 30}}, "2025-04-25T04:30:01.500Z"],
+        ["Europe/Berlin", {year: 2025, month: 10, day: 26, hour: 2, minute: 30}, "2025-10-26T00:30:00Z"],
+        ["Europe/Berlin", {year: 2025, month: 10, day: 26, hour: 2, minute: 30, utcOffset: {hours: 2, minutes: 0}}, "2025-10-26T00:30:00Z"],
+        ["Europe/Berlin", {year: 2025, month: 10, day: 26, hour: 2, minute: 30, utcOffset: {hours: 1, minutes: 0}}, "2025-10-26T01:30:00Z"],
+        ["Asia/Colombo", {year: 2025, month: 4, day: 25, hour: 10, minute: 0, timeAbbrev: "Europe/Berlin"}, "2025-04-25T08:00:00Z"]
+    ];
+}
+
+@test:Config {
+    groups: ["zone"],
+    dataProvider: dataProviderInvalidLocalCivilInReceiverZone
+}
+isolated function testZoneUtcFromCivilWithInvalidLocalCivil(string zoneId, Civil civil, string errorMsg)
+        returns Error? {
+    TimeZone zone = check new (zoneId);
+    Utc|Error result = zone.utcFromCivil(civil);
+    if result is Utc {
+        test:assertFail(string `Expected an error, found ${utcToString(result)}`);
+    }
+    test:assertTrue(result is FormatError);
+    test:assertEquals(result.message(), errorMsg);
+}
+
+isolated function dataProviderInvalidLocalCivilInReceiverZone() returns [string, Civil, string][] {
+    return [
+        ["Asia/Colombo", {year: 2025, month: 4, day: 25, hour: 10, minute: 0, utcOffset: {hours: 1, minutes: 0}}, "UTC offset +01:00 is not valid for 2025-04-25T10:00 in Asia/Colombo"],
+        ["Europe/Berlin", {year: 2025, month: 3, day: 30, hour: 2, minute: 30, utcOffset: {hours: 1, minutes: 0}}, "UTC offset +01:00 is not valid for 2025-03-30T02:30 in Europe/Berlin"],
+        ["Asia/Colombo", {year: 2025, month: 2, day: 30, hour: 10, minute: 0}, "Invalid date 'FEBRUARY 30'"],
+        ["Asia/Colombo", {year: 4294969321, month: 1, day: 1, hour: 0, minute: 0}, "Invalid value for Year (valid values -999999999 - 999999999): 4294969321"]
     ];
 }

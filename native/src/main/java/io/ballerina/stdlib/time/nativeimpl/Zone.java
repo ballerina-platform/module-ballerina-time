@@ -23,7 +23,10 @@ import io.ballerina.stdlib.time.util.Utils;
 
 import java.time.DateTimeException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 /**
@@ -58,6 +61,19 @@ public class Zone {
     public Utc utcFromCivil(Civil civil) {
 
         return new Utc(civil.getZonedDateTime().toInstant());
+    }
+
+    /**
+     * Resolves a local date-time in this zone. A given UTC offset must be valid for the local date-time and
+     * selects the offset when the local time occurs twice; without it, the earlier offset is used.
+     */
+    public Utc utcFromLocalDateTime(LocalDateTime localDateTime, ZoneOffset utcOffset) {
+
+        if (utcOffset != null && !zoneId.getRules().isValidOffset(localDateTime, utcOffset)) {
+            throw new DateTimeException("UTC offset " + utcOffset + " is not valid for " + localDateTime + " in " +
+                    zoneId);
+        }
+        return new Utc(ZonedDateTime.ofLocal(localDateTime, zoneId, utcOffset).toInstant());
     }
 
     public Civil utcToCivil(Utc utc) {

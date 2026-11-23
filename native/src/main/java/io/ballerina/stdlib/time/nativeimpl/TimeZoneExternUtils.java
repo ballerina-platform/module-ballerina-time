@@ -26,6 +26,8 @@ import io.ballerina.stdlib.time.util.Errors;
 import io.ballerina.stdlib.time.util.Utils;
 
 import java.time.DateTimeException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 /**
@@ -72,6 +74,22 @@ public class TimeZoneExternUtils {
         ZonedDateTime zonedDateTime = Utils.createZoneDateTimeFromCivilValues(year, month, day, hour, minute,
                 second, 0, 0, BDecimal.valueOf(0), zoneAbbr, zoneHandling.getValue());
         return zone.utcFromCivil(new Civil(zonedDateTime)).build();
+    }
+
+    public static Object externTimeZoneUtcFromLocalCivil(BObject timeZoneObj, long year, long month, long day,
+                                                         long hour, long minute, BDecimal second, long zoneHour,
+                                                         long zoneMinute, BDecimal zoneSecond,
+                                                         boolean hasZoneOffset) {
+
+        try {
+            Zone zone = (Zone) timeZoneObj.getNativeData(ZONE_ID_ENTRY);
+            LocalDateTime localDateTime = Utils.createLocalDateTimeFromCivilValues(year, month, day, hour, minute,
+                    second);
+            ZoneOffset utcOffset = hasZoneOffset ? Utils.createZoneOffset(zoneHour, zoneMinute, zoneSecond) : null;
+            return zone.utcFromLocalDateTime(localDateTime, utcOffset).build();
+        } catch (DateTimeException e) {
+            return Utils.createError(Errors.FormatError, e.getMessage());
+        }
     }
 
     public static BMap externTimeZoneUtcToCivil(BObject timeZoneObj, BArray utc) {
