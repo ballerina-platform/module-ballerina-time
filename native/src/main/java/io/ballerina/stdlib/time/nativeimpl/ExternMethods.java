@@ -159,11 +159,13 @@ public class ExternMethods {
 
     public static Object externCivilToString(long year, long month, long day, long hour, long minute, BDecimal second,
                                              long zoneHour, long zoneMinute, BDecimal zoneSecond, BString zoneAbbr,
-                                             BString zoneHandling) {
+                                             BString zoneHandling, boolean hasZoneOffset,
+                                             boolean laterOffsetAtOverlap) {
 
         try {
-            ZonedDateTime dateTime = TimeValueHandler.createZoneDateTimeFromCivilValues(year, month, day, hour,
-                    minute, second, zoneHour, zoneMinute, zoneSecond, zoneAbbr, zoneHandling.getValue());
+            ZonedDateTime dateTime = Utils.createZoneDateTimeFromCivilValues(year, month, day, hour, minute, second,
+                    zoneHour, zoneMinute, zoneSecond, zoneAbbr, zoneHandling.getValue(), hasZoneOffset,
+                    laterOffsetAtOverlap);
             return StringUtils.fromString(dateTime.toString());
         } catch (DateTimeException e) {
             return Utils.createError(Errors.FormatError, e.getMessage());
@@ -184,11 +186,13 @@ public class ExternMethods {
 
     public static Object externCivilToEmailString(long year, long month, long day, long hour, long minute,
                                                   BDecimal second, long zoneHour, long zoneMinute, BDecimal zoneSecond,
-                                                  BString zoneAbbr, BString zoneHandling) {
+                                                  BString zoneAbbr, BString zoneHandling,
+                                                  boolean hasZoneOffset, boolean laterOffsetAtOverlap) {
 
         try {
-            ZonedDateTime dateTime = TimeValueHandler.createZoneDateTimeFromCivilValues(year, month, day, hour,
-                    minute, second, zoneHour, zoneMinute, zoneSecond, zoneAbbr, zoneHandling.getValue());
+            ZonedDateTime dateTime = Utils.createZoneDateTimeFromCivilValues(year, month, day, hour, minute, second,
+                    zoneHour, zoneMinute, zoneSecond, zoneAbbr, zoneHandling.getValue(), hasZoneOffset,
+                    laterOffsetAtOverlap);
             if (Constants.HeaderZoneHandling.PREFER_ZONE_OFFSET.toString().equals(zoneHandling.getValue())) {
                 return StringUtils.fromString(dateTime.format(DateTimeFormatter.ofPattern(
                         Constants.EMAIL_DATE_TIME_FORMAT_WITHOUT_COMMENT)));
@@ -205,10 +209,12 @@ public class ExternMethods {
                                                 BDecimal zoneSecond, BString zoneAbbrev,
                                                 BString zoneHandling, int duYears, int duMonths,
                                                 int duDays, int duHours, int duMinutes,
-                                                BDecimal duSeconds) {
+                                                BDecimal duSeconds, boolean hasZoneOffset,
+                                                boolean laterOffsetAtOverlap) {
         try {
-            ZonedDateTime zonedDateTime = TimeValueHandler.createZoneDateTimeFromCivilValues(year, month, day, hour,
-                    minute, second, zoneHour, zoneMinute, zoneSecond, zoneAbbrev, zoneHandling.getValue());
+            ZonedDateTime zonedDateTime = Utils.createZoneDateTimeFromCivilValues(year, month, day, hour, minute,
+                    second, zoneHour, zoneMinute, zoneSecond, zoneAbbrev, zoneHandling.getValue(),
+                    hasZoneOffset, laterOffsetAtOverlap);
             CustomDuration duration = new CustomDuration(duYears, duMonths, duDays, duHours, duMinutes, duSeconds);
             Period period = Period.of(duration.years(), duration.months(), duration.days());
             zonedDateTime = zonedDateTime.plus(period);

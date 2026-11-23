@@ -4,6 +4,17 @@ This file contains all the notable changes done to the Ballerina time package th
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- [[#9873] Civil values whose local time falls in a DST fall-back overlap now carry `which` (0 for the earlier, 1 for the later occurrence); outside an overlap the record is unchanged](https://github.com/ballerina-platform/ballerina-library/issues/9873)
+- [[#9873] When a civil value has both a region `timeAbbrev` and a `utcOffset` that is valid for its local time, the offset selects the occurrence in a DST overlap (`which` is used only without such an offset)](https://github.com/ballerina-platform/ballerina-library/issues/9873)
+
+### Fixed
+
+- [[#9873] Fix `time:Zone.utcToCivil` results resolving to the wrong instant during a DST fall-back overlap. `time:utcFromCivil` and `time:civilToEmailString` with `PREFER_ZONE_OFFSET` still require `utcOffset`, which `Zone.utcToCivil` results do not carry](https://github.com/ballerina-platform/ballerina-library/issues/9873)
+
 ## [2.8.4] - 2026-10-16
 
 ### Changed

@@ -27,6 +27,7 @@ import io.ballerina.runtime.api.values.BString;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -107,6 +108,17 @@ public class Utils {
                                                                   long zoneMinute, BDecimal zoneSecond,
                                                                   BString zoneAbbr, String zoneHandling) {
 
+        return createZoneDateTimeFromCivilValues(year, month, day, hour, minute, second, zoneHour, zoneMinute,
+                zoneSecond, zoneAbbr, zoneHandling, false, false);
+    }
+
+    public static ZonedDateTime createZoneDateTimeFromCivilValues(long year, long month, long day, long hour,
+                                                                  long minute, BDecimal second, long zoneHour,
+                                                                  long zoneMinute, BDecimal zoneSecond,
+                                                                  BString zoneAbbr, String zoneHandling,
+                                                                  boolean hasZoneOffset,
+                                                                  boolean laterOffsetAtOverlap) {
+
         ZoneId zoneId;
         int intSecond = second.decimalValue().setScale(0, RoundingMode.FLOOR).intValue();
         int intNanoSecond = second.decimalValue().subtract(new BigDecimal(intSecond)).multiply(Constants.ANALOG_GIGA)
@@ -118,9 +130,28 @@ public class Utils {
         } else {
             zoneId = ZoneId.of(zoneAbbr.getValue());
         }
-        return ZonedDateTime.of(
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(
                 Long.valueOf(year).intValue(), Long.valueOf(month).intValue(), Long.valueOf(day).intValue(),
                 Long.valueOf(hour).intValue(), Long.valueOf(minute).intValue(), intSecond, intNanoSecond, zoneId);
+        if (hasZoneOffset) {
+            // When a region zone has two valid offsets, an explicit matching offset picks the occurrence.
+            ZoneOffset zoneOffset = toZoneOffsetOrNull(zoneHour, zoneMinute, intZoneSecond);
+            ZonedDateTime withZoneOffset = ZonedDateTime.ofLocal(zonedDateTime.toLocalDateTime(), zoneId, zoneOffset);
+            if (withZoneOffset.getOffset().equals(zoneOffset)) {
+                return withZoneOffset;
+            }
+        }
+        return laterOffsetAtOverlap ? zonedDateTime.withLaterOffsetAtOverlap() : zonedDateTime;
+    }
+
+    // An offset that is not a valid ZoneOffset cannot match, so the abbreviation-based resolution applies.
+    private static ZoneOffset toZoneOffsetOrNull(long zoneHour, long zoneMinute, int zoneSecond) {
+        try {
+            return ZoneOffset.ofHoursMinutesSeconds(Long.valueOf(zoneHour).intValue(),
+                    Long.valueOf(zoneMinute).intValue(), zoneSecond);
+        } catch (DateTimeException e) {
+            return null;
+        }
     }
 
     public static BError createError(Errors errorType, String errorMsg) {

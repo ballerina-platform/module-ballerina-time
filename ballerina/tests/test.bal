@@ -884,3 +884,76 @@ isolated function dataProviderInvalidZoneDateTimeCivilAddDuration() returns [str
         ["Asia/Colombo", {year: 2025, month: 13, day: 23, hour: 0, minute: 20, second: 1.2, timeAbbrev: "America/Los_Angeles", utcOffset: {hours: 8, minutes: 0}}, {years: 0, months: 10, days: 5, hours: 0, minutes: 0, seconds: 0}, "Invalid value for MonthOfYear (valid values 1 - 12): 13"]
     ];
 }
+
+@test:Config {
+    groups: ["zone", "dst"],
+    dataProvider: dataProviderDstOverlapInstants
+}
+isolated function testZoneConversionRoundTripAtDstOverlap(string instant, ZERO_OR_ONE which, string civilString,
+        string emailString) returns Error? {
+    TimeZone zone = check new ("Europe/Berlin");
+    Utc utc = check utcFromString(instant);
+    Civil civil = zone.utcToCivil(utc);
+    test:assertEquals(civil?.which, which);
+    test:assertEquals(check zone.utcFromCivil(civil), utc);
+    string actualCivilString = check civilToString(civil);
+    test:assertEquals(actualCivilString, civilString);
+    test:assertEquals(check utcFromString(actualCivilString), utc);
+    test:assertEquals(check civilToEmailString(civil, PREFER_TIME_ABBREV), emailString);
+}
+
+isolated function dataProviderDstOverlapInstants() returns [string, ZERO_OR_ONE, string, string][] {
+    return [
+        ["2025-10-26T00:30:00Z", 0, "2025-10-26T02:30+02:00[Europe/Berlin]", "Sun, 26 Oct 2025 02:30:00 +0200 (CEST)"],
+        ["2025-10-26T01:30:00Z", 1, "2025-10-26T02:30+01:00[Europe/Berlin]", "Sun, 26 Oct 2025 02:30:00 +0100 (CET)"]
+    ];
+}
+
+@test:Config {
+    groups: ["duration", "zone", "dst"]
+}
+isolated function testCivilAddDurationFromLaterOccurrenceAtDstOverlap() returns Error? {
+    TimeZone zone = check new ("Europe/Berlin");
+    Civil civil = zone.utcToCivil(check utcFromString("2025-10-26T01:30:00Z"));
+    Civil zoneResult = check zone.civilAddDuration(civil, {minutes: 10});
+    test:assertEquals(check zone.utcFromCivil(zoneResult), check utcFromString("2025-10-26T01:40:00Z"));
+    Civil result = check civilAddDuration(civil, {minutes: 10});
+    test:assertEquals(check civilToString(result), "2025-10-26T02:40+01:00[Europe/Berlin]");
+}
+
+@test:Config {
+    groups: ["zone", "dst"]
+}
+isolated function testWhichFieldAtDstOverlap() returns Error? {
+    TimeZone zone = check new ("Europe/Berlin");
+    test:assertEquals(zone.utcToCivil(check utcFromString("2025-07-01T00:30:00Z"))?.which, ());
+    Civil parsed = check civilFromString("2025-10-26T02:30:00+01:00[Europe/Berlin]");
+    test:assertEquals(parsed?.which, 1);
+    Civil withoutWhich = {year: 2025, month: 10, day: 26, hour: 2, minute: 30, timeAbbrev: "Europe/Berlin"};
+    test:assertEquals(check zone.utcFromCivil(withoutWhich), check utcFromString("2025-10-26T00:30:00Z"));
+}
+
+@test:Config {
+    groups: ["zone", "dst"],
+    dataProvider: dataProviderOverlapCivilWithOffsetAndAbbrev
+}
+isolated function testExplicitUtcOffsetSelectsOccurrenceAtDstOverlap(ZoneOffset utcOffset, ZERO_OR_ONE? which,
+        string expectedUtc, string expectedEmail) returns Error? {
+    TimeZone zone = check new ("Europe/Berlin");
+    Civil civil = {year: 2025, month: 10, day: 26, hour: 2, minute: 30, timeAbbrev: "Europe/Berlin",
+        utcOffset, which};
+    test:assertEquals(utcToString(check zone.utcFromCivil(civil)), expectedUtc);
+    test:assertEquals(check civilToEmailString(civil, ZONE_OFFSET_WITH_TIME_ABBREV_COMMENT), expectedEmail);
+    test:assertEquals(check civilToEmailString(civil, PREFER_TIME_ABBREV), expectedEmail);
+}
+
+isolated function dataProviderOverlapCivilWithOffsetAndAbbrev() returns [ZoneOffset, ZERO_OR_ONE?, string, string][] {
+    return [
+        [{hours: 1}, (), "2025-10-26T01:30:00Z", "Sun, 26 Oct 2025 02:30:00 +0100 (CET)"],
+        [{hours: 2}, 1, "2025-10-26T00:30:00Z", "Sun, 26 Oct 2025 02:30:00 +0200 (CEST)"],
+        [{hours: 5, minutes: 30}, (), "2025-10-26T00:30:00Z", "Sun, 26 Oct 2025 02:30:00 +0200 (CEST)"],
+        [{hours: 5, minutes: 30}, 1, "2025-10-26T01:30:00Z", "Sun, 26 Oct 2025 02:30:00 +0100 (CET)"],
+        [{hours: 19}, (), "2025-10-26T00:30:00Z", "Sun, 26 Oct 2025 02:30:00 +0200 (CEST)"],
+        [{hours: 19}, 1, "2025-10-26T01:30:00Z", "Sun, 26 Oct 2025 02:30:00 +0100 (CET)"]
+    ];
+}
