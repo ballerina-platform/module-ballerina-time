@@ -884,3 +884,23 @@ isolated function dataProviderInvalidZoneDateTimeCivilAddDuration() returns [str
         ["Asia/Colombo", {year: 2025, month: 13, day: 23, hour: 0, minute: 20, second: 1.2, timeAbbrev: "America/Los_Angeles", utcOffset: {hours: 8, minutes: 0}}, {years: 0, months: 10, days: 5, hours: 0, minutes: 0, seconds: 0}, "Invalid value for MonthOfYear (valid values 1 - 12): 13"]
     ];
 }
+
+@test:Config {
+    dataProvider: dataProviderOutOfIntRangeDates
+}
+isolated function testDateValidateWithOutOfIntRangeFields(Date date, string errorMsg) {
+    Error? result = dateValidate(date);
+    if result is () {
+        test:assertFail(string `Expected an error for date ${date.toString()}`);
+    }
+    test:assertTrue(result is FormatError);
+    test:assertEquals(result.message(), errorMsg);
+}
+
+isolated function dataProviderOutOfIntRangeDates() returns [Date, string][] {
+    return [
+        [{year: 9999999999, month: 1, day: 1}, "Date field out of range: year=9999999999, month=1, day=1"],
+        [{year: 2025, month: 4294967297, day: 1}, "Date field out of range: year=2025, month=4294967297, day=1"],
+        [{year: 2025, month: 1, day: -4294967295}, "Date field out of range: year=2025, month=1, day=-4294967295"]
+    ];
+}

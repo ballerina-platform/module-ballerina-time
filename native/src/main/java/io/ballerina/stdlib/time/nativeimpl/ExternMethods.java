@@ -96,14 +96,17 @@ public class ExternMethods {
 
     public static Object externDateValidate(BMap date) {
 
-        int year = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_YEAR_BSTRING));
-        int month = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_MONTH_BSTRING));
-        int day = Math.toIntExact(date.getIntValue(Constants.DATE_RECORD_DAY_BSTRING));
+        long year = date.getIntValue(Constants.DATE_RECORD_YEAR_BSTRING);
+        long month = date.getIntValue(Constants.DATE_RECORD_MONTH_BSTRING);
+        long day = date.getIntValue(Constants.DATE_RECORD_DAY_BSTRING);
         try {
-            LocalDate.of(year, month, day);
+            LocalDate.of(Math.toIntExact(year), Math.toIntExact(month), Math.toIntExact(day));
             return null;
         } catch (DateTimeException e) {
             return Utils.createError(Errors.FormatError, e.getMessage());
+        } catch (ArithmeticException e) {
+            return Utils.createError(Errors.FormatError,
+                    "Date field out of range: year=" + year + ", month=" + month + ", day=" + day);
         }
     }
 

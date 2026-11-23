@@ -4,6 +4,12 @@ This file contains all the notable changes done to the Ballerina time package th
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- [[#9870] Fix `time:dateValidate` panicking when a date field is outside the 32-bit integer range](https://github.com/ballerina-platform/ballerina-library/issues/9870)
+
 ## [2.8.4] - 2026-10-16
 
 ### Changed
