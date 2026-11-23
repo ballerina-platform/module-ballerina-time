@@ -31,7 +31,11 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static io.ballerina.stdlib.time.util.Constants.ANALOG_GIGA;
@@ -42,6 +46,21 @@ import static io.ballerina.stdlib.time.util.Constants.ANALOG_GIGA;
  * @since 2.0.2
  */
 public class Civil {
+
+    private static final DateTimeFormatter EMAIL_DATE_TIME_PARSER = new DateTimeFormatterBuilder()
+            .parseCaseInsensitive()
+            .optionalStart().appendPattern("EEE, ").optionalEnd()
+            .appendPattern("d MMM yyyy HH:mm")
+            .optionalStart().appendPattern(":ss").optionalEnd()
+            .appendPattern(" Z[ ][(z)]")
+            .toFormatter(Locale.ENGLISH);
+    // RFC 5322 section 4.3 obsolete zones, which must be accepted. Military zones are treated as -0000.
+    private static final Pattern OBSOLETE_ZONE = Pattern.compile(
+            "^(.*\\d:\\d{2}(?::\\d{2})?) +(UT|GMT|[ECMP][SD]T|[A-IK-Z])(\\s*(?:\\(.*\\))?\\s*)$",
+            Pattern.CASE_INSENSITIVE);
+    private static final Map<String, String> OBSOLETE_ZONE_OFFSETS = Map.of(
+            "EST", "-0500", "EDT", "-0400", "CST", "-0600", "CDT", "-0500",
+            "MST", "-0700", "MDT", "-0600", "PST", "-0800", "PDT", "-0700");
 
     private final ZonedDateTime zonedDateTime;
     private boolean isSecondExists = false;
@@ -57,14 +76,29 @@ public class Civil {
     public Civil(String zonedDateTimeString, Constants.CivilInputStringTypes inputStringTypes) {
 
         if (Constants.CivilInputStringTypes.EMAIL_STRING.toString().equals(inputStringTypes.toString())) {
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(Constants.EMAIL_DATE_TIME_FORMAT);
-            this.zonedDateTime = ZonedDateTime.parse(zonedDateTimeString, dateTimeFormatter);
+            this.zonedDateTime = parseEmailDateTime(zonedDateTimeString);
             this.isSecondExists = true;
             this.isLocalTimeZoneExists = true;
         } else {
             this.zonedDateTime = ZonedDateTime.parse(zonedDateTimeString);
             this.isSecondExists = isSecondExists(zonedDateTimeString);
             this.isLocalTimeZoneExists = isLocalTimeZoneExists(zonedDateTimeString);
+        }
+    }
+
+    private static ZonedDateTime parseEmailDateTime(String dateTimeString) {
+
+        Matcher matcher = OBSOLETE_ZONE.matcher(dateTimeString);
+        if (!matcher.matches()) {
+            return ZonedDateTime.parse(dateTimeString, EMAIL_DATE_TIME_PARSER);
+        }
+        String offset = OBSOLETE_ZONE_OFFSETS.getOrDefault(matcher.group(2).toUpperCase(Locale.ROOT), "+0000");
+        String normalized = matcher.group(1) + " " + offset + matcher.group(3);
+        try {
+            return ZonedDateTime.parse(normalized, EMAIL_DATE_TIME_PARSER);
+        } catch (DateTimeParseException e) {
+            throw new DateTimeParseException(e.getMessage().replace(normalized, dateTimeString), dateTimeString,
+                    e.getErrorIndex(), e);
         }
     }
 
