@@ -275,7 +275,8 @@ public readonly class TimeZone {
         decimal? civilTimeSecField = civil?.second;
         decimal civilTimeSeconds = (civilTimeSecField is Seconds) ? civilTimeSecField : 0.0;
 
-        return externTimeZoneUtcFromCivil(self, civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds, timeAbbrev, PREFER_TIME_ABBREV);
+        return externTimeZoneUtcFromCivil(self, civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds, timeAbbrev, PREFER_TIME_ABBREV,
+                civil?.which == 1);
     }
 
     # Converts a given UTC timestamp to a civil record based on the time zone value.
@@ -312,7 +313,8 @@ public readonly class TimeZone {
 
         return externTimeZoneCivilAddDuration(self, civil.year, civil.month, civil.day, civil.hour, civil.minute,
                 civilTimeSeconds, utcOffsetHours, utcOffsetMinutes, utcOffsetSeconds, timeAbbrev ?: "", zoneHandling,
-                duration.years, duration.months, duration.days, duration.hours, duration.minutes, duration.seconds);
+                duration.years, duration.months, duration.days, duration.hours, duration.minutes, duration.seconds,
+                civil?.which == 1);
     }
 }
 
@@ -356,14 +358,14 @@ isolated function externTimeZoneUtcToCivil(TimeZone timeZone, Utc utc) returns C
 } external;
 
 isolated function externTimeZoneUtcFromCivil(TimeZone timeZone, int year, int month, int day,
-        int hour, int minute, decimal second, string timeAbber, HeaderZoneHandling zoneHandling)
-returns Utc|Error = @java:Method {
+        int hour, int minute, decimal second, string timeAbber, HeaderZoneHandling zoneHandling,
+        boolean laterOffsetAtOverlap) returns Utc|Error = @java:Method {
     'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternUtils"
 } external;
 
 isolated function externTimeZoneCivilAddDuration(TimeZone timeZone, int year, int month, int day, int hour, int minute,
         decimal second, int zoneHour, int zoneMinute, decimal zoneSecond, string timeAbbrev,
         HeaderZoneHandling zoneHandling, int duYear, int duMonth, int duDay, int duHour, int duMinute,
-        decimal duSecond) returns Civil|Error = @java:Method {
+        decimal duSecond, boolean laterOffsetAtOverlap) returns Civil|Error = @java:Method {
     'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternUtils"
 } external;

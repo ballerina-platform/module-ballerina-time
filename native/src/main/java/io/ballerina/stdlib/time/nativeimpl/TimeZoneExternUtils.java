@@ -66,11 +66,11 @@ public class TimeZoneExternUtils {
 
     public static Object externTimeZoneUtcFromCivil(BObject timeZoneObj, long year, long month, long day, long hour,
                                                     long minute, BDecimal second, BString zoneAbbr,
-                                                    BString zoneHandling) {
+                                                    BString zoneHandling, boolean laterOffsetAtOverlap) {
 
         Zone zone = (Zone) timeZoneObj.getNativeData(ZONE_ID_ENTRY);
         ZonedDateTime zonedDateTime = Utils.createZoneDateTimeFromCivilValues(year, month, day, hour, minute,
-                second, 0, 0, BDecimal.valueOf(0), zoneAbbr, zoneHandling.getValue());
+                second, 0, 0, BDecimal.valueOf(0), zoneAbbr, zoneHandling.getValue(), laterOffsetAtOverlap);
         return zone.utcFromCivil(new Civil(zonedDateTime)).build();
     }
 
@@ -85,11 +85,12 @@ public class TimeZoneExternUtils {
                                                         int zoneHour, int zoneMinute, BDecimal zoneSecond,
                                                         BString zoneAbbrev, BString zoneHandling, int duYears,
                                                         int duMonths, int duDays, int duHours, int duMinutes,
-                                                        BDecimal duSeconds) {
+                                                        BDecimal duSeconds, boolean laterOffsetAtOverlap) {
         try {
             Zone zone = (Zone) timeZoneObj.getNativeData(ZONE_ID_ENTRY);
             ZonedDateTime zonedDateTime = Utils.createZoneDateTimeFromCivilValues(year, month, day, hour, minute,
-                    second, zoneHour, zoneMinute, zoneSecond, zoneAbbrev, zoneHandling.getValue());
+                    second, zoneHour, zoneMinute, zoneSecond, zoneAbbrev, zoneHandling.getValue(),
+                    laterOffsetAtOverlap);
             CustomDuration customDuration = new CustomDuration(duYears, duMonths, duDays, duHours, duMinutes,
                     duSeconds);
             return zone.civilAddDuration(new Civil(zonedDateTime), customDuration);

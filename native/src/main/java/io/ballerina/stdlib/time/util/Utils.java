@@ -107,6 +107,16 @@ public class Utils {
                                                                   long zoneMinute, BDecimal zoneSecond,
                                                                   BString zoneAbbr, String zoneHandling) {
 
+        return createZoneDateTimeFromCivilValues(year, month, day, hour, minute, second, zoneHour, zoneMinute,
+                zoneSecond, zoneAbbr, zoneHandling, false);
+    }
+
+    public static ZonedDateTime createZoneDateTimeFromCivilValues(long year, long month, long day, long hour,
+                                                                  long minute, BDecimal second, long zoneHour,
+                                                                  long zoneMinute, BDecimal zoneSecond,
+                                                                  BString zoneAbbr, String zoneHandling,
+                                                                  boolean laterOffsetAtOverlap) {
+
         ZoneId zoneId;
         int intSecond = second.decimalValue().setScale(0, RoundingMode.FLOOR).intValue();
         int intNanoSecond = second.decimalValue().subtract(new BigDecimal(intSecond)).multiply(Constants.ANALOG_GIGA)
@@ -118,9 +128,10 @@ public class Utils {
         } else {
             zoneId = ZoneId.of(zoneAbbr.getValue());
         }
-        return ZonedDateTime.of(
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(
                 Long.valueOf(year).intValue(), Long.valueOf(month).intValue(), Long.valueOf(day).intValue(),
                 Long.valueOf(hour).intValue(), Long.valueOf(minute).intValue(), intSecond, intNanoSecond, zoneId);
+        return laterOffsetAtOverlap ? zonedDateTime.withLaterOffsetAtOverlap() : zonedDateTime;
     }
 
     public static BError createError(Errors errorType, String errorMsg) {

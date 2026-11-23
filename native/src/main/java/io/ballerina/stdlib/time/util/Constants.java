@@ -79,6 +79,7 @@ public class Constants {
     public static final String CIVIL_RECORD_DAY_OF_WEEK = "dayOfWeek";
     public static final BString CIVIL_RECORD_UTC_OFFSET_BSTRING = StringUtils.fromString(CIVIL_RECORD_UTC_OFFSET);
     public static final BString CIVIL_RECORD_TIME_ABBREV_BSTRING = StringUtils.fromString(CIVIL_RECORD_TIME_ABBREV);
+    public static final BString CIVIL_RECORD_WHICH_BSTRING = StringUtils.fromString(CIVIL_RECORD_WHICH);
     public static final BString CIVIL_RECORD_DAY_OF_WEEK_BSTRING = StringUtils.fromString(CIVIL_RECORD_DAY_OF_WEEK);
 
     /**

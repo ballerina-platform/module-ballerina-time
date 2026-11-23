@@ -110,6 +110,10 @@ public class Civil {
         civilMap.put(Constants.CIVIL_RECORD_TIME_ABBREV_BSTRING,
                 StringUtils.fromString(zonedDateTime.getZone().toString()));
         civilMap.put(Constants.CIVIL_RECORD_DAY_OF_WEEK_BSTRING, (zonedDateTime.getDayOfWeek().getValue() % 7));
+        if (zonedDateTime.getZone().getRules().getValidOffsets(zonedDateTime.toLocalDateTime()).size() > 1) {
+            civilMap.put(Constants.CIVIL_RECORD_WHICH_BSTRING,
+                    zonedDateTime.isEqual(zonedDateTime.withEarlierOffsetAtOverlap()) ? 0L : 1L);
+        }
     }
 
     private boolean isLocalTimeZoneExists(String time) {
