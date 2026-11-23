@@ -23,7 +23,10 @@ import io.ballerina.stdlib.time.util.Utils;
 
 import java.time.DateTimeException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 /**
@@ -58,6 +61,26 @@ public class Zone {
     public Utc utcFromCivil(Civil civil) {
 
         return new Utc(civil.getZonedDateTime().toInstant());
+    }
+
+    /**
+     * Resolves a local date-time in this zone. A given UTC offset must be valid for the local date-time and
+     * selects the occurrence when the local time occurs twice; without it, {@code laterOffsetAtOverlap} selects
+     * it. A local time in a gap is moved forward by the length of the gap, as {@link ZonedDateTime#ofLocal} does.
+     */
+    public Utc utcFromLocalDateTime(LocalDateTime localDateTime, ZoneOffset utcOffset, boolean laterOffsetAtOverlap) {
+
+        if (utcOffset == null) {
+            ZonedDateTime zonedDateTime = ZonedDateTime.ofLocal(localDateTime, zoneId, null);
+            return new Utc((laterOffsetAtOverlap ? zonedDateTime.withLaterOffsetAtOverlap() : zonedDateTime)
+                    .toInstant());
+        }
+        if (!zoneId.getRules().isValidOffset(localDateTime, utcOffset)) {
+            String offset = utcOffset.getTotalSeconds() == 0 ? "+00:00" : utcOffset.getId();
+            throw new DateTimeException("UTC offset " + offset + " is not valid for " + localDateTime + " in " +
+                    zoneId);
+        }
+        return new Utc(ZonedDateTime.ofLocal(localDateTime, zoneId, utcOffset).toInstant());
     }
 
     public Civil utcToCivil(Utc utc) {

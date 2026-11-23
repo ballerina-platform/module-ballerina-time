@@ -217,10 +217,16 @@ public type Zone readonly & object {
     # + return - The fixed zone offset or nil
     public isolated function fixedOffset() returns ZoneOffset?;
 
-    # Converts a given civil record to a UTC timestamp based on the time zone value.
+    # Converts a given civil record to a UTC timestamp.
+    # If `civil.timeAbbrev` is present, the civil value is interpreted in the zone it names.
+    # Otherwise, it is interpreted in this time zone. When the local time occurs twice at the end of daylight
+    # saving time, `civil.utcOffset` selects the occurrence, or `civil.which` if there is no offset (the earlier
+    # occurrence by default). A local time skipped at the start of daylight saving time is moved forward by the
+    # length of the gap.
     #
     # + civil - The civil record to be converted
-    # + return - The corresponding UTC value or an error if `timeAbbrev` is missing
+    # + return - The corresponding UTC value, or an error if the civil value is invalid or `civil.utcOffset` is not
+    # a valid offset for the local time in this time zone
     public isolated function utcFromCivil(Civil civil) returns Utc|Error;
 
     # Converts a given UTC timestamp to a civil record based on the time zone value.
@@ -263,17 +269,26 @@ public readonly class TimeZone {
         return externTimeZoneFixedOffset(self);
     }
 
-    # Converts a given civil record to a UTC timestamp based on the time zone value.
+    # Converts a given civil record to a UTC timestamp.
+    # If `civil.timeAbbrev` is present, the civil value is interpreted in the zone it names.
+    # Otherwise, it is interpreted in this time zone. When the local time occurs twice at the end of daylight
+    # saving time, `civil.utcOffset` selects the occurrence, or `civil.which` if there is no offset (the earlier
+    # occurrence by default). A local time skipped at the start of daylight saving time is moved forward by the
+    # length of the gap.
     #
     # + civil - The civil record to be converted
-    # + return - The corresponding UTC value or an error if `timeAbbrev` is missing
+    # + return - The corresponding UTC value, or an error if the civil value is invalid or `civil.utcOffset` is not
+    # a valid offset for the local time in this time zone
     public isolated function utcFromCivil(Civil civil) returns Utc|Error {
         string? timeAbbrev = civil?.timeAbbrev;
-        if timeAbbrev is () {
-            return error FormatError("Abbreviation for the local time is required for the conversion");
-        }
         decimal? civilTimeSecField = civil?.second;
         decimal civilTimeSeconds = (civilTimeSecField is Seconds) ? civilTimeSecField : 0.0;
+        if timeAbbrev is () {
+            ZoneOffset? utcOffset = civil?.utcOffset;
+            return externTimeZoneUtcFromLocalCivil(self, civil.year, civil.month, civil.day, civil.hour,
+                    civil.minute, civilTimeSeconds, utcOffset?.hours ?: 0, utcOffset?.minutes ?: 0,
+                    utcOffset?.seconds ?: 0.0, utcOffset is ZoneOffset, civil?.which == 1);
+        }
 
         return externTimeZoneUtcFromCivil(self, civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds, timeAbbrev, PREFER_TIME_ABBREV);
     }
@@ -358,6 +373,12 @@ isolated function externTimeZoneUtcToCivil(TimeZone timeZone, Utc utc) returns C
 isolated function externTimeZoneUtcFromCivil(TimeZone timeZone, int year, int month, int day,
         int hour, int minute, decimal second, string timeAbber, HeaderZoneHandling zoneHandling)
 returns Utc|Error = @java:Method {
+    'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternUtils"
+} external;
+
+isolated function externTimeZoneUtcFromLocalCivil(TimeZone timeZone, int year, int month, int day, int hour,
+        int minute, decimal second, int zoneHour, int zoneMinute, decimal zoneSecond, boolean hasZoneOffset,
+        boolean laterOffsetAtOverlap) returns Utc|Error = @java:Method {
     'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternUtils"
 } external;
 

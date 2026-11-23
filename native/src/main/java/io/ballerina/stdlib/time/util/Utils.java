@@ -27,10 +27,13 @@ import io.ballerina.runtime.api.values.BString;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.DateTimeException;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -121,6 +124,35 @@ public class Utils {
         return ZonedDateTime.of(
                 Long.valueOf(year).intValue(), Long.valueOf(month).intValue(), Long.valueOf(day).intValue(),
                 Long.valueOf(hour).intValue(), Long.valueOf(minute).intValue(), intSecond, intNanoSecond, zoneId);
+    }
+
+    public static LocalDateTime createLocalDateTimeFromCivilValues(long year, long month, long day, long hour,
+                                                                   long minute, BDecimal second) {
+
+        BigDecimal roundedSecond = second.decimalValue().setScale(9, RoundingMode.HALF_UP);
+        BigDecimal wholeSecond = roundedSecond.setScale(0, RoundingMode.FLOOR);
+        int nanoSecond = roundedSecond.subtract(wholeSecond).multiply(Constants.ANALOG_GIGA).intValueExact();
+        int intSecond;
+        try {
+            intSecond = ChronoField.SECOND_OF_MINUTE.checkValidIntValue(wholeSecond.longValueExact());
+        } catch (ArithmeticException e) {
+            throw new DateTimeException("Invalid value for SecondOfMinute (valid values " +
+                    ChronoField.SECOND_OF_MINUTE.range() + "): " + wholeSecond.toPlainString(), e);
+        }
+        return LocalDateTime.of(ChronoField.YEAR.checkValidIntValue(year),
+                ChronoField.MONTH_OF_YEAR.checkValidIntValue(month), ChronoField.DAY_OF_MONTH.checkValidIntValue(day),
+                ChronoField.HOUR_OF_DAY.checkValidIntValue(hour), ChronoField.MINUTE_OF_HOUR.checkValidIntValue(minute),
+                intSecond, nanoSecond);
+    }
+
+    public static ZoneOffset createZoneOffset(long hours, long minutes, BDecimal seconds) {
+
+        try {
+            return ZoneOffset.ofHoursMinutesSeconds(Math.toIntExact(hours), Math.toIntExact(minutes),
+                    seconds.decimalValue().setScale(0, RoundingMode.HALF_UP).intValueExact());
+        } catch (ArithmeticException e) {
+            throw new DateTimeException("Zone offset is out of range", e);
+        }
     }
 
     public static BError createError(Errors errorType, String errorMsg) {
