@@ -127,30 +127,34 @@ public class Utils {
                 Long.valueOf(hour).intValue(), Long.valueOf(minute).intValue(), intSecond, intNanoSecond, zoneId);
     }
 
+    public static final String INSTANT_YEARS = "from year -1000000000 to year 1000000000";
+    public static final String DATE_TIME_YEARS = "from year -999999999 to year 999999999";
+    public static final String EMAIL_YEARS = "from year 0 to year 9999";
+
     /**
-     * Converts a Ballerina {@code time:Utc} to an Instant, panicking with a {@code time:Error} when the value
-     * is outside the range java.time supports.
+     * Converts a Ballerina {@code time:Utc} to an Instant, panicking with a {@code time:Error} that states
+     * {@code supportedYears} when the value cannot be represented.
      */
-    public static Instant toInstant(BArray utc) {
+    public static Instant toInstant(BArray utc, String supportedYears) {
         try {
             return new Utc(utc).generateInstant();
         } catch (DateTimeException e) {
-            throw createUtcOutOfRangeError(utc);
+            throw createUtcOutOfRangeError(utc, supportedYears);
         }
     }
 
-    public static ZonedDateTime toZonedDateTime(BArray utc, ZoneId zoneId) {
-        Instant instant = toInstant(utc);
+    public static ZonedDateTime toZonedDateTime(BArray utc, ZoneId zoneId, String supportedYears) {
+        Instant instant = toInstant(utc, supportedYears);
         try {
             return instant.atZone(zoneId);
         } catch (DateTimeException e) {
-            throw createUtcOutOfRangeError(utc);
+            throw createUtcOutOfRangeError(utc, supportedYears);
         }
     }
 
-    public static BError createUtcOutOfRangeError(BArray utc) {
+    public static BError createUtcOutOfRangeError(BArray utc, String supportedYears) {
         return createError(Errors.FormatError, "UTC value [" + utc.getInt(0) + ", " + utc.getValues()[1] +
-                "] is outside the supported range, from year -999999999 to year 999999999");
+                "] is outside the supported range, " + supportedYears);
     }
 
     public static BError createError(Errors errorType, String errorMsg) {

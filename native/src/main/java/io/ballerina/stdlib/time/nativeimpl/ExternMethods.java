@@ -79,12 +79,12 @@ public class ExternMethods {
 
     public static BString externUtcToString(BArray utc) {
 
-        return StringUtils.fromString(Utils.toInstant(utc).toString());
+        return StringUtils.fromString(Utils.toInstant(utc, Utils.INSTANT_YEARS).toString());
     }
 
     public static BDecimal externUtcDiffSeconds(BArray utc1, BArray utc2) {
 
-        return ValueCreator.createDecimalValue(new Utc(utc1).secondsSince(new Utc(utc2)));
+        return ValueCreator.createDecimalValue(Utc.secondsBetween(utc1, utc2));
     }
 
     public static Object externDateValidate(BMap date) {
@@ -114,7 +114,8 @@ public class ExternMethods {
 
     public static BMap externUtcToCivil(BArray utc) {
 
-        return TimeValueHandler.createCivilFromZoneDateTime(Utils.toZonedDateTime(utc, ZoneId.of("Z")));
+        return TimeValueHandler.createCivilFromZoneDateTime(
+                Utils.toZonedDateTime(utc, ZoneId.of("Z"), Utils.DATE_TIME_YEARS));
     }
 
     public static Object externUtcFromCivil(long year, long month, long day, long hour, long minute, BDecimal second,
@@ -163,13 +164,19 @@ public class ExternMethods {
 
     public static BString externUtcToEmailString(BArray utc, BString zh) {
 
-        ZonedDateTime time = Utils.toZonedDateTime(utc, ZoneId.of(Constants.GMT_STRING_VALUE));
+        ZonedDateTime time = Utils.toZonedDateTime(utc, ZoneId.of(Constants.GMT_STRING_VALUE), Utils.EMAIL_YEARS);
         String zhString = zh.getValue();
         if (zhString.equals("0")) {
             zhString = "+0000";
         }
-        return StringUtils.fromString(time.format(DateTimeFormatter.RFC_1123_DATE_TIME)
-                .replace(Constants.GMT_STRING_VALUE, zhString).replace(Constants.ZERO_ZONE_STRING_VALUE, zhString));
+        String formatted;
+        try {
+            formatted = time.format(DateTimeFormatter.RFC_1123_DATE_TIME);
+        } catch (DateTimeException e) {
+            throw Utils.createUtcOutOfRangeError(utc, Utils.EMAIL_YEARS);
+        }
+        return StringUtils.fromString(formatted.replace(Constants.GMT_STRING_VALUE, zhString)
+                .replace(Constants.ZERO_ZONE_STRING_VALUE, zhString));
     }
 
     public static Object externCivilToEmailString(long year, long month, long day, long hour, long minute,

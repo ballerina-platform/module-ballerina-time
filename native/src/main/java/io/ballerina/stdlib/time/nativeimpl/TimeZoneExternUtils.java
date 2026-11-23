@@ -80,7 +80,7 @@ public class TimeZoneExternUtils {
         try {
             return zone.utcToCivil(new Utc(utc)).build();
         } catch (DateTimeException e) {
-            throw Utils.createUtcOutOfRangeError(utc);
+            throw Utils.createUtcOutOfRangeError(utc, Utils.DATE_TIME_YEARS);
         }
     }
 

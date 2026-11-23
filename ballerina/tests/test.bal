@@ -915,22 +915,54 @@ isolated function dataProviderUtcDiffSeconds() returns [Utc, Utc, decimal][] {
         [[9223372036854775807, 0], [-9223372036854775807, 0], 18446744073709551614d],
         [[1, 0.2], [0, 0.7], 0.5],
         [[0, 0.7], [1, 0.2], -0.5],
-        [[0, 0.1234567891], [0, 0], 0.123456789]
+        [[0, 0.1234567891], [0, 0], 0.123456789],
+        [[9223372036854775807, 1.5], [9223372036854775807, 0.5], 1],
+        [[int:MIN_VALUE, -0.5], [int:MIN_VALUE, 0], -0.5]
     ];
 }
 
-@test:Config {}
-isolated function testUtcConversionsOutsideSupportedRangePanicWithTimeError() returns Error? {
-    Utc utc = [9223372036854775807, 0];
+@test:Config {
+    dataProvider: dataProviderUtcOutsideSupportedRange
+}
+isolated function testUtcConversionsOutsideSupportedRangePanicWithTimeError(Utc utc) returns Error? {
     TimeZone zone = check new ("Asia/Colombo");
-    string errorMsg = "UTC value [9223372036854775807, 0] is outside the supported range, from year -999999999 to year 999999999";
-    (string|Civil|error)[] results = [trap utcToString(utc), trap utcToCivil(utc), trap utcToEmailString(utc),
-        trap zone.utcToCivil(utc)];
-    foreach string|Civil|error result in results {
+    string utcText = string `UTC value [${utc[0]}, ${utc[1]}] is outside the supported range, `;
+    [string|Civil|error, string][] results = [
+        [trap utcToString(utc), "from year -1000000000 to year 1000000000"],
+        [trap utcToCivil(utc), "from year -999999999 to year 999999999"],
+        [trap zone.utcToCivil(utc), "from year -999999999 to year 999999999"],
+        [trap utcToEmailString(utc), "from year 0 to year 9999"]
+    ];
+    foreach [string|Civil|error, string] [result, supportedYears] in results {
         if result !is error {
             test:assertFail("Expected a panic");
         }
         test:assertTrue(result is FormatError);
-        test:assertEquals(result.message(), errorMsg);
+        test:assertEquals(result.message(), utcText + supportedYears);
     }
+}
+
+isolated function dataProviderUtcOutsideSupportedRange() returns [Utc][] {
+    return [[[9223372036854775807, 0]], [[9223372036854775807, 1.5]]];
+}
+
+@test:Config {}
+isolated function testUtcConversionsAtTheirRangeLimits() returns Error? {
+    Utc instantMax = [31556889864403199, 0];
+    test:assertEquals(utcToString(instantMax), "+1000000000-12-31T23:59:59Z");
+    Civil|error civil = trap utcToCivil(instantMax);
+    if civil !is error {
+        test:assertFail("Expected a panic beyond the date-time range");
+    }
+    test:assertEquals(civil.message(), "UTC value [31556889864403199, 0] is outside the supported range, " +
+            "from year -999999999 to year 999999999");
+    Utc year10000 = [253402300800, 0];
+    test:assertEquals(utcToString(year10000), "+10000-01-01T00:00:00Z");
+    string|error email = trap utcToEmailString(year10000);
+    if email !is error {
+        test:assertFail("Expected a panic beyond year 9999");
+    }
+    test:assertEquals(email.message(), "UTC value [253402300800, 0] is outside the supported range, " +
+            "from year 0 to year 9999");
+    test:assertEquals(utcToEmailString([253402300799, 0]), "Fri, 31 Dec 9999 23:59:59 +0000");
 }

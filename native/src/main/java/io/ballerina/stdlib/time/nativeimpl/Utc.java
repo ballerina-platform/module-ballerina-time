@@ -113,17 +113,17 @@ public class Utc {
     }
 
     /**
-     * Returns this UTC minus the other in seconds, without converting to {@link Instant} so that the full
-     * {@code int} range of seconds is supported. Both values must be created from a Ballerina {@code time:Utc}.
+     * Returns {@code utc1 - utc2} in seconds for two Ballerina {@code time:Utc} values. It works on epoch
+     * nanoseconds as a BigInteger, so it supports the full {@code int} range of seconds and any fraction, and it
+     * truncates sub-nanosecond digits as {@code Instant}-based conversions do.
      */
-    public BigDecimal secondsSince(Utc other) {
-        long nanoDiff = lastSecondFraction.longValue() - other.lastSecondFraction.longValue();
-        BigDecimal secondDiff = BigDecimal.valueOf(secondsFromEpoc).subtract(BigDecimal.valueOf(other.secondsFromEpoc));
-        if (nanoDiff < 0) {
-            nanoDiff += ANALOG_GIGA.longValue();
-            secondDiff = secondDiff.subtract(BigDecimal.ONE);
-        }
-        return secondDiff.add(new BigDecimal(nanoDiff).divide(ANALOG_GIGA));
+    public static BigDecimal secondsBetween(BArray utc1, BArray utc2) {
+        return new BigDecimal(epochNanos(utc1).subtract(epochNanos(utc2))).divide(ANALOG_GIGA);
+    }
+
+    private static BigInteger epochNanos(BArray utc) {
+        BigInteger nanos = new BigDecimal(utc.getValues()[1].toString()).multiply(ANALOG_GIGA).toBigInteger();
+        return BigInteger.valueOf(utc.getInt(0)).multiply(BIG_INTEGER_GIGA).add(nanos);
     }
 
     public Instant generateInstant() {
