@@ -922,18 +922,62 @@ isolated function testCivilFromEmailStringRoundTripsUtcToEmailString() returns E
 @test:Config {
     dataProvider: dataProviderInvalidRfc5322DateTimes
 }
-isolated function testCivilFromEmailStringWithInvalidRfc5322Forms(string dateTimeString, string errorMsg) {
+isolated function testCivilFromEmailStringWithInvalidRfc5322Forms(string dateTimeString, int? errorIndex) {
     Civil|Error result = civilFromEmailString(dateTimeString);
     if result is Civil {
         test:assertFail(string `Expected an error for '${dateTimeString}'`);
     }
-    test:assertEquals(result.message(), errorMsg);
+    string quoted = dateTimeString.length() > 64 ? dateTimeString.substring(0, 64) + "..." : dateTimeString;
+    test:assertTrue(result.message().startsWith(string `Text '${quoted}' could not be parsed`), result.message());
+    if errorIndex is int {
+        test:assertTrue(result.message().endsWith(string ` index ${errorIndex}`), result.message());
+    }
 }
 
-isolated function dataProviderInvalidRfc5322DateTimes() returns [string, string][] {
+isolated function dataProviderInvalidRfc5322DateTimes() returns [string, int?][] {
     return [
-        ["Mon, 3 Dec 2007 10:15:30 J", "Text 'Mon, 3 Dec 2007 10:15:30 J' could not be parsed at index 25"],
-        ["Mon, 3 Dez 2007 10:15:30 GMT", "Text 'Mon, 3 Dez 2007 10:15:30 GMT' could not be parsed at index 7"],
-        ["Tue, 3 Dec 2007 10:15:30 GMT", "Text 'Tue, 3 Dec 2007 10:15:30 GMT' could not be parsed: Conflict found: Field DayOfWeek 1 differs from DayOfWeek 2 derived from 2007-12-03"]
+        ["Mon, 3 Dec 2007 10:15:30 J", 25],
+        ["Mon, 3 Dez 2007 10:15:30 GMT", 7],
+        ["Mon,  3 Dez 2007 10:15:30 GMT", 8],
+        ["Tue, 3 Dec 2007 10:15:30 GMT", ()],
+        ["Tue, 3 Dec 2007 10:15:30 GMT (some long comment exceeding sixty-four characters)", ()],
+        ["Wed, 10 2021 19:51:55 -0800 (PST)", 8]
     ];
+}
+
+@test:Config {
+    dataProvider: dataProviderRfc5322FoldingAndObsoleteForms
+}
+isolated function testCivilFromEmailStringWithFoldingAndObsoleteForms(string dateTimeString, string expectedUtc)
+        returns Error? {
+    Civil civil = check civilFromEmailString(dateTimeString);
+    test:assertEquals(utcToString(check utcFromCivil(civil)), expectedUtc);
+}
+
+isolated function dataProviderRfc5322FoldingAndObsoleteForms() returns [string, string][] {
+    return [
+        ["Mon,  3 Dec 2007 10:15:30 +0000", "2007-12-03T10:15:30Z"],
+        ["Mon,3 Dec 2007 10:15:30 +0000", "2007-12-03T10:15:30Z"],
+        ["Mon, 3 Dec\r\n 2007 10:15:30 +0000", "2007-12-03T10:15:30Z"],
+        ["Mon, 3 Dec 2007 10:15:30 GMT\r\n", "2007-12-03T10:15:30Z"],
+        ["Mon, 3 Dec 2007 10:15:30 GMT  (UTC)", "2007-12-03T10:15:30Z"],
+        ["Mon, 3 Dec 2007 10:15:30 +0000 (added by relay)", "2007-12-03T10:15:30Z"],
+        ["Mon, 3 Dec 2007 10:15:30 UT (foo)", "2007-12-03T10:15:30Z"],
+        ["Mon, 3 Dec 07 10:15:30 +0000", "2007-12-03T10:15:30Z"],
+        ["Fri, 3 Dec 99 10:15:30 +0000", "1999-12-03T10:15:30Z"],
+        ["3 Dec 107 10:15:30 +0000", "2007-12-03T10:15:30Z"]
+    ];
+}
+
+@test:Config {}
+isolated function testCivilFromEmailStringRejectsLongCraftedInputQuickly() {
+    string padding = " ";
+    foreach int i in 0 ..< 17 {
+        padding = padding + padding;
+    }
+    foreach string crafted in ["1:00 A" + padding + "x", "Mon, 3 Dec 2007 10:15:30 A" + padding + "x"] {
+        decimal startTime = monotonicNow();
+        test:assertTrue(civilFromEmailString(crafted) is Error);
+        test:assertTrue(monotonicNow() - startTime < 5d, "Parsing a crafted input took too long");
+    }
 }
