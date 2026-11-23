@@ -4,6 +4,16 @@ This file contains all the notable changes done to the Ballerina time package th
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- [[#9875] `time:civilFromString` now always returns `utcOffset`, including `{hours: 0, minutes: 0}` for a `Z` timestamp with or without seconds or a fraction (previously omitted for `...T10:15Z` and `...T10:15:30.52Z`)](https://github.com/ballerina-platform/ballerina-library/issues/9875)
+
+### Fixed
+
+- [[#9875] Fix `time:civilFromString` dropping seconds for lowercase input and setting `utcOffset` inconsistently for `Z`](https://github.com/ballerina-platform/ballerina-library/issues/9875)
+
 ## [2.8.4] - 2026-10-16
 
 ### Changed

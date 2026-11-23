@@ -27,12 +27,13 @@ import io.ballerina.stdlib.time.util.Utils;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.text.ParsePosition;
 import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import static io.ballerina.stdlib.time.util.Constants.ANALOG_GIGA;
 
@@ -45,7 +46,6 @@ public class Civil {
 
     private final ZonedDateTime zonedDateTime;
     private boolean isSecondExists = false;
-    private boolean isLocalTimeZoneExists = false;
     private final BMap<BString, Object> civilMap = ValueCreator.createRecordValue(ModuleUtils.getModule(),
             Constants.CIVIL_RECORD);
 
@@ -60,11 +60,11 @@ public class Civil {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(Constants.EMAIL_DATE_TIME_FORMAT);
             this.zonedDateTime = ZonedDateTime.parse(zonedDateTimeString, dateTimeFormatter);
             this.isSecondExists = true;
-            this.isLocalTimeZoneExists = true;
         } else {
             this.zonedDateTime = ZonedDateTime.parse(zonedDateTimeString);
-            this.isSecondExists = isSecondExists(zonedDateTimeString);
-            this.isLocalTimeZoneExists = isLocalTimeZoneExists(zonedDateTimeString);
+            this.isSecondExists = DateTimeFormatter.ISO_ZONED_DATE_TIME
+                    .parseUnresolved(zonedDateTimeString, new ParsePosition(0))
+                    .isSupported(ChronoField.SECOND_OF_MINUTE);
         }
     }
 
@@ -92,11 +92,7 @@ public class Civil {
         if (this.isSecondExists) {
             civilMap.put(Constants.TIME_OF_DAY_RECORD_SECOND_BSTRING, ValueCreator.createDecimalValue(second));
         }
-        if (this.isLocalTimeZoneExists) {
-            civilMap.put(Constants.CIVIL_RECORD_UTC_OFFSET_BSTRING,
-                    createZoneOffsetFromZonedDateTime(zonedDateTime));
-        }
-
+        civilMap.put(Constants.CIVIL_RECORD_UTC_OFFSET_BSTRING, createZoneOffsetFromZonedDateTime(zonedDateTime));
         return civilMap;
     }
 
@@ -110,18 +106,6 @@ public class Civil {
         civilMap.put(Constants.CIVIL_RECORD_TIME_ABBREV_BSTRING,
                 StringUtils.fromString(zonedDateTime.getZone().toString()));
         civilMap.put(Constants.CIVIL_RECORD_DAY_OF_WEEK_BSTRING, (zonedDateTime.getDayOfWeek().getValue() % 7));
-    }
-
-    private boolean isLocalTimeZoneExists(String time) {
-
-        Pattern pattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(:\\d{2}\\.\\d+)?(Z$)");
-        return !pattern.matcher(time).find();
-    }
-
-    private boolean isSecondExists(String time) {
-
-        Pattern pattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?");
-        return pattern.matcher(time).find();
     }
 
     public BMap<BString, Object> createZoneOffsetFromZonedDateTime(ZonedDateTime zonedDateTime) {
