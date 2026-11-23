@@ -259,8 +259,9 @@ public isolated function civilToEmailString(Civil civil, HeaderZoneHandling zone
             utcOffsetHours, utcOffsetMinutes, utcOffsetSeconds, timeAbbrev, zoneHandling);
 }
 
-# Adds the given time duration to the specified civil record. This is a time zone-agnostic operation and assumes that
-# all days have exactly 86,400 seconds.
+# Adds the given time duration to the specified civil record.
+# Years, months and days are added to the local date-time, so across a daylight saving time change in the civil
+# value's `timeAbbrev` zone a day can be 23 or 25 hours long. Hours, minutes and seconds are added as elapsed time.
 # ```ballerina
 # time:Civil civil = check time:civilFromString("2025-04-25T10:15:30.00Z");
 # time:Civil|time:Error updatedCivil = time:civilAddDuration(civil, {years: 1, days: 3, hours: 4, seconds: 6});

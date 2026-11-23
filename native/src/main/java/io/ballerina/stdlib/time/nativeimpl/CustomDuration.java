@@ -21,9 +21,11 @@ import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.stdlib.time.util.Constants;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.DateTimeException;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 /**
@@ -41,6 +43,10 @@ import java.time.ZonedDateTime;
 public record CustomDuration(long years, long months, long days, long hours, long minutes, long seconds,
                              long nanoSeconds) {
 
+    private static final BigInteger MONTHS_PER_YEAR = BigInteger.valueOf(12);
+    private static final BigInteger SECONDS_PER_HOUR = BigInteger.valueOf(3600);
+    private static final BigInteger SECONDS_PER_MINUTE = BigInteger.valueOf(60);
+
     public CustomDuration(long years, long months, long days, long hours, long minutes, BDecimal seconds) {
         this(
             years,
@@ -54,15 +60,20 @@ public record CustomDuration(long years, long months, long days, long hours, lon
     }
 
     /**
-     * Adds the years and months, then the days on the local time-line (as {@link java.time.Period} does), and
-     * finally the hours, minutes and seconds on the instant time-line.
+     * Adds the years, months and days to the local date-time and resolves the zone once, exactly as
+     * {@code ZonedDateTime.plus(Period)} does, then adds the hours, minutes and seconds as elapsed time.
      */
     public ZonedDateTime addTo(ZonedDateTime zonedDateTime) {
         try {
-            return zonedDateTime
-                    .plusMonths(Math.addExact(Math.multiplyExact(years, 12), months))
-                    .plusDays(days)
-                    .plus(Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds).plusNanos(nanoSeconds));
+            long totalMonths = BigInteger.valueOf(years).multiply(MONTHS_PER_YEAR).add(BigInteger.valueOf(months))
+                    .longValueExact();
+            LocalDateTime localDateTime = zonedDateTime.toLocalDateTime().plusMonths(totalMonths).plusDays(days);
+            ZonedDateTime dateShifted = ZonedDateTime.ofLocal(localDateTime, zonedDateTime.getZone(),
+                    zonedDateTime.getOffset());
+            long totalSeconds = BigInteger.valueOf(hours).multiply(SECONDS_PER_HOUR)
+                    .add(BigInteger.valueOf(minutes).multiply(SECONDS_PER_MINUTE))
+                    .add(BigInteger.valueOf(seconds)).longValueExact();
+            return dateShifted.plus(Duration.ofSeconds(totalSeconds, nanoSeconds));
         } catch (ArithmeticException e) {
             throw new DateTimeException("Duration is out of range", e);
         }
