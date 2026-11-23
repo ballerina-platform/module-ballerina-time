@@ -224,6 +224,7 @@ public type Zone readonly & object {
     public isolated function utcFromCivil(Civil civil) returns Utc|Error;
 
     # Converts a given UTC timestamp to a civil record based on the time zone value.
+    # Panics if `utc` is outside the supported range, from year -999999999 to year 999999999.
     #
     # + utc - The UTC time as a tuple `[int, decimal]`, where the first element is the seconds from the epoch
     #         and the second element is the fractional part of the last second.
@@ -279,6 +280,7 @@ public readonly class TimeZone {
     }
 
     # Converts a given UTC timestamp to a civil record based on the time zone value.
+    # Panics if `utc` is outside the supported range, from year -999999999 to year 999999999.
     #
     # + utc - The UTC timestamp value to be converted
     # + return - The corresponding civil record

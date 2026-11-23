@@ -26,8 +26,10 @@ import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.stdlib.time.util.Constants;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -42,6 +44,8 @@ import static io.ballerina.stdlib.time.util.Constants.ANALOG_GIGA;
  * @since 2.0.2
  */
 public class Utc {
+
+    private static final BigInteger BIG_INTEGER_GIGA = ANALOG_GIGA.toBigInteger();
 
     private long secondsFromEpoc = 0;
     private BigDecimal lastSecondFraction = new BigDecimal(0);
@@ -61,8 +65,19 @@ public class Utc {
 
     public Utc (BArray utc) {
         if (utc.getLength() == 2) {
-            secondsFromEpoc = utc.getInt(0);
-            lastSecondFraction = new BigDecimal(utc.getValues()[1].toString()).multiply(Constants.ANALOG_GIGA);
+            // Same normalisation as Instant.ofEpochSecond(seconds, nanos), but without int overflow of the nanos.
+            BigInteger[] carryAndNanos = new BigDecimal(utc.getValues()[1].toString()).multiply(ANALOG_GIGA)
+                    .toBigInteger().divideAndRemainder(BIG_INTEGER_GIGA);
+            if (carryAndNanos[1].signum() < 0) {
+                carryAndNanos[0] = carryAndNanos[0].subtract(BigInteger.ONE);
+                carryAndNanos[1] = carryAndNanos[1].add(BIG_INTEGER_GIGA);
+            }
+            try {
+                secondsFromEpoc = Math.addExact(utc.getInt(0), carryAndNanos[0].longValueExact());
+            } catch (ArithmeticException e) {
+                throw new DateTimeException("Instant exceeds minimum or maximum instant", e);
+            }
+            lastSecondFraction = new BigDecimal(carryAndNanos[1]);
         } else if (utc.getLength() == 1) {
             secondsFromEpoc = utc.getInt(0);
         }
@@ -95,6 +110,20 @@ public class Utc {
         utcTuple.add(1, ValueCreator.createDecimalValue(lastSecondFraction));
         utcTuple.freezeDirect();
         return utcTuple;
+    }
+
+    /**
+     * Returns this UTC minus the other in seconds, without converting to {@link Instant} so that the full
+     * {@code int} range of seconds is supported. Both values must be created from a Ballerina {@code time:Utc}.
+     */
+    public BigDecimal secondsSince(Utc other) {
+        long nanoDiff = lastSecondFraction.longValue() - other.lastSecondFraction.longValue();
+        BigDecimal secondDiff = BigDecimal.valueOf(secondsFromEpoc).subtract(BigDecimal.valueOf(other.secondsFromEpoc));
+        if (nanoDiff < 0) {
+            nanoDiff += ANALOG_GIGA.longValue();
+            secondDiff = secondDiff.subtract(BigDecimal.ONE);
+        }
+        return secondDiff.add(new BigDecimal(nanoDiff).divide(ANALOG_GIGA));
     }
 
     public Instant generateInstant() {

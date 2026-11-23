@@ -20,14 +20,18 @@ package io.ballerina.stdlib.time.util;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
+import io.ballerina.stdlib.time.nativeimpl.Utc;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.DateTimeException;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -121,6 +125,32 @@ public class Utils {
         return ZonedDateTime.of(
                 Long.valueOf(year).intValue(), Long.valueOf(month).intValue(), Long.valueOf(day).intValue(),
                 Long.valueOf(hour).intValue(), Long.valueOf(minute).intValue(), intSecond, intNanoSecond, zoneId);
+    }
+
+    /**
+     * Converts a Ballerina {@code time:Utc} to an Instant, panicking with a {@code time:Error} when the value
+     * is outside the range java.time supports.
+     */
+    public static Instant toInstant(BArray utc) {
+        try {
+            return new Utc(utc).generateInstant();
+        } catch (DateTimeException e) {
+            throw createUtcOutOfRangeError(utc);
+        }
+    }
+
+    public static ZonedDateTime toZonedDateTime(BArray utc, ZoneId zoneId) {
+        Instant instant = toInstant(utc);
+        try {
+            return instant.atZone(zoneId);
+        } catch (DateTimeException e) {
+            throw createUtcOutOfRangeError(utc);
+        }
+    }
+
+    public static BError createUtcOutOfRangeError(BArray utc) {
+        return createError(Errors.FormatError, "UTC value [" + utc.getInt(0) + ", " + utc.getValues()[1] +
+                "] is outside the supported range, from year -999999999 to year 999999999");
     }
 
     public static BError createError(Errors errorType, String errorMsg) {

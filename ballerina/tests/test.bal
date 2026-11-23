@@ -884,3 +884,53 @@ isolated function dataProviderInvalidZoneDateTimeCivilAddDuration() returns [str
         ["Asia/Colombo", {year: 2025, month: 13, day: 23, hour: 0, minute: 20, second: 1.2, timeAbbrev: "America/Los_Angeles", utcOffset: {hours: 8, minutes: 0}}, {years: 0, months: 10, days: 5, hours: 0, minutes: 0, seconds: 0}, "Invalid value for MonthOfYear (valid values 1 - 12): 13"]
     ];
 }
+
+@test:Config {
+    dataProvider: dataProviderUtcWithFractionOutsideUnitRange
+}
+isolated function testUtcWithFractionOutsideUnitRange(Utc utc, string expected) {
+    test:assertEquals(utcToString(utc), expected);
+}
+
+isolated function dataProviderUtcWithFractionOutsideUnitRange() returns [Utc, string][] {
+    return [
+        [[0, 5.0], "1970-01-01T00:00:05Z"],
+        [[0, 2.5], "1970-01-01T00:00:02.500Z"],
+        [[0, 1.5], "1970-01-01T00:00:01.500Z"],
+        [[10, -0.5], "1970-01-01T00:00:09.500Z"],
+        [[0, 3000000000.25], "2065-01-24T05:20:00.250Z"]
+    ];
+}
+
+@test:Config {
+    dataProvider: dataProviderUtcDiffSeconds
+}
+isolated function testUtcDiffSecondsAcrossIntRange(Utc utc1, Utc utc2, decimal expected) {
+    test:assertEquals(utcDiffSeconds(utc1, utc2), expected);
+}
+
+isolated function dataProviderUtcDiffSeconds() returns [Utc, Utc, decimal][] {
+    return [
+        [[9223372036854775807, 0], [0, 0], 9223372036854775807],
+        [[9223372036854775807, 0], [-9223372036854775807, 0], 18446744073709551614d],
+        [[1, 0.2], [0, 0.7], 0.5],
+        [[0, 0.7], [1, 0.2], -0.5],
+        [[0, 0.1234567891], [0, 0], 0.123456789]
+    ];
+}
+
+@test:Config {}
+isolated function testUtcConversionsOutsideSupportedRangePanicWithTimeError() returns Error? {
+    Utc utc = [9223372036854775807, 0];
+    TimeZone zone = check new ("Asia/Colombo");
+    string errorMsg = "UTC value [9223372036854775807, 0] is outside the supported range, from year -999999999 to year 999999999";
+    (string|Civil|error)[] results = [trap utcToString(utc), trap utcToCivil(utc), trap utcToEmailString(utc),
+        trap zone.utcToCivil(utc)];
+    foreach string|Civil|error result in results {
+        if result !is error {
+            test:assertFail("Expected a panic");
+        }
+        test:assertTrue(result is FormatError);
+        test:assertEquals(result.message(), errorMsg);
+    }
+}

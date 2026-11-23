@@ -77,7 +77,11 @@ public class TimeZoneExternUtils {
     public static BMap externTimeZoneUtcToCivil(BObject timeZoneObj, BArray utc) {
 
         Zone zone = (Zone) timeZoneObj.getNativeData(ZONE_ID_ENTRY);
-        return zone.utcToCivil(new Utc(utc)).build();
+        try {
+            return zone.utcToCivil(new Utc(utc)).build();
+        } catch (DateTimeException e) {
+            throw Utils.createUtcOutOfRangeError(utc);
+        }
     }
 
     public static Object externTimeZoneCivilAddDuration(BObject timeZoneObj, int year, int month,

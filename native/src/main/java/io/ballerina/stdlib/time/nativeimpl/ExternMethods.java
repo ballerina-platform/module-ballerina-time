@@ -79,19 +79,12 @@ public class ExternMethods {
 
     public static BString externUtcToString(BArray utc) {
 
-        Instant time = new Utc(utc).generateInstant();
-        return StringUtils.fromString(time.toString());
+        return StringUtils.fromString(Utils.toInstant(utc).toString());
     }
 
     public static BDecimal externUtcDiffSeconds(BArray utc1, BArray utc2) {
 
-        Instant time1 = new Utc(utc1).generateInstant();
-        Instant time2 = new Utc(utc2).generateInstant();
-        time1 = time1.minusNanos(time2.getNano());
-        time1 = time1.minusSeconds(time2.getEpochSecond());
-        BigDecimal nanoSeconds = new BigDecimal(time1.getNano()).divide(Constants.ANALOG_GIGA);
-        BigDecimal seconds = new BigDecimal(time1.getEpochSecond()).add(nanoSeconds);
-        return ValueCreator.createDecimalValue(seconds);
+        return ValueCreator.createDecimalValue(new Utc(utc1).secondsSince(new Utc(utc2)));
     }
 
     public static Object externDateValidate(BMap date) {
@@ -121,9 +114,7 @@ public class ExternMethods {
 
     public static BMap externUtcToCivil(BArray utc) {
 
-        Instant time = new Utc(utc).generateInstant();
-        ZonedDateTime zonedDateTime = time.atZone(ZoneId.of("Z"));
-        return TimeValueHandler.createCivilFromZoneDateTime(zonedDateTime);
+        return TimeValueHandler.createCivilFromZoneDateTime(Utils.toZonedDateTime(utc, ZoneId.of("Z")));
     }
 
     public static Object externUtcFromCivil(long year, long month, long day, long hour, long minute, BDecimal second,
@@ -172,13 +163,12 @@ public class ExternMethods {
 
     public static BString externUtcToEmailString(BArray utc, BString zh) {
 
-        Instant time = new Utc(utc).generateInstant();
+        ZonedDateTime time = Utils.toZonedDateTime(utc, ZoneId.of(Constants.GMT_STRING_VALUE));
         String zhString = zh.getValue();
         if (zhString.equals("0")) {
             zhString = "+0000";
         }
-        return StringUtils.fromString(ZonedDateTime.ofInstant(time,
-                        ZoneId.of(Constants.GMT_STRING_VALUE)).format(DateTimeFormatter.RFC_1123_DATE_TIME)
+        return StringUtils.fromString(time.format(DateTimeFormatter.RFC_1123_DATE_TIME)
                 .replace(Constants.GMT_STRING_VALUE, zhString).replace(Constants.ZERO_ZONE_STRING_VALUE, zhString));
     }
 

@@ -48,6 +48,7 @@ public isolated function utcFromString(string timestamp) returns Utc|Error {
 }
 
 # Converts a given UTC time to an RFC 3339 timestamp (e.g., `2007-12-03T10:15:30.00Z`).
+# Panics if `utc` is outside the supported range, from year -999999999 to year 999999999.
 # ```ballerina
 # string utcString = time:utcToString(time:utcNow());
 # ```
@@ -119,6 +120,7 @@ public isolated function dayOfWeek(Date date) returns DayOfWeek {
 }
 
 # Converts a given UTC timestamp to a civil value.
+# Panics if `utc` is outside the supported range, from year -999999999 to year 999999999.
 # ```ballerina
 # time:Utc utc = time:utcNow();
 # time:Civil civil = time:utcToCivil(utc);
@@ -196,6 +198,7 @@ public isolated function civilToString(Civil civil) returns string|Error {
 }
 
 # Converts a given UTC to an email-formatted string (e.g `Mon, 3 Dec 2007 10:15:30 GMT`).
+# Panics if `utc` is outside the supported range, from year -999999999 to year 999999999.
 # ```ballerina
 # time:Utc utc = time:utcNow();
 # string emailFormattedString = time:utcToEmailString(utc);
