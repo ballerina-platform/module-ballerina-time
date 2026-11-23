@@ -80,11 +80,11 @@ public class TimeZoneExternUtils {
         return zone.utcToCivil(new Utc(utc)).build();
     }
 
-    public static Object externTimeZoneCivilAddDuration(BObject timeZoneObj, int year, int month,
-                                                        int day, int hour, int minute, BDecimal second,
-                                                        int zoneHour, int zoneMinute, BDecimal zoneSecond,
-                                                        BString zoneAbbrev, BString zoneHandling, int duYears,
-                                                        int duMonths, int duDays, int duHours, int duMinutes,
+    public static Object externTimeZoneCivilAddDuration(BObject timeZoneObj, long year, long month,
+                                                        long day, long hour, long minute, BDecimal second,
+                                                        long zoneHour, long zoneMinute, BDecimal zoneSecond,
+                                                        BString zoneAbbrev, BString zoneHandling, long duYears,
+                                                        long duMonths, long duDays, long duHours, long duMinutes,
                                                         BDecimal duSeconds) {
         try {
             Zone zone = (Zone) timeZoneObj.getNativeData(ZONE_ID_ENTRY);
