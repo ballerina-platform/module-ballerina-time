@@ -310,9 +310,11 @@ public readonly class TimeZone {
         decimal utcOffsetSeconds = utcOffset?.seconds ?: 0.0;
         decimal civilTimeSeconds = civil?.second ?: 0.0;
 
+        int days = check durationDays(duration);
+
         return externTimeZoneCivilAddDuration(self, civil.year, civil.month, civil.day, civil.hour, civil.minute,
                 civilTimeSeconds, utcOffsetHours, utcOffsetMinutes, utcOffsetSeconds, timeAbbrev ?: "", zoneHandling,
-                duration.years, duration.months, duration.days, duration.hours, duration.minutes, duration.seconds);
+                duration.years, duration.months, days, duration.hours, duration.minutes, duration.seconds);
     }
 }
 

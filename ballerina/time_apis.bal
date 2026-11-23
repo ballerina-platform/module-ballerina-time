@@ -282,10 +282,17 @@ public isolated function civilAddDuration(Civil civil, Duration duration) return
     decimal utcOffsetSeconds = utcOffset?.seconds ?: 0.0;
     decimal civilTimeSeconds = civil?.second ?: 0.0;
 
+    int days = check durationDays(duration);
+
     return externCivilAddDuration(civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds,
             utcOffsetHours, utcOffsetMinutes, utcOffsetSeconds, timeAbbrev ?: "", zoneHandling, duration.years,
-            duration.months, duration.days, duration.hours, duration.minutes, duration.seconds);
+            duration.months, days, duration.hours, duration.minutes, duration.seconds);
 };
+
+isolated function durationDays(Duration duration) returns int|Error {
+    int|error days = trap (duration.days + duration.weeks * 7);
+    return days is int ? days : error FormatError("Duration is out of range");
+}
 
 isolated function externUtcNow(int precision) returns Utc = @java:Method {
     name: "externUtcNow",
