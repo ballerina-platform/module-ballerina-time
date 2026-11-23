@@ -571,6 +571,34 @@ isolated function testGetZone() returns Error? {
     test:assertEquals(<ZoneOffset>zoneOffset2, {hours: 9, minutes: 0});
 }
 
+@test:Config {
+    dataProvider: dataProviderInvalidZoneIds
+}
+isolated function testGetZoneWithInvalidZoneId(string zoneId, string errorMsg) {
+    test:assertTrue(getZone(zoneId) is ());
+}
+
+@test:Config {
+    dataProvider: dataProviderInvalidZoneIds
+}
+isolated function testTimeZoneInitWithInvalidZoneId(string zoneId, string errorMsg) {
+    TimeZone|Error timeZone = new (zoneId);
+    if timeZone is TimeZone {
+        test:assertFail(string `Expected an error for zone ID '${zoneId}'`);
+    }
+    test:assertTrue(timeZone is FormatError);
+    test:assertEquals(timeZone.message(), errorMsg);
+}
+
+isolated function dataProviderInvalidZoneIds() returns [string, string][] {
+    return [
+        ["Europe/Berln", "Invalid zone ID 'Europe/Berln': Unknown time-zone ID: Europe/Berln"],
+        ["+20:00", "Invalid zone ID '+20:00': Zone offset hours not in valid range: value 20 is not in the range -18 to 18"],
+        ["+04:61", "Invalid zone ID '+04:61': Zone offset minutes not in valid range: value 61 is not in the range -59 to 59"],
+        ["", "Invalid zone ID '': Invalid ID for ZoneOffset, invalid format: "]
+    ];
+}
+
 @test:Config {}
 isolated function testZoneUtcFromCivil() returns Error? {
     Civil civil = {

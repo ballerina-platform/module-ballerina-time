@@ -250,7 +250,7 @@ public readonly class TimeZone {
     # + return - An `time:Error` if the zone ID is invalid, otherwise nil
     public isolated function init(string? zoneId = ()) returns Error? {
         if zoneId is string {
-            externTimeZoneInitWithId(self, zoneId);
+            check externTimeZoneInitWithId(self, zoneId);
         } else {
             check externTimeZoneInitWithSystemZone(self);
         }
@@ -343,7 +343,7 @@ isolated function externTimeZoneInitWithSystemZone(TimeZone timeZone) returns Er
     'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternUtils"
 } external;
 
-isolated function externTimeZoneInitWithId(TimeZone timeZone, string zoneId) = @java:Method {
+isolated function externTimeZoneInitWithId(TimeZone timeZone, string zoneId) returns Error? = @java:Method {
     'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternUtils"
 } external;
 

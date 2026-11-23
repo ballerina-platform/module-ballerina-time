@@ -52,10 +52,16 @@ public class TimeZoneExternUtils {
         }
     }
 
-    public static void externTimeZoneInitWithId(BObject timeZoneObj, BString zoneId) {
+    public static Object externTimeZoneInitWithId(BObject timeZoneObj, BString zoneId) {
 
-        Zone zone = new Zone(zoneId.getValue());
-        timeZoneObj.addNativeData(ZONE_ID_ENTRY, zone);
+        try {
+            Zone zone = new Zone(zoneId.getValue());
+            timeZoneObj.addNativeData(ZONE_ID_ENTRY, zone);
+            return null;
+        } catch (DateTimeException e) {
+            return Utils.createError(Errors.FormatError,
+                    "Invalid zone ID '" + zoneId.getValue() + "': " + e.getMessage());
+        }
     }
 
     public static Object externTimeZoneFixedOffset(BObject timeZoneObj) {
