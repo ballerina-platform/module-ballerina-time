@@ -219,8 +219,10 @@ public type Zone readonly & object {
 
     # Converts a given civil record to a UTC timestamp.
     # If `civil.timeAbbrev` is present, the civil value is interpreted in the zone it names.
-    # Otherwise, it is interpreted in this time zone, and `civil.utcOffset`, if present, selects the offset
-    # when the local time occurs twice at the end of daylight saving time.
+    # Otherwise, it is interpreted in this time zone. When the local time occurs twice at the end of daylight
+    # saving time, `civil.utcOffset` selects the occurrence, or `civil.which` if there is no offset (the earlier
+    # occurrence by default). A local time skipped at the start of daylight saving time is moved forward by the
+    # length of the gap.
     #
     # + civil - The civil record to be converted
     # + return - The corresponding UTC value, or an error if the civil value is invalid or `civil.utcOffset` is not
@@ -269,8 +271,10 @@ public readonly class TimeZone {
 
     # Converts a given civil record to a UTC timestamp.
     # If `civil.timeAbbrev` is present, the civil value is interpreted in the zone it names.
-    # Otherwise, it is interpreted in this time zone, and `civil.utcOffset`, if present, selects the offset
-    # when the local time occurs twice at the end of daylight saving time.
+    # Otherwise, it is interpreted in this time zone. When the local time occurs twice at the end of daylight
+    # saving time, `civil.utcOffset` selects the occurrence, or `civil.which` if there is no offset (the earlier
+    # occurrence by default). A local time skipped at the start of daylight saving time is moved forward by the
+    # length of the gap.
     #
     # + civil - The civil record to be converted
     # + return - The corresponding UTC value, or an error if the civil value is invalid or `civil.utcOffset` is not
@@ -283,7 +287,7 @@ public readonly class TimeZone {
             ZoneOffset? utcOffset = civil?.utcOffset;
             return externTimeZoneUtcFromLocalCivil(self, civil.year, civil.month, civil.day, civil.hour,
                     civil.minute, civilTimeSeconds, utcOffset?.hours ?: 0, utcOffset?.minutes ?: 0,
-                    utcOffset?.seconds ?: 0.0, utcOffset is ZoneOffset);
+                    utcOffset?.seconds ?: 0.0, utcOffset is ZoneOffset, civil?.which == 1);
         }
 
         return externTimeZoneUtcFromCivil(self, civil.year, civil.month, civil.day, civil.hour, civil.minute, civilTimeSeconds, timeAbbrev, PREFER_TIME_ABBREV);
@@ -373,8 +377,8 @@ returns Utc|Error = @java:Method {
 } external;
 
 isolated function externTimeZoneUtcFromLocalCivil(TimeZone timeZone, int year, int month, int day, int hour,
-        int minute, decimal second, int zoneHour, int zoneMinute, decimal zoneSecond, boolean hasZoneOffset)
-        returns Utc|Error = @java:Method {
+        int minute, decimal second, int zoneHour, int zoneMinute, decimal zoneSecond, boolean hasZoneOffset,
+        boolean laterOffsetAtOverlap) returns Utc|Error = @java:Method {
     'class: "io.ballerina.stdlib.time.nativeimpl.TimeZoneExternUtils"
 } external;
 

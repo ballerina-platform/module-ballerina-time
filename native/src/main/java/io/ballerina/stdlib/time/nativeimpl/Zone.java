@@ -65,12 +65,19 @@ public class Zone {
 
     /**
      * Resolves a local date-time in this zone. A given UTC offset must be valid for the local date-time and
-     * selects the offset when the local time occurs twice; without it, the earlier offset is used.
+     * selects the occurrence when the local time occurs twice; without it, {@code laterOffsetAtOverlap} selects
+     * it. A local time in a gap is moved forward by the length of the gap, as {@link ZonedDateTime#ofLocal} does.
      */
-    public Utc utcFromLocalDateTime(LocalDateTime localDateTime, ZoneOffset utcOffset) {
+    public Utc utcFromLocalDateTime(LocalDateTime localDateTime, ZoneOffset utcOffset, boolean laterOffsetAtOverlap) {
 
-        if (utcOffset != null && !zoneId.getRules().isValidOffset(localDateTime, utcOffset)) {
-            throw new DateTimeException("UTC offset " + utcOffset + " is not valid for " + localDateTime + " in " +
+        if (utcOffset == null) {
+            ZonedDateTime zonedDateTime = ZonedDateTime.ofLocal(localDateTime, zoneId, null);
+            return new Utc((laterOffsetAtOverlap ? zonedDateTime.withLaterOffsetAtOverlap() : zonedDateTime)
+                    .toInstant());
+        }
+        if (!zoneId.getRules().isValidOffset(localDateTime, utcOffset)) {
+            String offset = utcOffset.getTotalSeconds() == 0 ? "+00:00" : utcOffset.getId();
+            throw new DateTimeException("UTC offset " + offset + " is not valid for " + localDateTime + " in " +
                     zoneId);
         }
         return new Utc(ZonedDateTime.ofLocal(localDateTime, zoneId, utcOffset).toInstant());

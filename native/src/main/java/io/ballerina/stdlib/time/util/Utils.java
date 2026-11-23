@@ -129,14 +129,15 @@ public class Utils {
     public static LocalDateTime createLocalDateTimeFromCivilValues(long year, long month, long day, long hour,
                                                                    long minute, BDecimal second) {
 
-        BigDecimal wholeSecond = second.decimalValue().setScale(0, RoundingMode.FLOOR);
-        int nanoSecond = second.decimalValue().subtract(wholeSecond).multiply(Constants.ANALOG_GIGA)
-                .setScale(0, RoundingMode.HALF_UP).intValue();
+        BigDecimal roundedSecond = second.decimalValue().setScale(9, RoundingMode.HALF_UP);
+        BigDecimal wholeSecond = roundedSecond.setScale(0, RoundingMode.FLOOR);
+        int nanoSecond = roundedSecond.subtract(wholeSecond).multiply(Constants.ANALOG_GIGA).intValueExact();
         int intSecond;
         try {
             intSecond = ChronoField.SECOND_OF_MINUTE.checkValidIntValue(wholeSecond.longValueExact());
         } catch (ArithmeticException e) {
-            throw new DateTimeException("Invalid value for SecondOfMinute: " + wholeSecond.toPlainString(), e);
+            throw new DateTimeException("Invalid value for SecondOfMinute (valid values " +
+                    ChronoField.SECOND_OF_MINUTE.range() + "): " + wholeSecond.toPlainString(), e);
         }
         return LocalDateTime.of(ChronoField.YEAR.checkValidIntValue(year),
                 ChronoField.MONTH_OF_YEAR.checkValidIntValue(month), ChronoField.DAY_OF_MONTH.checkValidIntValue(day),

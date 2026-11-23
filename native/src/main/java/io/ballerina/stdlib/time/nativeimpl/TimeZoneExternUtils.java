@@ -79,14 +79,14 @@ public class TimeZoneExternUtils {
     public static Object externTimeZoneUtcFromLocalCivil(BObject timeZoneObj, long year, long month, long day,
                                                          long hour, long minute, BDecimal second, long zoneHour,
                                                          long zoneMinute, BDecimal zoneSecond,
-                                                         boolean hasZoneOffset) {
+                                                         boolean hasZoneOffset, boolean laterOffsetAtOverlap) {
 
         try {
             Zone zone = (Zone) timeZoneObj.getNativeData(ZONE_ID_ENTRY);
             LocalDateTime localDateTime = Utils.createLocalDateTimeFromCivilValues(year, month, day, hour, minute,
                     second);
             ZoneOffset utcOffset = hasZoneOffset ? Utils.createZoneOffset(zoneHour, zoneMinute, zoneSecond) : null;
-            return zone.utcFromLocalDateTime(localDateTime, utcOffset).build();
+            return zone.utcFromLocalDateTime(localDateTime, utcOffset, laterOffsetAtOverlap).build();
         } catch (DateTimeException e) {
             return Utils.createError(Errors.FormatError, e.getMessage());
         }

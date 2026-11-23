@@ -901,7 +901,12 @@ isolated function dataProviderLocalCivilInReceiverZone() returns [string, Civil,
         ["Europe/Berlin", {year: 2025, month: 10, day: 26, hour: 2, minute: 30}, "2025-10-26T00:30:00Z"],
         ["Europe/Berlin", {year: 2025, month: 10, day: 26, hour: 2, minute: 30, utcOffset: {hours: 2, minutes: 0}}, "2025-10-26T00:30:00Z"],
         ["Europe/Berlin", {year: 2025, month: 10, day: 26, hour: 2, minute: 30, utcOffset: {hours: 1, minutes: 0}}, "2025-10-26T01:30:00Z"],
-        ["Asia/Colombo", {year: 2025, month: 4, day: 25, hour: 10, minute: 0, timeAbbrev: "Europe/Berlin"}, "2025-04-25T08:00:00Z"]
+        ["Asia/Colombo", {year: 2025, month: 4, day: 25, hour: 10, minute: 0, timeAbbrev: "Europe/Berlin"}, "2025-04-25T08:00:00Z"],
+        ["Europe/Berlin", {year: 2025, month: 10, day: 26, hour: 2, minute: 30, which: 1}, "2025-10-26T01:30:00Z"],
+        ["Europe/Berlin", {year: 2025, month: 10, day: 26, hour: 2, minute: 30, which: 0}, "2025-10-26T00:30:00Z"],
+        ["Europe/Berlin", {year: 2025, month: 10, day: 26, hour: 2, minute: 30, utcOffset: {hours: 2}, which: 1}, "2025-10-26T00:30:00Z"],
+        ["Europe/Berlin", {year: 2025, month: 3, day: 30, hour: 2, minute: 30}, "2025-03-30T01:30:00Z"],
+        ["Asia/Colombo", {year: 2025, month: 4, day: 25, hour: 10, minute: 0, second: 10.9999999996}, "2025-04-25T04:30:11Z"]
     ];
 }
 
@@ -925,6 +930,9 @@ isolated function dataProviderInvalidLocalCivilInReceiverZone() returns [string,
         ["Asia/Colombo", {year: 2025, month: 4, day: 25, hour: 10, minute: 0, utcOffset: {hours: 1, minutes: 0}}, "UTC offset +01:00 is not valid for 2025-04-25T10:00 in Asia/Colombo"],
         ["Europe/Berlin", {year: 2025, month: 3, day: 30, hour: 2, minute: 30, utcOffset: {hours: 1, minutes: 0}}, "UTC offset +01:00 is not valid for 2025-03-30T02:30 in Europe/Berlin"],
         ["Asia/Colombo", {year: 2025, month: 2, day: 30, hour: 10, minute: 0}, "Invalid date 'FEBRUARY 30'"],
-        ["Asia/Colombo", {year: 4294969321, month: 1, day: 1, hour: 0, minute: 0}, "Invalid value for Year (valid values -999999999 - 999999999): 4294969321"]
+        ["Asia/Colombo", {year: 4294969321, month: 1, day: 1, hour: 0, minute: 0}, "Invalid value for Year (valid values -999999999 - 999999999): 4294969321"],
+        ["Asia/Colombo", {year: 2025, month: 4, day: 25, hour: 10, minute: 0, utcOffset: {hours: 0}}, "UTC offset +00:00 is not valid for 2025-04-25T10:00 in Asia/Colombo"],
+        ["Asia/Colombo", {year: 2025, month: 4, day: 25, hour: 10, minute: 0, utcOffset: {hours: 4294967296}}, "Zone offset is out of range"],
+        ["Asia/Colombo", {year: 2025, month: 4, day: 25, hour: 10, minute: 0, second: 1e30}, "Invalid value for SecondOfMinute (valid values 0 - 59): 1000000000000000000000000000000"]
     ];
 }
