@@ -899,8 +899,8 @@ isolated function testDateValidateWithOutOfIntRangeFields(Date date, string erro
 
 isolated function dataProviderOutOfIntRangeDates() returns [Date, string][] {
     return [
-        [{year: 9999999999, month: 1, day: 1}, "Date field out of range: year=9999999999, month=1, day=1"],
-        [{year: 2025, month: 4294967297, day: 1}, "Date field out of range: year=2025, month=4294967297, day=1"],
-        [{year: 2025, month: 1, day: -4294967295}, "Date field out of range: year=2025, month=1, day=-4294967295"]
+        [{year: 9999999999, month: 1, day: 1}, "Invalid value for Year (valid values -999999999 - 999999999): 9999999999"],
+        [{year: 2025, month: 4294967297, day: 1}, "Invalid value for MonthOfYear (valid values 1 - 12): 4294967297"],
+        [{year: 2025, month: 1, day: -4294967295}, "Invalid value for DayOfMonth (valid values 1 - 28/31): -4294967295"]
     ];
 }
