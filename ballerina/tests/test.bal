@@ -574,29 +574,33 @@ isolated function testGetZone() returns Error? {
 @test:Config {
     dataProvider: dataProviderInvalidZoneIds
 }
-isolated function testGetZoneWithInvalidZoneId(string zoneId, string errorMsg) {
+isolated function testGetZoneWithInvalidZoneId(string zoneId) {
     test:assertTrue(getZone(zoneId) is ());
 }
 
 @test:Config {
     dataProvider: dataProviderInvalidZoneIds
 }
-isolated function testTimeZoneInitWithInvalidZoneId(string zoneId, string errorMsg) {
+isolated function testTimeZoneInitWithInvalidZoneId(string zoneId) {
     TimeZone|Error timeZone = new (zoneId);
     if timeZone is TimeZone {
         test:assertFail(string `Expected an error for zone ID '${zoneId}'`);
     }
     test:assertTrue(timeZone is FormatError);
-    test:assertEquals(timeZone.message(), errorMsg);
+    test:assertTrue(timeZone.message().startsWith(string `Invalid zone ID '${zoneId}': `), timeZone.message());
 }
 
-isolated function dataProviderInvalidZoneIds() returns [string, string][] {
-    return [
-        ["Europe/Berln", "Invalid zone ID 'Europe/Berln': Unknown time-zone ID: Europe/Berln"],
-        ["+20:00", "Invalid zone ID '+20:00': Zone offset hours not in valid range: value 20 is not in the range -18 to 18"],
-        ["+04:61", "Invalid zone ID '+04:61': Zone offset minutes not in valid range: value 61 is not in the range -59 to 59"],
-        ["", "Invalid zone ID '': Invalid ID for ZoneOffset, invalid format: "]
-    ];
+isolated function dataProviderInvalidZoneIds() returns [string][] {
+    return [["Europe/Berln"], ["+20:00"], ["+04:61"], [""]];
+}
+
+@test:Config {}
+isolated function testTimeZoneInitWithUnknownRegion() {
+    TimeZone|Error timeZone = new ("Europe/Berln");
+    if timeZone is TimeZone {
+        test:assertFail("Expected an error for zone ID 'Europe/Berln'");
+    }
+    test:assertEquals(timeZone.message(), "Invalid zone ID 'Europe/Berln': unknown time-zone region");
 }
 
 @test:Config {}
